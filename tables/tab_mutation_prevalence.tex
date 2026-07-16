@@ -1,0 +1,24 @@
+% Table tab:mutation_prevalence — TCGA-LUAD cohort mutation prevalence
+% (687 analysable diagnostic slides, 668 patients).
+\small
+\setlength{\tabcolsep}{8pt}
+\begin{tabular}{l c c c}
+\toprule
+\textbf{Gene} & \textbf{Positive slides} ($n_{+}$) &
+  \textbf{Prevalence} (\%) & \textbf{Conclusive verdict?} \\
+\midrule
+\textit{TP53}  & 261 & 38.0 & Yes \\
+\textit{KRAS}  & 196 & 28.5 & No  \\
+\textit{KEAP1} &  98 & 14.3 & No  \\
+\textit{EGFR}  &  97 & 14.1 & Yes \\
+\textit{STK11} &  68 &  9.9 & No  \\
+\textit{RBM10} &  37 &  5.4 & No  \\
+\bottomrule
+\end{tabular}
+\begin{flushleft}\footnotesize
+$n_{+}\!=\!$~number of slides with at least one non-silent somatic
+mutation called for the gene under the TCGA harmonised pipeline.
+\emph{Conclusive verdict} is the cohort-level signal-presence flag
+(mean AUROC $\geq\!0.70$ under five-fold cross-validation; see
+Methods, Cross-validation and statistical analysis).
+\end{flushleft}

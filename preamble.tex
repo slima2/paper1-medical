@@ -1,0 +1,58 @@
+% ============================================================
+% Preamble — Paper 1 (Medical)
+% Nature-friendly free-format article skeleton.
+% Compiles with pdflatex; LaTeX accepted by npj Prec Onc at acceptance.
+% ============================================================
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage{lmodern}
+\usepackage{microtype}
+
+\usepackage[a4paper,top=25mm,bottom=25mm,left=22mm,right=22mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+
+\usepackage{amsmath,amssymb,bm,mathtools}
+\usepackage{graphicx}
+\graphicspath{%
+  {figures/}%
+  {../../SLIMA_Thesis_Research_ver_2026_rev_9/chapters/figures/}%
+  {../../SLIMA_Thesis_Research_ver_2026_rev_9/figures/}%
+}
+\usepackage{float}
+\usepackage{subcaption}
+\usepackage[labelfont=bf,font=small]{caption}
+
+\usepackage{booktabs,multirow,makecell,longtable,tabularx,array}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+
+\usepackage[dvipsnames,table]{xcolor}
+\definecolor{npjpink}{RGB}{205,32,124}
+
+\usepackage[colorlinks,linkcolor=npjpink,citecolor=npjpink,urlcolor=npjpink]{hyperref}
+\usepackage[capitalise,noabbrev]{cleveref}
+\usepackage[numbers,sort&compress]{natbib}
+
+\usepackage{authblk}
+\renewcommand\Authsep{, }
+\renewcommand\Authand{, }
+\renewcommand\Authands{, }
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{Three regimes, six levels: decomposed mutation prediction in LUAD}}
+\fancyhead[R]{\small\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+\newcommand{\auroc}{\text{AUROC}}
+\newcommand{\auprc}{\text{AUPRC}}
+\newcommand{\fuzzyarc}{\textsc{FuzzyArcLoss}}
+\newcommand{\abmil}{\textsc{ABMIL}}
+\newcommand{\lchai}{\textsc{LCHAI}}
+\newcommand{\ctranspath}{\textsc{CTransPath}}
+\newcommand{\fcmil}{\textsc{FC-MIL}}
+\newcommand{\piabmil}{\textsc{PI-ABMIL}}

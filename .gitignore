@@ -1,0 +1,30 @@
+# ---- LaTeX build artifacts ----
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.toc
+*.lof
+*.lot
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.dvi
+*.idx
+*.ilg
+*.ind
+*.nav
+*.snm
+*.vrb
+*.run.xml
+*-blx.bib
+
+# ---- Python ----
+__pycache__/
+*.pyc
+
+# ---- OS / editor ----
+.DS_Store
+Thumbs.db
+*~
