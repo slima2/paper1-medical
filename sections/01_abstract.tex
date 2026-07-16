@@ -1,61 +1,35 @@
 \begin{abstract}
 \noindent
-Histopathology-driven prediction of driver mutations in lung
-adenocarcinoma (LUAD) from haematoxylin-and-eosin (H\&E) whole-slide
-images has progressed rapidly under foundation-scale cohorts
-($n=8{,}461$ EAGLE, $n=60{,}530$ CHIEF), but the resulting models
-remain opaque to the pathologist who must trust them, and most public
-benchmarks report a single cohort-average metric that obscures
-\emph{which} genes a model can actually call on \emph{which} slides.
-This paper makes two empirical contributions on the public TCGA-LUAD
-cohort ($n=687$ slides from $668$ patients; 5-fold patient-stratified
-cross-validation) for six driver mutations
-(\textit{TP53, EGFR, KRAS, STK11, KEAP1, RBM10}):
-\textbf{(i)~a three-regime taxonomy} that decomposes per-gene H\&E
-predictability into \emph{encoder-saturation} (TP53, EGFR;
-$\auroc\in[0.701,0.718]$ already at the embedding-only baseline),
-\emph{inter-pattern co-occurrence} (KRAS; a 2-additive Choquet
-aggregator recovers a positive interaction
-$I(\text{lepidic}\!\times\!\text{solid})\!=\!{+}0.032$ matching the
-invasive-mucinous-adenocarcinoma proxy), and \emph{out-of-ontology}
-(STK11, KEAP1, RBM10; signal lives outside the 6-pattern simplex
-in the immune microenvironment, in a biochemical state, or below the
-class-prior collapse floor); and \textbf{(ii)~a six-level per-slide
-interpretability stack} (MIL attention, pattern overlay, SHAP,
-Choquet--Shapley pairwise interactions, channel ablation, fuzzy
-linguistic labels) wrapped in a dual anti-hallucination LLM
-explanation layer grounded in a curated NCIt$+$MONDO knowledge graph.
-Both contributions are delivered by \lchai{}\,v2 (Lung Cancer
-Histologic Analysis with Interpretable AI), a pattern-informed
-MIL pipeline that decomposes each slide into the six expert-defined
-LUAD growth patterns (lepidic, acinar, papillary, micropapillary,
-solid, cribriform) with a fuzzy angular-margin classifier
-(macro-F1\,$=\,92.31\,\%\!\pm\!2.04$ on Zenodo-ANORAK) and propagates
-the 6-d pattern probabilities to a gated-attention MIL aggregator
-(\piabmil{}) and a 2-additive fuzzy Choquet integral (\fcmil{}).
-A per-gene Conclusive/Inconclusive verdict (mean AUROC $\geq 0.70$)
-operationalises the taxonomy at the user interface, separating
-cohort-level signal presence from per-slide model confidence and
-gating the explanation pathway accordingly.
-Framed as an imperfect \emph{translation} from tissue morphology
-to genotype---with the fuzzy angular-margin classifier rendering
-the source domain and the MIL aggregator acting as translator---the
-taxonomy locates each gene on a faithfulness spectrum shared with
-other medical cross-domain inference tasks (radiogenomics,
-retinal-to-cardiovascular, and ECG-to-function mapping), where the
-achievable accuracy is bounded by the physics of the source
-modality rather than by the estimator.
-This lens reframes interpretability from post-hoc attribution to
-\emph{exhibiting the translation}, promoting per-gene
-\emph{untranslatability} to a first-class, actionable result rather
-than a silent low score.
-These results bound what H\&E-only mutation prediction can achieve
-within the WHO/ANORAK pattern ontology, identify the genes for which
-multimodal fusion (gene expression, radiology, micro-environment
-channels) rather than further architectural refinement is the
-natural next step, and demonstrate that pattern-informed
-interpretability is most valuable precisely on the cases the
-predictor gets wrong.
+Predicting driver mutations in lung adenocarcinoma (LUAD) directly
+from haematoxylin-and-eosin (H\&E) whole-slide images could triage
+molecular testing at the cost of a scan, yet current models are
+opaque to the pathologist and are judged by a single cohort-average
+metric that hides \emph{which} genes are actually predictable.
+On the public TCGA-LUAD cohort ($n=687$ slides, $668$ patients;
+5-fold patient-stratified cross-validation) we frame H\&E-based
+mutation prediction as an imperfect \emph{translation} from tissue
+morphology to genotype and make two contributions.
+First, a \textbf{three-regime taxonomy} of per-gene predictability:
+\emph{encoder saturation} (TP53, EGFR; $\auroc\in[0.70,0.72]$ from
+the embedding alone), \emph{inter-pattern co-occurrence} (KRAS; a
+2-additive Choquet aggregator recovers a lepidic$\times$solid
+interaction of ${+}0.032$ matching the invasive-mucinous-adenocarcinoma
+phenotype), and \emph{out-of-ontology} (STK11, KEAP1, RBM10; signal
+lying outside the six growth patterns---in the immune
+microenvironment, a biochemical state, or below the data floor).
+Second, a \textbf{six-level per-slide interpretability stack} that
+recasts explanation as \emph{exhibiting the translation} and reports
+per-gene \emph{untranslatability} as a first-class result, wrapped in
+a knowledge-graph-grounded anti-hallucination language layer; a
+per-gene Conclusive/Inconclusive verdict operationalises the taxonomy.
+Delivered by \lchai{}\,v2 (source patterns rendered by a fuzzy
+angular-margin classifier, macro-F1\,$=\,92.3\%$), and situated on a
+fidelity spectrum shared with radiogenomics, retinal-to-cardiovascular
+and ECG-to-function mapping, our results bound what H\&E alone can
+achieve, show where multimodal fusion---rather than architectural
+refinement---is the needed next step, and demonstrate that
+pattern-informed interpretability is most valuable precisely when the
+predictor is wrong.
 \end{abstract}
 
 \paragraph{Keywords.}
