@@ -1,0 +1,58 @@
+% Table tab:literature_comparison_resultssec — comparison of mutation prediction
+% methods in NSCLC. Synced with thesis Table 2.5 (ch02_background.tex, lines
+% 1299-1331): seven prior studies + this work's two MIL conditions.
+% AUROC values are means or ranges across the cited paper's CV protocol;
+% daggers (^\dagger) indicate values approximated from published figures.
+% Wide table: wrapped in \resizebox so it scales to the printed column width.
+\resizebox{\linewidth}{!}{%
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{l c l r l c c c c c c}
+\toprule
+\textbf{Study} & \textbf{Year} & \textbf{Journal} & $\boldsymbol{N}$ &
+  \textbf{Method} &
+  \textit{TP53} & \textit{EGFR} & \textit{KRAS} &
+  \textit{STK11} & \textit{KEAP1} & \textit{RBM10} \\
+\midrule
+Coudray~et~al.\cite{coudray2018classification} &
+  2018 & Nat.\ Med.\ & 382 & Inception-v3 e2e &
+  0.733--0.86\textsuperscript{*} & 0.826 & 0.733 & 0.733\textsuperscript{*} & --- & --- \\
+Kather~et~al.\cite{kather2020pancancer} &
+  2020 & Nat.\ Cancer & 17{,}355 & ShuffleNet+att.\ &
+  0.65--0.72$^{\dagger}$ & 0.63--0.68$^{\dagger}$ & 0.60--0.65$^{\dagger}$ & --- & --- & --- \\
+Saldanha~et~al.\cite{saldanha2023npj} &
+  2023 & npj Prec.\ Onc.\ & 676 & RetCCL+attMIL &
+  0.65$^{\dagger}$ & 0.67$^{\dagger}$ & 0.61$^{\dagger}$ &
+  0.63$^{\dagger}$ & 0.58$^{\dagger}$ & --- \\
+Logan~et~al.\cite{logan2022medrxiv} &
+  2022 & medRxiv & 747 & CNN+subtypes &
+  0.692 & 0.681 & --- & --- & --- & --- \\
+Zhao~et~al.\cite{zhao2025deepgem} (DeepGEM) &
+  2025 & Lancet Onc.\ & 3{,}637 & co-supervised MIL &
+  0.82--0.96 & 0.82--0.96 & 0.82--0.96 & 0.82--0.96 & --- & --- \\
+Campanella~et~al.\cite{campanella2025eagle} (EAGLE) &
+  2025 & Nat.\ Med.\ & 8{,}461 & FM fine-tuning &
+  --- & \textbf{0.890} & --- & --- & --- & --- \\
+Wang~et~al.\cite{wang2024chief} (CHIEF) &
+  2024 & Nature & 60{,}530 & FM, pan-cancer &
+  $>$\,0.70 & $>$\,0.70 & --- & --- & --- & --- \\
+\midrule
+\multirow{2}{*}{\textbf{This work}} & \multirow{2}{*}{2026} & \multirow{2}{*}{---} & \multirow{2}{*}{\textbf{687}}
+  & \piabmil{} & \textbf{0.717} & \textbf{0.694} & 0.590 & \textbf{0.695} & \textbf{0.610} & 0.640 \\
+  & & & & \fcmil{} & 0.716 & 0.684 & \textbf{0.609} & 0.658 & 0.589 & \textbf{0.661} \\
+\bottomrule
+\end{tabular}%
+}
+\begin{flushleft}\footnotesize
+\textsuperscript{*}Range across six genes.
+$^{\dagger}$Approximate values transcribed from published figures or
+supplementary bar charts.
+Cohort sizes ($N$) are slide counts; CHIEF and EAGLE use proprietary
+cohorts an order of magnitude larger than the public TCGA-LUAD subset
+evaluated here.
+This work reports six driver genes per slide simultaneously, with two
+parallel MIL aggregators (\piabmil{} concatenative attention,
+\fcmil{} 2-additive Choquet); prior work typically reports two to three
+genes.
+``---'' indicates the gene was not reported in the corresponding study;
+most published studies do not report STK11, KEAP1, or RBM10 individually.
+\end{flushleft}

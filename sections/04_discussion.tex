@@ -1,0 +1,263 @@
+\section*{Discussion}
+
+% =====================================================================
+\subsection*{What the three-regime taxonomy means for clinical
+deployment}
+% =====================================================================
+
+Computational pathology has converged on a single output for
+mutation prediction: a probability per gene.
+The implicit assumption is that this probability is comparable
+across genes and that improvement on the cohort-mean metric is
+the figure of merit.
+Our results challenge both assumptions.
+The same cohort, same encoder, same MIL backbone yields
+qualitatively different gene-level behaviour: encoder
+saturation on TP53/EGFR (where additional pattern information
+adds nothing), inter-pattern co-occurrence on KRAS (where only
+a non-additive aggregator captures the IMA proxy), and
+out-of-ontology on STK11/KEAP1/RBM10 (where the signal lives
+in stromal, biochemical or splicing substrates the 6-pattern
+ontology does not encode).
+The Conclusive/Inconclusive flag we report alongside each AUROC
+is therefore not a cosmetic addition---it is a statement that
+the cohort-level metric does \emph{not} translate uniformly into
+per-slide actionability, and that downstream clinical use must
+be gene-conditional.
+
+% =====================================================================
+\subsection*{Why pattern-informed interpretability is the
+clinically useful contribution}
+% =====================================================================
+
+The pattern-informed channel does not win the cohort-mean
+benchmark---the upper tier of \cref{tab:mutation_luad_resultssec}
+is statistically tied within $\pm 0.02$ AUROC.
+What pattern-informed MIL does win is the \emph{argument} with the
+pathologist.
+A model that says ``P(KRAS) = 0.965 because the
+lepidic$\,\times\,$solid Choquet interaction is $+0.032$ on the
+top-200 attended tiles'' invites a textbook reply about the
+invasive mucinous adenocarcinoma proxy.
+A model that says ``P(KEAP1) = 0.610 with negligible Choquet
+interaction; the SHAP decomposition assigns 87\% of the slide-level
+contribution to the embedding channel and 13\% to the pattern
+channel; the channel-ablation $\Delta\auroc$ on a held-out fold is
+$-44.7$\,pp if the embedding is zeroed and $-0.5$\,pp if the pattern
+is zeroed'' is honest about what the slide cannot answer, and
+points the next investigation toward NRF2 immunostaining or
+RNA-seq rather than another loss function.
+This is the central clinical claim of the paper: \emph{when the
+predictor is wrong, the explanation is most valuable}, and only a
+pattern-informed pipeline gives the explanation a vocabulary the
+pathologist can act on.\cite{rudin2019stop,holzinger2019causability}
+
+% =====================================================================
+\subsection*{Mutation prediction as an imperfect domain translation:
+analogues across medicine}
+% =====================================================================
+
+Read through the translation lens introduced above, our results
+belong to a well-established family of medical machine-learning
+tasks in which one clinically cheap or ubiquitous modality is
+mapped onto a second, more expensive or latent one, with a
+faithfulness that is bounded by how much of the target signal the
+source physically encodes.
+Placing our LUAD map beside these tasks clarifies both what is and
+what is not surprising about the per-gene ceiling:
+\begin{itemize}
+  \item \textbf{Radiogenomics} maps preoperative MRI onto glioma
+  genotype: IDH mutation and 1p/19q codeletion are recovered at
+  high accuracy while MGMT-promoter methylation translates
+  markedly less well\cite{chang2018radiogenomics}---a
+  \emph{per-marker} split of the same kind as our per-gene
+  regimes.
+  \item \textbf{Pathomics-to-genomics} maps the very H\&E substrate
+  we use onto molecular labels: microsatellite
+  instability\cite{kather2019msi} and a pan-cancer panel of
+  actionable alterations\cite{kather2020pancancer} are inferable
+  from morphology, but with the same gene-dependent ceiling we
+  observe.
+  \item \textbf{Retinal-to-systemic} mapping recovers cardiovascular
+  risk factors---age, sex, blood pressure, major adverse cardiac
+  events---from fundus photographs\cite{poplin2018retinal},
+  surfacing signal not previously thought to be morphologically
+  encoded: the optimistic end of the spectrum.
+  \item \textbf{ECG-to-function} mapping recovers left-ventricular
+  contractile dysfunction ($\mathrm{EF}\!\leq\!35\%$,
+  $\auroc=0.93$) from a routine
+  electrocardiogram\cite{attia2019ecg}, an electrical modality
+  that faithfully encodes a structural target.
+  \item \textbf{Virtual staining} is the literal image-to-image
+  case: unlabelled tissue autofluorescence is translated into
+  stained histology at pathologist-level
+  fidelity\cite{rivenson2019virtualstaining}, precisely because the
+  source physically contains the target.
+\end{itemize}
+
+\begin{figure}[ht!]
+  \centering
+  \includegraphics[width=\linewidth]{fidelity_spectrum}
+  \caption{\textbf{A fidelity spectrum of medical cross-domain mapping
+  tasks.} Each task maps a cheap or ubiquitous source modality onto a
+  more expensive or latent target; the horizontal axis is the
+  representative reported AUROC/accuracy (translational faithfulness)
+  and the vertical axis the training-cohort size (log scale).
+  Analogous tasks span virtual staining (near-perfect, source
+  physically contains
+  target)\cite{rivenson2019virtualstaining}, ECG-to-left-ventricular
+  function\cite{attia2019ecg}, radiogenomics of
+  glioma\cite{chang2018radiogenomics},
+  pathomics-to-microsatellite-instability\cite{kather2019msi} and
+  retinal-to-cardiovascular mapping\cite{poplin2018retinal}. The six
+  LUAD genes of this work occupy the \emph{low-faithfulness,
+  low-data} corner (shaded); the dashed line is the Conclusive
+  verdict threshold (AUROC $0.70$). Marker shape encodes the
+  three-regime taxonomy.}
+  \label{fig:fidelity_spectrum}
+\end{figure}
+
+Against this backdrop our LUAD map sits at the
+\emph{low-faithfulness, low-data} corner
+(\cref{fig:fidelity_spectrum}; per-gene
+$\auroc\in[0.6,0.72]$; positive sets down to $n_+\!=\!37$ for
+RBM10).
+The three-regime taxonomy is the diagnostic that explains
+\emph{why} a given gene lands there---encoder saturation, a missing
+non-additive grammar, or genuine out-of-ontology
+untranslatability---and therefore whether the remedy is a better
+translator (architecture), a richer source vocabulary
+(micro-environment channels) or a different source modality
+altogether (RNA-seq, radiology).
+The recurring lesson across all of these tasks is the one our
+Conclusive/Inconclusive verdict operationalises: the value of a
+cross-domain map is set by the physics of the source, not by the
+sophistication of the estimator, and transparent per-target
+reporting of that ceiling is what turns the map into a usable
+clinical tool.
+
+% =====================================================================
+\subsection*{Translational interpretability: untranslatability as a
+first-class result}
+% =====================================================================
+
+The translation frame does more than organise the results; it
+suggests a different stance on interpretability itself.
+Mainstream explainable-AI methods for computational pathology are
+\emph{post-hoc and attributive}: a saliency map, an attention
+overlay or a SHAP value indicates \emph{where} in the slide the
+model attended, but not in a vocabulary the pathologist can contest
+line by line.\cite{rudin2019stop,jain2019attention}
+Reading the pipeline as a translator reframes explanation as the
+act of \emph{exhibiting the translation}: the six-level stack (C2)
+is a bilingual dictionary that must express every prediction in the
+source language of growth patterns (L2), expose the non-additive
+\emph{grammar} that couples them (L4 Choquet--Shapley interactions),
+and hand the result to a target-domain lexicon (the NCIt$+$MONDO
+knowledge graph, C4) that forbids invented genotype terms.
+Interpretability becomes contrastive and bilingual rather than a
+heat-coloured monologue.
+
+The sharper consequence is that \emph{untranslatability is promoted
+to a first-class, actionable result}.
+When a gene falls in the out-of-ontology regime, the honest output
+is not a low probability presented as if it were a confident call,
+but the statement that the mutation cannot be said in morphological
+words at all---and, via the per-slide channel ablation (L5) and the
+SHAP embedding/pattern split (L3), \emph{why}: the signal is in the
+immune micro-environment (STK11), in a biochemical axis with no
+H\&E correlate (KEAP1), or below the data floor (RBM10).
+A translation that returns ``this sentence has no equivalent in the
+target language, and here is the missing vocabulary'' is more useful
+to the next experiment---NRF2 immunostaining, TIL quantification,
+RNA-seq---than a fluent but ungrounded paraphrase.
+We therefore position the Conclusive/Inconclusive verdict not as a
+confidence threshold but as a \emph{translatability} flag, and we
+argue that reporting untranslatability explicitly is a distinct and
+underused mode of interpretability for cross-domain medical
+prediction.
+
+% =====================================================================
+\subsection*{Dual anti-hallucination as a deployment prerequisite}
+% =====================================================================
+
+Large language models are entering the clinical pathology workflow
+as report-drafters and second readers, but the failure mode is
+the same as in the consumer setting: confident assertions
+unsupported by the underlying evidence.
+The dual anti-hallucination mechanism we built into the LCHAI
+explanation layer is a direct response: the fuzzy linguistic labels
+constrain the \emph{vocabulary} (a 0.59 prediction cannot be
+\emph{high}; it must be \emph{moderate}), the NCIt+MONDO knowledge
+graph constrains the \emph{entity set} (the agent cannot invent
+mutations that do not exist for LUAD), and a DeepSearch literature
+layer constrains the \emph{citations} (every claim must be
+traceable to PubMed or a curated ontology IRI).
+In the SOLCA-CISOL pilot, deactivation-without-deletion of
+incorrect agent assertions preserved an audit trail that
+pathologists explicitly cited as the reason they were willing to
+endorse the system.
+We argue this is the minimum bar for AI-assisted pathology
+reporting and that it should generalise beyond LUAD.
+
+% =====================================================================
+\subsection*{Limitations}
+% =====================================================================
+
+\paragraph{Single retrospective cohort.}
+All numbers reported here are 5-fold patient-stratified CV on
+TCGA-LUAD.
+External validation on CPTAC-3, APOLLO and the EAGLE-1 silent-trial
+cohort is the natural next step and is enumerated as a prospective
+plan in the Methods.
+A multi-site reader study with SOLCA-CISOL and a Swiss
+academic medical centre is in preparation.
+
+\paragraph{Cohort size relative to foundation-scale benchmarks.}
+At $n=687$ slides, TCGA-LUAD is two orders of magnitude smaller
+than EAGLE ($n=8{,}461$) and CHIEF ($n=60{,}530$).
+Our numbers therefore underestimate what a foundation-scale
+pattern-informed pipeline could deliver and should be read as
+\emph{what is reachable from the most-used public cohort}.
+
+\paragraph{The 6-pattern simplex is a pre-committed hypothesis
+space.}
+The out-of-ontology regime is by definition unreachable inside
+the ANORAK ontology.
+Adding micro-environment channels (tumour-infiltrating
+lymphocytes,\cite{brambilla2016til} budding,\cite{kadota2015budding}
+tumour-stroma ratio\cite{zhang2015tsr}) is the principled next
+step for STK11 and KEAP1.
+Multimodal fusion with RNA-seq is the principled next step for
+KEAP1 and RBM10.
+
+\paragraph{Single-pathologist validation.}
+The current explanation-layer audit was performed with the
+SOLCA-CISOL team and the two pathologist co-authors of this
+manuscript.
+A formal multi-rater concordance study is in preparation; the
+preliminary numbers should not be over-interpreted.
+
+% =====================================================================
+\subsection*{Outlook}
+% =====================================================================
+
+The clinically actionable verdict from this work is not that the
+LCHAI predictor outperforms the published competition---it does
+not, and is not expected to at this cohort size---but that
+\emph{the explanation layer it offers is what enables a
+pathologist to use the prediction at all}.
+We argue that mutation prediction at the public-cohort scale
+should be reported with per-gene Conclusive/Inconclusive flags,
+that pattern-informed interpretability should be the default
+rather than a research add-on, and that the gene-conditional
+three-regime taxonomy we propose is a more honest scaffold for
+cross-paper comparison than the cohort-average metric currently
+in use.
+
+The live system---live-pathologist user interface, six-level
+explanation stack, NCIt+MONDO knowledge graph, fuzzy LLM agent
+and the active-learning loop that ingests pathologist
+corrections---is publicly accessible at
+\href{https://lchai.gptfy.biz}{lchai.gptfy.biz} and the source
+code is published at \href{https://github.com/slima2/lchai}{github.com/slima2/lchai}.

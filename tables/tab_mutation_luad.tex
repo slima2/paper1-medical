@@ -1,0 +1,31 @@
+% =====================================================================
+% Table tab:mutation_luad — adapted from thesis ch06:622-652
+% =====================================================================
+\small
+\begin{tabular}{l c c c c c c c}
+\hline
+\textbf{Cond.} & \textbf{TP53} & \textbf{EGFR} & \textbf{STK11} &
+\textbf{KEAP1} & \textbf{KRAS} & \textbf{RBM10} & \textbf{Mean} \\
+\hline
+B1 (XGBoost)
+  & .518$\pm$.025 & .634$\pm$.033 & .545$\pm$.055
+  & .489$\pm$.034 & .522$\pm$.057 & .474$\pm$.101 & .530 \\
+B2 (ABMIL embeddings)
+  & \textbf{.718}$\pm$.053 & \textbf{.701}$\pm$.049
+  & .684$\pm$.042 & .597$\pm$.081 & .607$\pm$.078
+  & .642$\pm$.054 & .658 \\
+B3 (ABMIL patterns)
+  & .616$\pm$.043 & .625$\pm$.044 & .617$\pm$.050
+  & .588$\pm$.031 & .545$\pm$.076 & .653$\pm$.081 & .607 \\
+PI-ABMIL (ours)
+  & .717$\pm$.058 & .694$\pm$.051 & \textbf{.695}$\pm$.023
+  & \textbf{.610}$\pm$.071 & .590$\pm$.071 & .640$\pm$.064 & .658 \\
+A (one-hot ablation)
+  & .716$\pm$.050 & .695$\pm$.046 & .691$\pm$.050
+  & .594$\pm$.082 & .594$\pm$.071 & .623$\pm$.048 & .652 \\
+FC-MIL (ours)
+  & .716$\pm$.047 & .684$\pm$.037 & .658$\pm$.077
+  & .589$\pm$.080 & \textbf{.609}$\pm$.059
+  & \textbf{.661}$\pm$.063 & .653 \\
+\hline
+\end{tabular}

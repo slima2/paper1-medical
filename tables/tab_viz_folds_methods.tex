@@ -1,0 +1,29 @@
+% Table tab:viz_folds_methods — Conclusive / Inconclusive verdict bands
+% over the five-fold patient-stratified CV protocol.
+% Wide table (4 cols, last col long): use tabularx so the "Genes" column
+% wraps cleanly inside the text width.
+\small
+\setlength{\tabcolsep}{6pt}
+\begin{tabularx}{\linewidth}{l c c X}
+\toprule
+\textbf{Verdict} & \textbf{Mean AUROC band} &
+  \makecell{\textbf{Per-slide score}\\\textbf{still reported?}} &
+  \textbf{Genes (this cohort)} \\
+\midrule
+Conclusive   & $\geq 0.70$ & Yes &
+  \textit{TP53} ($0.717$), \textit{EGFR} ($0.694$)$^{\dagger}$ \\
+Inconclusive & $< 0.70$    & Yes &
+  \textit{KRAS} ($0.609$), \textit{STK11} ($0.695$)$^{\dagger}$,
+  \textit{KEAP1} ($0.610$), \textit{RBM10} ($0.661$) \\
+\bottomrule
+\end{tabularx}
+\begin{flushleft}\footnotesize
+The verdict is a population-level signal-presence flag, not a
+per-slide confidence threshold; the per-slide model probability is
+reported independently in every case.
+$^{\dagger}$EGFR and STK11 are within $\pm 0.01$ of the threshold
+under the upper-tier conditions and are reported here under their
+best-tier AUROC. The Conclusive/Inconclusive flag is robust to
+choice of MIL aggregator within the upper tier; the per-gene
+ranking is not.
+\end{flushleft}

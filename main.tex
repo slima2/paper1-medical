@@ -1,0 +1,44 @@
+\documentclass[11pt,a4paper]{article}
+\input{preamble}
+
+\title{Translating Histology into Genotype:\\
+A Three-Regime, Six-Level Framework for Interpretable Mutation
+Prediction in Lung Adenocarcinoma}
+
+\author[1,*]{Servio F.~Lima~Reina}
+\author[2]{Servio R.~Lima~Idrobo, MD}
+\author[2]{Dom\'enica~N.~L\'opez~Garc\'\i a, MD}
+\author[3]{Luis~Ter\'an}
+\author[1]{Edy~Portmann}
+
+\affil[1]{Human-IST Institute, Department of Informatics, University of Fribourg, Fribourg, Switzerland}
+\affil[2]{GPTfy Medical, Guayaquil, Ecuador}
+\affil[3]{Lucerne University of Applied Sciences and Arts (HSLU), Lucerne, Switzerland}
+\affil[*]{Corresponding author: \texttt{servio.lima@unifr.ch}}
+
+\date{\today}
+
+\begin{document}
+\maketitle
+
+% ----------------------------------------------------------------------
+% Front matter
+% ----------------------------------------------------------------------
+\input{sections/01_abstract}
+
+% ----------------------------------------------------------------------
+% Body (Nature-style: Introduction → Results → Discussion → Methods)
+% ----------------------------------------------------------------------
+\input{sections/02_introduction}
+\input{sections/03_results}
+\input{sections/04_discussion}
+\input{sections/05_methods}
+\input{sections/06_data_code_avail}
+
+% ----------------------------------------------------------------------
+% References
+% ----------------------------------------------------------------------
+\bibliographystyle{unsrtnat}   % Nature-style numeric; fallback: plainnat
+\bibliography{shared/references}
+
+\end{document}
