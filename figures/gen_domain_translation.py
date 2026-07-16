@@ -154,8 +154,8 @@ def fig_spectrum():
     # (label, representative AUROC/accuracy, training n, category)
     #   category: 'analogue' or one of the three LUAD regimes.
     pts = [
-        ("Virtual staining\n(autofluorescence->H&E)", 0.99, 700, "analogue", (10, 14)),
-        ("ECG -> LV function\n(EF<=35%)",             0.93, 44959, "analogue", (0, 12)),
+        ("Virtual staining\n(autofluorescence->H&E)", 0.99, 700, "analogue", (-12, 20)),
+        ("ECG -> LV function\n(EF<=35%)",             0.93, 44959, "analogue", (-10, 16)),
         ("Radiogenomics\nglioma IDH",                 0.94, 260, "analogue", (-6, 12)),
         ("Radiogenomics\nglioma MGMT",                0.83, 260, "analogue", (10, 8)),
         ("Pathomics -> MSI\n(GI cancer)",             0.81, 4000, "analogue", (-20, 12)),
