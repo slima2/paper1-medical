@@ -64,10 +64,11 @@ Best per gene in bold.}
   co-occurrence} (KRAS; only an aggregator capable of representing
   positive interactions recovers the lepidic$\times$solid joint
   activation that maps to the invasive mucinous adenocarcinoma
-  phenotype), and \emph{out-of-ontology} (STK11, KEAP1, RBM10; the
-  predictive signal lives in the immune microenvironment, in a
-  biochemical state with no H\&E correlate, or below the
-  class-prior collapse floor). The three regimes are the
+  phenotype), and \emph{out-of-ontology} (STK11, KEAP1; the predictive signal
+  lives in the immune microenvironment or in a biochemical state with
+  no H\&E correlate), with RBM10 a distinct estimation-floor case
+  (non-empty pattern-side atoms unestimable at $n_+\!=\!37$). The
+  three regimes are the
   redundant, synergistic and unique atoms of the partial
   information decomposition of the pattern and embedding channels
   (\cref{eq:pid}, \cref{tab:pid_regimes}). The taxonomy is the
@@ -223,12 +224,10 @@ but they are not free-standing: they are the three ways in which
 the partial information decomposition of
 \cref{eq:pid}\cite{williams2010pid,bertschinger2014unique} can be
 dominated when the two sources are the pattern channel
-$\mathbf{P}$ and the embedding channel $\mathbf{E}$
-(\cref{tab:pid_regimes}).
-Saturation is the case in which the pattern-side information is
-\emph{redundant} with the embedding; co-occurrence is the case in
-which it is \emph{synergistic}; out-of-ontology is the case in
-which no pattern-side atom exists at all.
+$\mathbf{P}$ and the embedding channel $\mathbf{E}$---pattern-side
+information that is \emph{redundant} with the embedding,
+\emph{synergistic} with it, or \emph{absent} altogether,
+respectively (\cref{tab:pid_regimes}).
 
 \begin{table}[h!]
 \centering
@@ -290,13 +289,10 @@ that single label covers three different states of the world.
 For KEAP1 the pattern-side atoms are empty and the verdict is
 untranslatability in the strict sense.
 For RBM10 they are non-empty but unestimable at $n_+ = 37$.
-For KRAS they are non-empty \emph{and} estimable, but they are
-carried by a subpopulation: the interaction index
-$I(\text{lepidic}\!\times\!\text{solid})$ is the signature of the
-IMA phenotype, which is a minority of KRAS-mutant LUAD, so a cohort
-average taken over all case pairs is diluted towards chance even
-though the translation holds cleanly wherever that morphology is
-present---TCGA-55-7815 at $P = 0.965$ being our worked instance.
+For KRAS they are non-empty \emph{and} estimable but carried by a
+subpopulation---the IMA-associated lepidic$\times$solid morphology of
+regime~(ii) above---so the cohort average over all case pairs is
+diluted towards chance even where the translation holds cleanly.
 The three states share a mediocre AUROC and call for a new source
 modality, a larger cohort and a stratified or
 conditional readout respectively.
@@ -470,10 +466,12 @@ cohorts an order of magnitude larger (CHIEF, EAGLE).}
 beside the published competition.
 On TP53 our $0.717$ is comparable to Saldanha's $0.65$ but below
 Coudray's $0.733$.
-On EGFR our $0.694$ is below Coudray's $0.826$ and Campanella's
-EAGLE $0.890$, both of which use proprietary cohorts an
-order of magnitude larger and architectures tuned end-to-end for
-EGFR specifically.
+On EGFR our pattern-informed $0.694$ sits just under the
+encoder-only ceiling ($0.701$, the value that places EGFR in the
+Conclusive, encoder-saturated regime~(i)) and well below Coudray's
+$0.826$ and Campanella's EAGLE $0.890$, both of which use proprietary
+cohorts an order of magnitude larger and architectures tuned
+end-to-end for EGFR specifically.
 On STK11 ($0.695$), KEAP1 ($0.610$) and RBM10 ($0.661$) our
 upper-tier conditions deliver per-gene numbers that are
 \emph{not} reported in most prior work; STK11 and KEAP1 are
@@ -482,7 +480,7 @@ positive sets, and RBM10 is to our knowledge first reported
 here at the per-slide level.
 
 The cohort gap to CHIEF ($n=60{,}530$) and EAGLE ($n=8{,}461$)
-is two orders of magnitude.
+is one to two orders of magnitude.
 The contribution of this paper is not to close that gap, but to
 publish \emph{what the public TCGA-LUAD cohort actually
 supports} for each gene---with a Conclusive/Inconclusive

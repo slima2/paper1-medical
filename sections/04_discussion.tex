@@ -37,14 +37,14 @@ A model that says ``P(KRAS) = 0.965 because the
 lepidic$\,\times\,$solid Choquet interaction is $+0.032$ on the
 top-200 attended tiles'' invites a textbook reply about the
 invasive mucinous adenocarcinoma proxy.
-A model that says ``P(KEAP1) = 0.610 with negligible Choquet
-interaction; the SHAP decomposition assigns 87\% of the slide-level
-contribution to the embedding channel and 13\% to the pattern
-channel; the channel-ablation $\Delta\auroc$ on a held-out fold is
-$-44.7$\,pp if the embedding is zeroed and $-0.5$\,pp if the pattern
-is zeroed'' is honest about what the slide cannot answer, and
-points the next investigation toward NRF2 immunostaining or
-RNA-seq rather than another loss function.
+A model that instead reports $P(\text{KEAP1}) = 0.610$ with a
+negligible Choquet interaction and a SHAP/ablation split that places
+almost all of the slide-level signal in the embedding channel and
+essentially none in the pattern channel
+(\cref{tab:pid_regimes}, with the exact figures in Results) is honest
+about what the slide cannot answer, and points the next investigation
+toward NRF2 immunostaining or RNA-seq rather than another loss
+function.
 This is the central clinical claim of the paper: \emph{when the
 predictor is wrong, the explanation is most valuable}, and only a
 pattern-informed pipeline gives the explanation a vocabulary the
@@ -124,10 +124,8 @@ of one cohort and travels no further than that cohort.
 The three regimes are instead a decomposition: the pattern channel
 and the embedding channel are two sources of information about the
 same target, and \cref{eq:pid} states the only four ways that
-information can be
-distributed between them.\cite{williams2010pid,bertschinger2014unique}
-Regime~(i) is the redundant atom, regime~(ii) the synergistic atom,
-regime~(iii) the absence of any pattern-side atom.
+information can be distributed between them
+(\cref{tab:pid_regimes}).\cite{williams2010pid,bertschinger2014unique}
 Once stated this way, the taxonomy makes commitments that can be
 checked, and the check reported in Results---that the non-additive
 aggregator wins on exactly the genes with a recoverable synergistic
@@ -188,12 +186,12 @@ property of the cohort and not of any slide, so reading a low cohort
 mean as ``this mutation cannot be seen in this tissue'' is a level
 error---and a costly one, because it discards exactly the cases
 where the morphology \emph{does} speak.
-KRAS is our counterexample and it is unambiguous: the gene averages
-$\auroc = 0.609$ and is Inconclusive as a population, yet
-TCGA-55-7815 carries $P(\text{KRAS}) = 0.965$ with a positive
-lepidic$\times$solid interaction index localised in the tissue and
-matching the IMA phenotype that pathologists already recognise.
-Nothing about that slide is untranslatable.
+KRAS is our counterexample and it is unambiguous
+(\cref{fig:kras_lepidic_solid_proxy}): a gene that is Inconclusive as
+a population ($\auroc = 0.609$) yet carries confident,
+tissue-localised per-slide calls wherever the IMA-associated
+lepidic$\times$solid morphology is present.
+Nothing about those slides is untranslatable.
 What is true is that the subpopulation in which the translation holds
 is a minority of the cohort, so the average over case pairs is
 mediocre---a statement about population heterogeneity, not about the
@@ -429,17 +427,15 @@ established by different experiments. The glioma and electrocardiogram
 instantiations test \emph{structural portability}---whether the three
 regimes and the falsification test recur when the modality and the
 source ontology change. They do not test whether the \emph{regime
-assignment of a given gene} is stable, because the assignment is not a
-property of the gene: it is a property of the triple (source ontology,
-learned encoder, cohort), and the \pid{} atoms of \cref{eq:pid} and the
-verdict of \cref{eq:conclusive_verdict} are expectations over the joint
-distribution of that cohort. A different cohort can therefore move a
-gene across the threshold, and KRAS already shows the mechanism
-in-sample: because the verdict averages over the case-mix, reweighting
-the lepidic$\times$solid subpopulation would change it. Calling an
-assignment near-intrinsic is licensed only by concordance across
-independent cohorts with overlapping confidence intervals, which a
-single-cohort study cannot supply.
+assignment of a given gene} is stable, which is a separate question:
+because the atoms and the verdict are population expectations
+(\cref{tab:levels_crossdomain}), an assignment is a property of the
+triple (source ontology, learned encoder, cohort) rather than of the
+gene, so a different cohort can move a gene across the
+threshold---as the KRAS case-mix dilution already shows in-sample.
+Calling an assignment near-intrinsic is therefore licensed only by
+concordance across independent cohorts with overlapping confidence
+intervals, which a single-cohort study cannot supply.
 We therefore pre-register a within-domain cohort-transfer test on
 CPTAC-LUAD, whose whole-slide images are on The Cancer Imaging Archive
 and whose matched whole-exome/whole-genome calls are on the Genomic
@@ -470,8 +466,8 @@ the regime-(iii) genes fall below it, which is stated in advance.}
 \end{table}
 
 The cohort is also small relative to foundation-scale benchmarks.
-At $n=687$ slides, TCGA-LUAD is two orders of magnitude smaller
-than EAGLE ($n=8{,}461$) and CHIEF ($n=60{,}530$).
+At $n=687$ slides, TCGA-LUAD is one to two orders of magnitude
+smaller than EAGLE ($n=8{,}461$) and CHIEF ($n=60{,}530$).
 Our numbers therefore underestimate what a foundation-scale
 pattern-informed pipeline could deliver and should be read as
 \emph{what is reachable from the most-used public cohort}.
