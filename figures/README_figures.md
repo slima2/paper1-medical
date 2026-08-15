@@ -28,7 +28,7 @@ only.
 | ED 6 | CONSORT-style flowchart | NEW (generate from `tab:datasets_overview`, `tab:mutation_prevalence`) | Cohort flow (TCGA query → 1,054 slides → 687 analysable) |
 | ED 7 | `tab:variant_types` + `tab:mutation_prevalence` | thesis ch03:1162–1343 | MAF processing |
 | ED 8 | `tab:external_cohorts` (CPTAC-3, APOLLO, EAGLE-1) | thesis ch03:1479–1525 | External cohort plan |
-| ED 9 | SOLCA explainability questionnaire summary | thesis appendix `LCHAI_Explainability_Questionnaire_SOLCA.{md,pdf}` | Pilot pathologist study |
+| ~~ED 9~~ | ~~SOLCA explainability questionnaire summary~~ | — | **Dropped.** The pilot reader study is no longer reported; the manuscript makes no reader-validation claim. |
 | ED 10 | `tab:data_scale` | thesis ch03:1546–1633 | Data-scarcity vs foundation cohorts |
 
 ## How to fetch figures

@@ -67,9 +67,12 @@ Best per gene in bold.}
   phenotype), and \emph{out-of-ontology} (STK11, KEAP1, RBM10; the
   predictive signal lives in the immune microenvironment, in a
   biochemical state with no H\&E correlate, or below the
-  class-prior collapse floor). The taxonomy is the qualitative
-  output of the Conclusive/Inconclusive verdict and is what the
-  clinical interface surfaces to the pathologist.}
+  class-prior collapse floor). The three regimes are the
+  redundant, synergistic and unique atoms of the partial
+  information decomposition of the pattern and embedding channels
+  (\cref{eq:pid}, \cref{tab:pid_regimes}). The taxonomy is the
+  qualitative output of the Conclusive/Inconclusive verdict and is
+  what the clinical interface surfaces to the pathologist.}
   \label{fig:signal_tree}
 \end{figure}
 
@@ -86,22 +89,29 @@ the AUROC by $\leq 0.02$.
 This is the predicted regime when the \ctranspath{} foundation
 encoder already represents the discriminative morphology---TP53's
 high-grade nuclear pleomorphism\cite{ahn2022tp53highgrade,mendoza2024tp53nuclear}
-and EGFR's lepidic-leaning low-grade phenotype\cite{yoshizawa2013egfrmorph,suda2017egfrlepidic}---so
+and EGFR's lepidic-leaning low-grade phenotype\cite{yoshizawa2013egfrmorph,li2025lepidicgenomics}---so
 the additional 6-d categorical channel adds no information.
 Both genes pass the cohort-level Conclusive threshold
 (mean AUROC $\geq 0.70$).
 
 \paragraph{Regime~(ii)~--~inter-pattern co-occurrence: KRAS.}
 KRAS is the cleanest demonstration of why a non-additive aggregator
-matters.
-B2 reaches $\auroc = 0.607 \pm 0.078$, but \fcmil{} reaches
-$\auroc = 0.609 \pm 0.059$ with an explicit positive interaction
-index $I(\text{lepidic}\!\times\!\text{solid})\!=\!{+}0.032$ on
-the case-study slide TCGA-55-7815 (per-slide
-$P(\text{KRAS}) = 0.965$, true positive)
-and a negative interaction
+matters, and the isolating comparison is between the two aggregators
+that receive \emph{the same} two channels.
+Fusing the pattern channel additively \emph{hurts}: \piabmil{}
+concat fusion falls to $\auroc = 0.590 \pm 0.071$, below the
+embedding-only B2 at $0.607 \pm 0.078$.
+The 2-additive Choquet head recovers it to $0.609 \pm 0.059$,
+${+}0.019$ over additive fusion, and exposes an explicit positive
+interaction index
+$I(\text{lepidic}\!\times\!\text{solid})\!=\!{+}0.032$ on the
+case-study slide TCGA-55-7815 (per-slide
+$P(\text{KRAS}) = 0.965$, true positive) together with a negative
+interaction
 $I(\text{lepidic}\!\times\!\text{micropapillary})\!=\!-0.018$
 (\cref{fig:kras_lepidic_solid_proxy}).
+The pattern channel therefore carries KRAS information that is
+available only from the \emph{joint} state of a pattern pair.
 This is the histological proxy for invasive mucinous
 adenocarcinoma (IMA), the KRAS-enriched subtype historically
 characterised as lepidic mucinous-acinar-solid coexistence with a
@@ -114,6 +124,14 @@ KRAS therefore fails the cohort-level Conclusive threshold
 (mean AUROC $0.609 < 0.70$) but at the per-slide level the
 prediction is well-calibrated and the explanation is
 clinically argumentative.
+The two facts are not in tension once the level is stated
+(\cref{tab:levels_of_analysis}): the cohort mean is an average over
+all case pairs, whereas the IMA morphology that the interaction
+index detects is present in only a subset of KRAS-mutant slides, so
+a real slide-level signal is diluted into a mediocre population
+statistic.
+KRAS is thus Inconclusive but \emph{not} untranslatable, and it is
+the clearest reason in this cohort to keep the two words apart.
 
 \begin{figure}[ht!]
   \centering
@@ -147,10 +165,11 @@ clinically argumentative.
   \label{fig:kras_lepidic_solid_proxy}
 \end{figure}
 
-\paragraph{Regime~(iii)~--~out-of-ontology: STK11, KEAP1, RBM10.}
-For these three genes no representation within the 6-pattern
-simplex carries the signal, and the regime decomposes into three
-named mechanisms.
+\paragraph{Regime~(iii)~--~out-of-ontology: STK11 and KEAP1, with
+RBM10 at the estimation floor.}
+For these three genes the pattern channel yields nothing usable at
+this cohort size, but for three different reasons, and only the
+first two are out-of-ontology in the strict sense.
 
 \emph{Label-space mismatch} (STK11).
 The B2 embedding-only ceiling reaches
@@ -182,12 +201,118 @@ cohort), the discriminative signal struggles to overcome the
 class prior; the model collapses much of its probability mass
 to the negative class.\cite{bowman2016posteriorcollapse}
 RBM10's biology---defective alternative
-splicing\cite{bechara2013rbm10,cao2024rbm10egfr}---also produces
-no obvious morphological correlate at the level the encoder sees.
+splicing\cite{bechara2013rbm10,cao2024rbm10egfr}---has no
+established morphological correlate at the level the encoder sees.
+It is nevertheless the one gene of the three for which the pattern
+channel is not empty: B3 ($0.653$) exceeds B2 ($0.642$), which
+happens for no other gene, and the decomposition below argues that
+RBM10 is therefore a data-floor rather than an out-of-ontology
+failure.
 
 The three-regime taxonomy is summarised in
 \cref{fig:signal_tree} and informs the Conclusive/Inconclusive
 verdict that \lchai{} surfaces in the clinical interface.
+
+% =====================================================================
+\subsection*{The three regimes are the partial information
+decomposition of the source}
+% =====================================================================
+
+The three regimes were introduced above as an empirical grouping,
+but they are not free-standing: they are the three ways in which
+the partial information decomposition of
+\cref{eq:pid}\cite{williams2010pid,bertschinger2014unique} can be
+dominated when the two sources are the pattern channel
+$\mathbf{P}$ and the embedding channel $\mathbf{E}$
+(\cref{tab:pid_regimes}).
+Saturation is the case in which the pattern-side information is
+\emph{redundant} with the embedding; co-occurrence is the case in
+which it is \emph{synergistic}; out-of-ontology is the case in
+which no pattern-side atom exists at all.
+
+\begin{table}[h!]
+\centering
+\input{tables/tab_pid_regimes}
+\caption{The three regimes as partial-information-decomposition
+atoms.
+Each row states the dominant atom of \cref{eq:pid} for one gene and
+the model-side signature that evidences it; all signature values
+are read off \cref{tab:mutation_luad_resultssec} and the L3--L5
+readouts, and no additional experiment is introduced.}
+\label{tab:pid_regimes}
+\end{table}
+
+This reading is falsifiable, and the falsifying test is already in
+\cref{tab:mutation_luad_resultssec}.
+If the KRAS advantage of \fcmil{} were a generic benefit of the
+Choquet head rather than the recovery of a synergistic atom, the
+non-additive aggregator would beat the additive one across the
+board.
+It does not.
+\fcmil{} exceeds \piabmil{} on exactly two of the six genes---KRAS
+($0.609$ vs $0.590$, ${+}0.019$) and RBM10 ($0.661$ vs $0.640$,
+${+}0.021$)---and loses on the remaining four, including by
+$0.037$ on STK11.
+On the two genes of regime~(i) the two aggregators agree to within
+$0.010$, which is what redundancy predicts: when the pattern
+channel carries nothing the embedding does not already carry,
+the choice of how to combine them cannot matter.
+
+The decomposition also sharpens regime~(iii) in a way the
+cohort-mean metric cannot.
+KEAP1 and RBM10 are grouped together by their AUROC, but their
+atoms differ.
+For KEAP1 the pattern side is genuinely empty: the L3 split
+assigns $87\%$ of the slide-level contribution to the embedding and
+$13\%$ to the pattern channel, the L5 ablation costs $-44.7$\,pp of
+fold-level \auroc{} when the embedding is zeroed against $-0.5$\,pp
+when the pattern is zeroed, and the pattern-only B3 ($0.588$) sits
+below the
+embedding-only B2 ($0.597$).
+For RBM10 the opposite holds, and it is the only gene in the cohort
+for which it holds: the pattern-only B3 reaches $0.653$ and
+\emph{exceeds} the embedding-only B2 at $0.642$, and the
+non-additive aggregator adds a further ${+}0.021$.
+The pattern-side atoms for RBM10 are therefore not empty---they are
+unestimable, at $n_+ = 37$ and a per-fold SD of $\pm 0.081$ on B3,
+roughly four times the ${+}0.021$ non-additive gain it would have
+to resolve.
+This distinction is invisible in an AUROC table and it inverts the
+recommended next experiment: KEAP1 needs a different source
+modality (RNA-seq, NRF2 immunostaining), whereas RBM10 needs only
+more slides of the same kind.
+
+Adding KRAS completes the picture, and it is the case that forces
+the level distinction of \cref{tab:levels_of_analysis} into the
+open.
+Four of our six genes are Inconclusive at the population level, and
+that single label covers three different states of the world.
+For KEAP1 the pattern-side atoms are empty and the verdict is
+untranslatability in the strict sense.
+For RBM10 they are non-empty but unestimable at $n_+ = 37$.
+For KRAS they are non-empty \emph{and} estimable, but they are
+carried by a subpopulation: the interaction index
+$I(\text{lepidic}\!\times\!\text{solid})$ is the signature of the
+IMA phenotype, which is a minority of KRAS-mutant LUAD, so a cohort
+average taken over all case pairs is diluted towards chance even
+though the translation holds cleanly wherever that morphology is
+present---TCGA-55-7815 at $P = 0.965$ being our worked instance.
+The three states share a mediocre AUROC and call for a new source
+modality, a larger cohort and a stratified or
+conditional readout respectively.
+Reporting the verdict without the state, as a cohort-average metric
+does, therefore does not merely lose information; on KRAS it points
+to the wrong experiment, because it recommends abandoning a
+modality that is in fact informative on the cases that matter.
+
+We report this decomposition as a structural claim evidenced by its
+three model-side signatures rather than as a table of numeric atoms.
+At the per-fold SDs available here the atoms inherit a sampling
+variance of the same order as the differences they would have to
+resolve, and quoting point estimates under those conditions would
+reproduce exactly the false precision that the
+Conclusive/Inconclusive verdict exists to prevent; the estimator and
+this bound are specified in Methods.
 
 % =====================================================================
 \subsection*{Six-level interpretability and dual anti-hallucination}
@@ -195,7 +320,7 @@ verdict that \lchai{} surfaces in the clinical interface.
 
 \begin{figure}[ht!]
   \centering
-  \includegraphics[width=\linewidth]{lchai_full_system}
+  \includegraphics[width=\linewidth]{lchai_six_level_stack}
   \caption{\textbf{\lchai{} v2 system overview and six-level
   interpretability stack.} Each WSI passes through tiling, the
   frozen \ctranspath{} foundation encoder, the ANORAK-trained
@@ -205,8 +330,8 @@ verdict that \lchai{} surfaces in the clinical interface.
   interpretability layers: \textbf{L1} ABMIL attention,
   \textbf{L2} pattern overlay, \textbf{L3} SHAP channel
   decomposition, \textbf{L4} Choquet--Shapley values and pairwise
-  interaction indices, \textbf{L5} per-slide channel ablation
-  ($\Delta\auroc$), and \textbf{L6} fuzzy linguistic labels.
+  interaction indices,   \textbf{L5} channel ablation, and \textbf{L6} fuzzy linguistic
+  labels.
   The explanation layer wraps these six artefacts in an LLM agent
   grounded in a three-layer knowledge graph
   (NCIt+MONDO+curated PMID edges), with the fuzzy labels
@@ -230,14 +355,26 @@ the $512$-d \ctranspath{} embedding and the $6$-d pattern channel;
 \textbf{L4}~Choquet--Shapley values (intrinsic contribution of
 each pattern) and pairwise interaction indices (\emph{e.g.} the
 $+0.032$ KRAS lepidic$\,\times\,$solid above);
-\textbf{L5}~per-slide channel ablation, where the prediction is
-recomputed with each input channel zeroed in turn, expressed as
-a $\Delta\auroc$ table;
+\textbf{L5}~channel ablation, recomputing the prediction with each
+input channel zeroed in turn, read out per slide as
+$\Delta P(\mathrm{mut})$ and per gene as the fold-level
+$\Delta\auroc$;
 \textbf{L6}~fuzzy linguistic labels that re-render every continuous
 score as a five-step linguistic variable
 (\emph{very low / low / moderate / high / very high}) with
-trapezoidal membership functions calibrated to the
-SOLCA-CISOL multi-rater study.
+trapezoidal membership functions whose breakpoints are fixed a
+priori and held constant across every gene, slide and fold.
+
+Levels L3--L5 are not three independent attributions but the
+per-slide instruments of the same decomposition: L3 separates the
+contribution shared by both channels from that of the embedding
+alone, L4 reads out pairwise synergy through the $I_{jk}$, and L5
+estimates each channel's unique contribution by ablation.
+The stack therefore answers, for one slide, the same question the
+taxonomy answers for the cohort---which atom, if any, the
+morphology supplies---which is what allows a per-slide explanation
+to remain informative on a gene whose cohort verdict is
+Inconclusive.
 
 The explanation layer wraps the six-level evidence bundle in an
 LLM agent grounded in a three-layer knowledge graph built from
@@ -248,10 +385,9 @@ inside the \emph{moderate} band) and the KG constrains \emph{what}
 entities and edges may appear in the narrative
 (deactivation-without-deletion records corrections as evidence,
 preserving an audit trail).
-The dual mechanism reduced the LLM hallucination rate on the
-SOLCA-CISOL pilot questionnaire; the questionnaire instrument,
-the rubric and the per-question reduction figures are described
-in Methods (Pilot reader study).
+Both constraints are architectural: they are enforced by the prompt
+grammar and the knowledge-graph guard described in Methods, and we
+report no reader-study measurement of their effect.
 
 % =====================================================================
 \subsection*{Per-gene case studies}
@@ -260,32 +396,32 @@ in Methods (Pilot reader study).
 \begin{figure}[ht!]
   \centering
   \begin{subfigure}[t]{0.32\linewidth}
-    \includegraphics[width=\linewidth]{lchai_v2_TP53_TCGA-99-8025_combined}
+    \casepanel{lchai_v2_TP53_TCGA-99-8025_combined}
     \caption{TP53, TCGA-99-8025 ($P=0.951$, TP).}
     \label{fig:case_tp53}
   \end{subfigure}\hfill
   \begin{subfigure}[t]{0.32\linewidth}
-    \includegraphics[width=\linewidth]{lchai_v2_EGFR_TCGA-86-8280_combined}
+    \casepanel{lchai_v2_EGFR_TCGA-86-8280_combined}
     \caption{EGFR, TCGA-86-8280 (TP).}
     \label{fig:case_egfr}
   \end{subfigure}\hfill
   \begin{subfigure}[t]{0.32\linewidth}
-    \includegraphics[width=\linewidth]{lchai_v2_KRAS_TCGA-55-7815_combined}
+    \casepanel{lchai_v2_KRAS_TCGA-55-7815_combined}
     \caption{KRAS, TCGA-55-7815 ($P=0.965$, IMA proxy).}
     \label{fig:case_kras}
   \end{subfigure}\\[1.2ex]
   \begin{subfigure}[t]{0.32\linewidth}
-    \includegraphics[width=\linewidth]{lchai_v2_STK11_TCGA-49-AAR0_combined}
+    \casepanel{lchai_v2_STK11_TCGA-49-AAR0_combined}
     \caption{STK11, TCGA-49-AAR0 (TP).}
     \label{fig:case_stk11}
   \end{subfigure}\hfill
   \begin{subfigure}[t]{0.32\linewidth}
-    \includegraphics[width=\linewidth]{lchai_v2_KEAP1_TCGA-49-AAR9_combined}
+    \casepanel{lchai_v2_KEAP1_TCGA-49-AAR9_combined}
     \caption{KEAP1, TCGA-49-AAR9 (TP).}
     \label{fig:case_keap1}
   \end{subfigure}\hfill
   \begin{subfigure}[t]{0.32\linewidth}
-    \includegraphics[width=\linewidth]{lchai_v2_RBM10_TCGA-78-7148_combined}
+    \casepanel{lchai_v2_RBM10_TCGA-78-7148_combined}
     \caption{RBM10, TCGA-78-7148 (TP).}
     \label{fig:case_rbm10}
   \end{subfigure}
@@ -307,20 +443,11 @@ in Methods (Pilot reader study).
   \label{fig:case_grid}
 \end{figure}
 
-\cref{fig:case_grid} shows representative true-positive and
-true-negative cases for each gene, juxtaposing the
-\ctranspath{} thumbnail, the pattern overlay (L2), the ABMIL
-attention map (L1) and the combined overlay; specifically:
-TP53 \href{https://portal.gdc.cancer.gov}{TCGA-99-8025}
-($P=0.951$, TP), EGFR TCGA-86-8280, KRAS TCGA-55-7815
-($P=0.965$, IMA-proxy), STK11 TCGA-49-AAR0, KEAP1 TCGA-49-AAR9,
-RBM10 TCGA-78-7148.
-The case studies illustrate the value of decoupling the
-cohort-level verdict from the per-slide explanation:
-KRAS TCGA-55-7815 is per-slide confident and the L4 Choquet
-readout localises the confidence in the
-lepidic$\,\times\,$solid co-activation, even though the cohort
-verdict for KRAS is Inconclusive.
+\cref{fig:case_grid} shows one representative true-positive slide
+per gene, juxtaposing the \ctranspath{} thumbnail, the pattern
+overlay (L2), the ABMIL attention map (L1) and the combined overlay.
+All six slide identifiers are resolvable in the GDC
+portal.\footnote{\url{https://portal.gdc.cancer.gov}}
 
 % =====================================================================
 \subsection*{Comparison with published mutation-prediction work}

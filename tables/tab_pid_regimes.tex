@@ -1,0 +1,56 @@
+% Table tab:pid_regimes — the three regimes as partial-information-decomposition
+% atoms, with the model-side signature that evidences each atom.
+% All signature values are read off tab:mutation_luad and the L3--L5 readouts;
+% no additional experiment is introduced here.
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\linewidth}{l c l X X}
+\toprule
+\textbf{Gene} & \textbf{Regime} & \textbf{Dominant atom} &
+  \textbf{Model-side signature (this cohort)} &
+  \textbf{Implied remedy} \\
+\midrule
+\textit{TP53}  & (i)   & $\Ired$
+  & Pattern channel is a no-op on top of the embedding:
+    $\auroc$ $.718\!\to\!.717$ (PI) and $.716$ (FC)
+  & None; already Conclusive \\
+\textit{EGFR}  & (i)   & $\Ired$
+  & Same signature: $.701\!\to\!.694$ (PI), $.684$ (FC)
+  & None; already Conclusive \\
+\midrule
+\textit{KRAS}  & (ii)  & $\Isyn$
+  & Non-additive aggregator recovers what the additive one discards:
+    FC $.609$ vs PI $.590$, with
+    $I(\text{lep}\!\times\!\text{sol})={+}0.032$
+  & Aggregator already adequate; larger $n$ to cross $0.70$ \\
+\midrule
+\textit{STK11} & (iii) & $\Iuni{\mathbf{E}}$
+  & Pattern fusion gains $+0.011$ ($.684\!\to\!.695$) and no
+    pairwise interaction survives the $L_1$ prior
+  & Micro-environment channels (TIL, budding, tumour--stroma ratio) \\
+\textit{KEAP1} & (iii) & $\Iuni{\mathbf{E}}$
+  & L3 assigns $87\%$/$13\%$ to embedding/pattern; L5 ablation
+    $-44.7$\,pp vs $-0.5$\,pp
+  & RNA-seq; NRF2 immunostaining \\
+\textit{RBM10} & (iii) & Atoms not estimable
+  & Pattern-only B3 ($.653$) \emph{exceeds} embedding-only B2
+    ($.642$), but SD $\pm.081$ at $n_+\!=\!37$
+  & Cohort size before any new channel \\
+\bottomrule
+\end{tabularx}
+\begin{flushleft}\footnotesize
+Regimes (i)--(iii) are encoder saturation, inter-pattern
+co-occurrence and out-of-ontology respectively;
+atoms are those of \cref{eq:pid}.
+All rows below \textit{EGFR} carry an Inconclusive population
+verdict, and that one label hides three different states: for
+\textit{KEAP1} the pattern-side atoms are empty, for \textit{RBM10}
+they are non-empty but unestimable at the available prevalence, and
+for \textit{KRAS} they are both non-empty and estimable but carried
+by a morphological subpopulation, so they are diluted in a cohort
+average.
+The three look identical in an AUROC table and imply different next
+experiments; only the first is untranslatability
+(\cref{tab:levels_of_analysis}).
+\end{flushleft}

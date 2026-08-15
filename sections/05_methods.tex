@@ -5,8 +5,11 @@
 % =====================================================================
 
 \paragraph{TCGA-LUAD acquisition.}
+% OPTIONAL BEFORE SUBMISSION: if the number of patients behind the
+% 1,054 downloaded WSIs is available from the GDC manifest, state it
+% here. It must be >= the 668 patients that survive filtering.
 We obtained $1{,}054$ FFPE-fixed haematoxylin-and-eosin (H\&E) WSIs
-from $522$ LUAD patients in The Cancer Genome Atlas via the
+from the LUAD collection of The Cancer Genome Atlas via the
 GDC portal.\cite{tcga2014luad,gdc2024maf}
 Diagnostic slides only (DX1--DX2) were retained; frozen, snap-frozen,
 and resections without a paired primary diagnostic block were
@@ -163,6 +166,126 @@ and projected to the per-gene prediction.
 pattern--pattern interactions as the $15$ scalars $I_{jk}$ for
 direct clinical inspection at inference time.
 
+\begin{figure}[ht!]
+  \centering
+  \includegraphics[width=\linewidth]{two_channel_architecture}
+  \caption{\textbf{The two channels over which the decomposition is
+  taken.} The morphology channel carries the \ctranspath{} tile
+  embeddings $\mathbf{h}_i$ into the \piabmil{} gated-attention
+  aggregator; the composition channel carries the 6-d fuzzy pattern
+  probabilities $\mathbf{p}_i$ into the \fcmil{} 2-additive Choquet
+  integral. The two are disjoint until the classifier head, where
+  $\mathbf{c}_s$ and $\mathbf{z}_\mathrm{attn}$ are concatenated and
+  projected. This separation is what makes \cref{eq:pid} well posed as
+  a statement about two sources: neither channel can route information
+  through the other, so an empty pattern-side atom cannot be an
+  artefact of the architecture.}
+  \label{fig:two_channels}
+\end{figure}
+
+% =====================================================================
+\subsection*{Partial information decomposition of the pattern and
+embedding channels}
+% =====================================================================
+
+\paragraph{Decomposition.}
+The three-regime taxonomy of C1 is stated as a claim about how the
+information the slide carries about the mutation label is
+distributed between the two channels the aggregator receives.
+Let $Y\in\{0,1\}$ be the per-gene mutation label, and let the two
+sources be the slide-level pattern channel $\mathbf{P}\in\Delta^{5}$
+and the \ctranspath{} embedding channel
+$\mathbf{E}\in\mathbb{R}^{512}$.
+Partial information decomposition
+(\pid{})\cite{williams2010pid,bertschinger2014unique} splits the
+joint mutual information\cite{cover2006elements} into four
+non-negative atoms,
+\begin{equation}
+I\!\left(\mathbf{P},\mathbf{E};Y\right) \;=\;
+\Ired \;+\; \Iuni{\mathbf{P}} \;+\; \Iuni{\mathbf{E}} \;+\; \Isyn ,
+\label{eq:pid}
+\end{equation}
+where $\Ired$ is the information available \emph{redundantly} from
+either channel, $\Iuni{\mathbf{P}}$ and $\Iuni{\mathbf{E}}$ the
+information available from one channel only, and $\Isyn$ the
+information available only from their \emph{joint} state.
+\Cref{eq:pid} makes the three regimes mutually exclusive
+predictions rather than post-hoc descriptions: regime~(i) is
+$\Ired$-dominated (so any fusion of $\mathbf{P}$ into $\mathbf{E}$
+is a no-op), regime~(ii) requires $\Isyn>0$ (so only a non-additive
+aggregator can realise it), and regime~(iii) requires
+$\Iuni{\mathbf{P}}\!\approx\!\Isyn\!\approx\!0$ with
+$I(\mathbf{P},\mathbf{E};Y)$ itself near the estimation floor.
+
+\paragraph{Correspondence with the Choquet interaction index.}
+For a $2$-additive fuzzy measure, \cref{eq:fuzzy_measure} assigns
+the pair $\{j,k\}$ a value that exceeds the sum of its singletons
+exactly when $I_{jk}>0$; the aggregator therefore pays for the
+\emph{joint} activation of patterns $j$ and $k$ over and above
+their separate activations.\cite{grabisch1996application,marichal2000determination}
+This is the decision-theoretic counterpart of a positive
+synergistic atom in \cref{eq:pid}, and, symmetrically, $I_{jk}<0$
+is the counterpart of redundancy between the two patterns.
+We therefore treat the learned $I_{jk}$ as the model-side estimator
+of pattern-pair synergy, and the additive concat fusion of
+\piabmil{} as an aggregator whose hypothesis space forces
+$\Isyn$ to be discarded.
+The three remaining interpretability levels estimate the remaining
+atoms: the L3 SHAP embedding/pattern split tracks $\Ired$ versus
+$\Iuni{\mathbf{E}}$, L4 reads out $\Isyn$ through the $I_{jk}$, and
+the L5 channel ablation is the plug-in estimator of the unique atom
+of the ablated channel.
+
+\paragraph{Estimator.}
+Direct estimation of \cref{eq:pid} on a $512$-d source is
+intractable at $n=687$.
+We therefore replace each channel by a task-relevant scalar
+summary---the held-out logit of the corresponding single-channel
+model, B3 for $\mathbf{P}$ and B2 for $\mathbf{E}$---pool the
+out-of-fold logits across the five folds, and discretise each into
+$Q=4$ quantile bins, yielding a $4\times4\times2$ joint
+contingency table.
+Because each logit is a deterministic function of its channel, the
+data-processing inequality\cite{cover2006elements} makes every atom
+computed on this table a \emph{lower} bound on the corresponding
+atom of the full channels, so the decomposition can establish that
+a pattern-side atom is present but cannot prove that one is absent;
+the out-of-ontology verdict is correspondingly reported against the
+estimation floor rather than as an exact zero.
+On this table the bivariate atoms are obtained by the
+Bertschinger~et~al.\ construction\cite{bertschinger2014unique},
+which defines the unique atoms as a minimum over the polytope of
+distributions preserving the two source--target marginals and
+recovers $\Ired$ and $\Isyn$ by subtraction from
+\cref{eq:pid}; confidence intervals are obtained by $1{,}000$
+patient-level bootstrap resamples.
+
+\paragraph{Scope and corrections.}
+Because both channels are computed from the same slide, every case
+is modality-complete and the inverse-probability-weighting
+correction for missingness-induced bias in information-gain
+estimates\cite{choi2025icym2i} is not required here.
+It \emph{is} required for the multimodal extension proposed in the
+Discussion, where the additional channels (RNA-seq,
+micro-environment quantification) are available for a
+non-randomly-selected subset of TCGA-LUAD, and we specify it as
+part of that protocol rather than applying it retrospectively.
+Similarly, the per-slide impact of a channel is reported here by
+the plug-in L5 ablation; the latent-variable estimator of
+instance-level modality impact\cite{madaan2026primo} is the
+principled replacement and is adopted in the external-validation
+protocol.
+Finally, the atoms of \cref{eq:pid} inherit the prevalence-dependent
+variance of the two single-channel models whose logits they are
+computed from, which across B2 and B3 spans $\pm 0.031$ to
+$\pm 0.081$ AUROC per fold (\cref{tab:mutation_luad_resultssec})
+and is therefore of the same order as the between-atom differences
+the decomposition would have to resolve.
+We consequently report the decomposition per gene as a
+\emph{structural} claim evidenced by its three model-side
+signatures (\cref{tab:pid_regimes}) and do not interpret point
+estimates of individual atoms.
+
 % =====================================================================
 \subsection*{Cross-validation and statistical analysis}
 % =====================================================================
@@ -201,6 +324,76 @@ protocol used throughout the paper.}
 \end{table}
 
 % =====================================================================
+\subsection*{Levels of analysis and the scope of a verdict}
+% =====================================================================
+
+Every quantity in this paper is estimated at one of four levels, and
+the claims each level supports are different
+(\cref{tab:levels_of_analysis}).
+We state the correspondence explicitly because the central verdict of
+the framework is defined at one level and is routinely read as though
+it held at another.
+
+\paragraph{The verdict is a population statement.}
+\Cref{eq:conclusive_verdict} thresholds a mean \auroc{}.
+The \auroc{} is the probability that a randomly drawn positive case
+is ranked above a randomly drawn negative one; it is a property of
+the \emph{joint distribution of case pairs} in the cohort and it
+contains no information about the posterior assigned to any named
+slide.
+Two inferences are therefore invalid, and we avoid both throughout.
+The \emph{upward} fallacy reads a Conclusive verdict as a licence to
+present every per-slide call as confident; the cohort mean is an
+average and says nothing about the tails.
+The \emph{downward} fallacy---the one that matters more here---reads
+an Inconclusive verdict as evidence that the source modality carries
+no information about the target.
+It does not follow, because the cohort mean is taken over a
+population that may be morphologically heterogeneous with respect to
+the target.
+
+\paragraph{An Inconclusive verdict is compatible with three distinct
+states.}
+Writing $\ell$ for the level at which a claim is made, a gene may
+fail \cref{eq:conclusive_verdict} because
+\emph{(a)}~the source-side atoms of \cref{eq:pid} are empty at every
+$\ell$, which is untranslatability in the strict sense;
+\emph{(b)}~those atoms are non-empty on a subpopulation of cases
+defined by source-domain morphology, so the signal is real at the
+slide level but is diluted in an average taken over the whole
+cohort; or
+\emph{(c)}~the atoms are non-empty but unestimable at the available
+positive-set size.
+These have the same cohort-mean signature and opposite remedies---a
+different source modality, a stratified or conditional readout, and
+more slides respectively---so we report which of the three we believe
+holds, with the model-side evidence for it, rather than reporting the
+verdict alone.
+KRAS is our instance of \emph{(b)} and is discussed in Results; it is
+also the reason the six-level stack is evaluated per slide rather
+than summarised into a cohort statistic.
+
+\paragraph{Consequence for the interpretability stack.}
+Levels L1--L6 are computed at the slide and tile levels and are never
+aggregated into the verdict, and the verdict is never propagated into
+the linguistic layer as a per-case confidence statement.
+The LLM agent receives both, together with the level at which each
+was estimated, and is constrained (\cref{eq:trap_mf} and the
+knowledge-graph guard below) from asserting a cohort property of a
+single case or a case property of the cohort.
+
+\begin{table}[h!]
+\centering
+\input{tables/tab_levels_of_analysis}
+\caption{The four levels of analysis, the quantities estimated at
+each and the scope of the claims each supports.
+The Conclusive/Inconclusive verdict and the three-regime taxonomy are
+population-level objects; the six-level explanation stack is a
+slide-level and tile-level object; neither transfers to the other.}
+\label{tab:levels_of_analysis}
+\end{table}
+
+% =====================================================================
 \subsection*{Six-level interpretability stack}
 % =====================================================================
 
@@ -216,9 +409,13 @@ contributions.
 \textbf{(L4) Choquet--Shapley and pairwise
 interactions:}\cite{shapley1953value,grabisch1996application}
 the FC-MIL parameter set is read out per slide.
-\textbf{(L5) Per-slide channel ablation:} the prediction is
-recomputed with each input channel zeroed; the resulting
-$\Delta\auroc$ table is reported.
+\textbf{(L5) Channel ablation:} the prediction is recomputed with
+each input channel zeroed in turn.
+The per-slide readout is the shift in that slide's posterior,
+$\Delta P(\mathrm{mut})$; its cohort counterpart, reported per gene
+in \cref{tab:pid_regimes}, is the $\Delta\auroc$ of the held-out
+fold. Only the latter is a population quantity, and the two are
+never interchanged (\cref{tab:levels_of_analysis}).
 \textbf{(L6) Fuzzy linguistic labels:} continuous scores
 $x\!\in\![0,1]$ (per-slide $P$-value, Shapley values
 $\phi_k$, interaction magnitudes $|I_{jk}|$) are mapped to one of
@@ -231,17 +428,24 @@ the trapezoidal membership functions
 \min\!\left(1,\,\frac{x-a}{b-a},\,\frac{d-x}{d-c}\right)\right),
 \label{eq:trap_mf}
 \end{equation}
-with breakpoints calibrated against the SOLCA-CISOL pilot reader
-study so that the categorical word is the one the on-call
-pathologist would have used at the same score range
+The breakpoints are a uniform five-band partition of $[0,1]$
 ($\mathrm{VL}\!:\![0,0.10]$, $\mathrm{L}\!:\![0.10,0.30]$,
 $\mathrm{M}\!:\![0.30,0.70]$, $\mathrm{H}\!:\![0.70,0.90]$,
-$\mathrm{VH}\!:\![0.90,1.00]$; overlap of $0.10$ between adjacent
-trapezoids).
+$\mathrm{VH}\!:\![0.90,1.00]$) with a symmetric overlap of $0.10$
+between adjacent trapezoids.
+They are a reporting convention rather than a fitted parameter:
+they are fixed before any result is computed and held constant
+across every gene, slide and fold, so no calibration data enter the
+linguistic layer and the layer adds no researcher degree of freedom
+to the reported numbers.
 The LLM agent below is permitted to use only these categorical
 words when stating evidence strength, removing spurious decimal
 precision and monotonic claims on probabilities inside the
 \emph{Moderate} band.
+
+The mapping of L3--L5 onto the atoms of \cref{eq:pid} is given
+above; it is why the stack is reported as a single artefact rather
+than as a menu of independent overlays.
 
 % =====================================================================
 \subsection*{LLM explanation layer with dual anti-hallucination}
@@ -297,7 +501,9 @@ a T4 GPU (inference; live LCHAI deployment at
 \url{https://lchai.gptfy.biz}).
 PyTorch 2.x, CTransPath checkpoint as published.\cite{wang2022ctranspath}
 Seeds: 42, 123, 2026.
-Source code: \url{https://github.com/slima2/lchai}.
+System source code: \url{https://github.com/slima2/lchai}.
+Manuscript source, figures and analysis scripts:
+\url{https://github.com/slima2/paper1-medical}.
 TCGA-LUAD data: \url{https://portal.gdc.cancer.gov}.
 ANORAK Zenodo dataset: \cite{ANORAKZenodo}.
 Mutation calls (MAF): GDC, accessed 03~April~2026.
@@ -309,7 +515,6 @@ Mutation calls (MAF): GDC, accessed 03~April~2026.
 The TCGA-LUAD cohort is a publicly available, de-identified
 research dataset published under the controlled-access policy of
 the NIH Genomic Data Commons.\cite{tcga2014luad}
-The SOLCA-CISOL pilot validation study was approved by the
-Comit\'e de \'Etica de Investigaci\'on en Seres Humanos
-(CEISH) of SOLCA Ecuador (approval 2026-014).
+No new human-subject data were collected for this study and no
+patient-identifiable information was accessed.
 

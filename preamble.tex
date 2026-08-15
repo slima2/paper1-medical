@@ -44,7 +44,7 @@
 \usepackage{fancyhdr}
 \pagestyle{fancy}
 \fancyhf{}
-\fancyhead[L]{\small\textit{Translating histology into genotype: interpretable LUAD mutation prediction}}
+\fancyhead[L]{\small\textit{A three-regime translatability framework for cross-domain medical prediction}}
 \fancyhead[R]{\small\thepage}
 \renewcommand{\headrulewidth}{0.4pt}
 
@@ -56,3 +56,22 @@
 \newcommand{\ctranspath}{\textsc{CTransPath}}
 \newcommand{\fcmil}{\textsc{FC-MIL}}
 \newcommand{\piabmil}{\textsc{PI-ABMIL}}
+\newcommand{\xgb}{\textsc{XGBoost}}
+
+\DeclareMathOperator{\softmax}{softmax}
+\newcommand{\sigmoid}{\sigma}
+
+% Partial information decomposition (Williams & Beer atoms).
+\newcommand{\pid}{\textsc{PID}}
+\newcommand{\Ired}{\mathcal{R}}          % redundant information
+\newcommand{\Iuni}[1]{\mathcal{U}_{#1}}  % unique information of source #1
+\newcommand{\Isyn}{\mathcal{S}}          % synergistic information
+
+% Uniform-size case-study panel: fixed box, image scaled to fit
+% (keepaspectratio => no cropping, no distortion, full detail).
+\newlength{\casepanelht}\setlength{\casepanelht}{4.4cm}
+\newcommand{\casepanel}[1]{%
+  \begin{minipage}[c][\casepanelht][c]{\linewidth}%
+    \centering
+    \includegraphics[width=\linewidth,height=\casepanelht,keepaspectratio]{#1}%
+  \end{minipage}}
