@@ -223,7 +223,7 @@ them as the biological prior / evaluation targets for the mutation paper.
 | Solid / micropapillary / cribriform (high-grade) | **TP53** | `ahn2022tp53highgrade`, `mendoza2024tp53nuclear` |
 | Micropapillary | **TP53** | `zhang2022micropaptp53` |
 | Papillary | **KEAP1 / NRF2** | `li2011keap1papillary` |
-| Lepidic | **EGFR** | `yatabe2005egfrlepidic`, `suda2017egfrlepidic`, `yoshizawa2013egfrmorph` |
+| Lepidic | **EGFR** | `li2025lepidicgenomics`, `yoshizawa2013egfrmorph` |
 | Invasive mucinous (IMA) | **KRAS** | `shim2015krasmucinous`, `cha2017imapatterns`, `hwang2017nonlepidicima` |
 | EGFR-mutant co-mutation | **RBM10** | `cao2024rbm10egfr`, `bechara2013rbm10` |
 | STK11-mutant morphology | **STK11** | `pineda2025stk11morphology`, `hong2022stk11biomedinf`, `skoulidis2018stk11pd1` |

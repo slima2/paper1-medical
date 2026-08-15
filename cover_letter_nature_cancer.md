@@ -49,8 +49,7 @@ We would welcome a presubmission inquiry at the editor's discretion. We can prov
 Sincerely,
 
 **Servio F. Lima Reina** (corresponding)
-PhD Candidate, Department of Informatics
-University of Fribourg, Switzerland
-servio.lima@unifr.ch
+GPTfy Medical, Guayaquil, Ecuador
+slima@gptfy.biz
 
-On behalf of: Servio R. Lima Idrobo MD, Doménica N. López García MD, Luis Terán, Edy Portmann.
+On behalf of: Servio R. Lima Idrobo MD, Doménica N. López García MD, Luis Terán.

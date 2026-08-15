@@ -1,0 +1,84 @@
+% Table tab:crossdomain_protocol — the framework instantiated in three domains.
+% Column 1 = framework element; columns 2-4 = its realisation per domain.
+% Domain A (LUAD) is reported in this paper; B and C are pre-registered.
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\linewidth}{l X X X}
+\toprule
+\textbf{Framework element} &
+  \textbf{A. LUAD (this paper)} &
+  \textbf{B. Glioma (pre-registered)} &
+  \textbf{C. ECG (pre-registered)} \\
+\midrule
+Source modality
+  & H\&E whole-slide image
+  & Preoperative multiparametric MRI
+  & 12-lead electrocardiogram \\
+Target domain
+  & 6 somatic driver mutations
+  & IDH, 1p/19q, MGMT
+  & Laboratory abnormalities; structural heart disease \\
+\midrule
+Source ontology
+  & ANORAK, 6 growth patterns\cite{anorak2024}
+  & VASARI, $\sim$30 semantic MR features\cite{gutman2013vasari,vasari_tcia}
+  & SCP-ECG, 71 statements (44 diagnostic, 19 form, 12
+    rhythm)\cite{wagner2020ptbxl} \\
+Ontology already graded?
+  & No; fuzzy membership learned
+  & No; ordinal expert scores
+  & \textbf{Yes}: $0$--$100$ likelihood per statement, native to L6 \\
+Vocabulary renderer
+  & \fuzzyarc{}\,V2 on Zenodo-ANORAK ($n=637$ tiles)
+  & VASARI-feature classifier on the TCIA-annotated subset
+    ($n=178$ LGG, $75$ GBM)
+  & Direct: statements are supplied per record \\
+Propagated to
+  & 687 TCGA-LUAD slides
+  & $\sim$1{,}251 BraTS 2021 subjects\cite{baid2021brats}
+  & 21{,}799 PTB-XL records; MIMIC-IV-ECG\cite{gow2023mimicivecg} \\
+Target lexicon (KG)
+  & NCIt $+$ MONDO
+  & NCIt $+$ MONDO $+$ RadLex
+  & SNOMED-CT, supplied pre-mapped\cite{strodthoff2023ptbxlplus} \\
+\midrule
+Regime (i) saturation
+  & TP53, EGFR
+  & IDH ($\auroc\!\approx\!0.88$)\cite{chang2018radiogenomics}
+  & NT-proBNP ($\auroc\!\approx\!0.78$)\cite{xiao2025anyecglab} \\
+Regime (ii) synergy
+  & KRAS (lepidic$\times$solid)
+  & 1p/19q (feature combinations)
+  & Candidate pairs, e.g.\ LVH$\times$strain \\
+Regime (iii) out-of-ontology
+  & STK11, KEAP1 (RBM10: estimation floor)
+  & \textbf{MGMT} (at chance, $\auroc\!\approx\!0.50$--$0.56$ across
+    architectures)\cite{kim2022mgmtvalidation,robinet2023mgmt,saeed2023mgmt}
+  & Troponin~I ($\auroc<0.55$); 16 of 108
+    targets\cite{xiao2025anyecglab} \\
+\midrule
+Falsification test
+  & Non-additive aggregator wins on regime-(ii) targets only
+  & Same, on 1p/19q but not IDH or MGMT
+  & Same, on the borderline band but not the recoverable one \\
+Access
+  & GDC, public
+  & TCIA/IDC $+$ BraTS 2021, public
+  & PhysioNet, open (PTB-XL, PTB-XL+, MIMIC-IV-ECG) \\
+\bottomrule
+\end{tabularx}
+\begin{flushleft}\footnotesize
+The framework requires only an expert source vocabulary and an
+unconstrained learned encoder of the same modality; every row above
+is an instance of the same decomposition, not an analogy.
+Domain~B is chosen because MGMT is the best-documented
+population-level translation failure in the field and is currently
+reported as a defeat rather than as a result; whether that failure is
+untranslatability in the strict sense or a diluted subpopulation
+effect (\cref{tab:levels_of_analysis}) is the question the
+pre-registration is designed to settle.
+Domain~C is chosen because its source ontology is
+already graded and ontology-mapped, and because $108$ simultaneous
+targets test whether the taxonomy scales beyond six.
+\end{flushleft}

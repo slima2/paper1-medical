@@ -1,0 +1,64 @@
+% Table tab:levels_of_analysis — the four levels at which this paper makes
+% claims, and the scope of each. The point of the table is the last column:
+% a verdict established at one level does not transfer to another, which is
+% why the Conclusive/Inconclusive flag (population) and untranslatability
+% (a statement about absent information at a stated level) are distinct.
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\linewidth}{l c X X}
+\toprule
+\textbf{Level} & \textbf{Unit ($n$)} &
+  \textbf{Quantities estimated here} &
+  \textbf{Scope: what a claim at this level does, and does not, license} \\
+\midrule
+Population
+  & gene $\times$ cohort (6)
+  & Mean $\auroc$ over the five folds, \auprc{}, the \pid{} atoms of
+    \cref{eq:pid}, the regime assignment, and the
+    Conclusive/Inconclusive verdict of \cref{eq:conclusive_verdict}
+  & \emph{Licenses} statements about average discriminability over
+    randomly drawn case pairs. \emph{Does not license} any statement
+    about a named case: $\auroc$ is a ranking statistic and carries
+    no posterior \\
+\midrule
+Patient
+  & patient (668)
+  & Mutation label; fold membership (stratification is at this level);
+    $P(\mathrm{mut})$ pooled over that patient's slides
+  & \emph{Licenses} the clinical decision---this is the unit a
+    molecular test would be ordered for. \emph{Does not license}
+    cohort claims, and inherits slide-level sampling of the tumour \\
+\midrule
+Slide
+  & WSI (687)
+  & $P(\mathrm{mut})$; $\mathbf{c}_s$, $\mathbf{z}_{\mathrm{attn}}$;
+    the whole L1--L6 stack; Choquet--Shapley $\Phi_k$ and interaction
+    indices $I_{jk}$; the fuzzy linguistic label
+  & \emph{Licenses} the per-case argument with the pathologist and
+    the localisation of evidence. \emph{Does not license}
+    generalisation: one confident slide is not a cohort result \\
+\midrule
+Tile
+  & $224\!\times\!224$ px ($\leq\!200$/slide)
+  & $\tilde{\mathbf{x}}$, $\cos\theta_k$; pattern probabilities
+    $\mathbf{p}_i$; attention $\alpha_i$; per-tile SHAP
+  & \emph{Licenses} where in the tissue the evidence sits.
+    \emph{Does not license} a slide-level call on its own: attention
+    mass is not probability \\
+\bottomrule
+\end{tabularx}
+\begin{flushleft}\footnotesize
+The three-regime taxonomy and the Conclusive/Inconclusive verdict are
+defined at the population level only.
+The consequence that matters clinically is that an Inconclusive
+verdict is compatible with three distinct states of the world, which
+the cohort mean cannot separate: information absent at every level
+(strict untranslatability, the KEAP1 candidate); information present
+in a morphologically defined \emph{subpopulation} and therefore
+diluted in the cohort average (KRAS, where the cohort mean is $0.609$
+yet TCGA-55-7815 carries $P=0.965$ with a coherent
+lepidic$\times$solid Choquet readout); and information present but
+unestimable at the available positive-set size (RBM10, $n_+=37$).
+Only the first is untranslatability.
+\end{flushleft}

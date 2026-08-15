@@ -1,12 +1,19 @@
 % =====================================================================
 % Table tab:mutation_luad — adapted from thesis ch06:622-652
+% Eight columns of mean$\pm$SD overflow the 166 mm text block at \small,
+% so the table is wrapped in \resizebox exactly as
+% tab_literature_comparison.tex is. Rules are booktabs for consistency
+% with the other tables in this manuscript.
 % =====================================================================
+\resizebox{\linewidth}{!}{%
 \small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.15}
 \begin{tabular}{l c c c c c c c}
-\hline
+\toprule
 \textbf{Cond.} & \textbf{TP53} & \textbf{EGFR} & \textbf{STK11} &
 \textbf{KEAP1} & \textbf{KRAS} & \textbf{RBM10} & \textbf{Mean} \\
-\hline
+\midrule
 B1 (XGBoost)
   & .518$\pm$.025 & .634$\pm$.033 & .545$\pm$.055
   & .489$\pm$.034 & .522$\pm$.057 & .474$\pm$.101 & .530 \\
@@ -17,6 +24,7 @@ B2 (ABMIL embeddings)
 B3 (ABMIL patterns)
   & .616$\pm$.043 & .625$\pm$.044 & .617$\pm$.050
   & .588$\pm$.031 & .545$\pm$.076 & .653$\pm$.081 & .607 \\
+\midrule
 PI-ABMIL (ours)
   & .717$\pm$.058 & .694$\pm$.051 & \textbf{.695}$\pm$.023
   & \textbf{.610}$\pm$.071 & .590$\pm$.071 & .640$\pm$.064 & .658 \\
@@ -27,5 +35,6 @@ FC-MIL (ours)
   & .716$\pm$.047 & .684$\pm$.037 & .658$\pm$.077
   & .589$\pm$.080 & \textbf{.609}$\pm$.059
   & \textbf{.661}$\pm$.063 & .653 \\
-\hline
-\end{tabular}
+\bottomrule
+\end{tabular}%
+}

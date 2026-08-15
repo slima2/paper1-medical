@@ -18,8 +18,8 @@ returns a per-gene answer in seconds at the cost of a scan.
 A line of work pioneered by Coudray~et~al.\cite{coudray2018classification}
 (Inception-v3 end-to-end, $n=382$, EGFR $\auroc=0.826$,
 KRAS $\auroc=0.733$) and continued by
-Kather~et~al.\cite{kather2020pancancer}, Saldanha~et~al.\cite{saldanha2023npj},
-Logan~et~al.\cite{logan2022medrxiv} and most recently
+Kather~et~al.\cite{kather2020pancancer}, Fu~et~al.\cite{fu2020pancancer},
+Saldanha~et~al.\cite{saldanha2023npj} and most recently
 Zhao~et~al.\cite{zhao2025deepgem} (DeepGEM MIL, $n=3{,}637$, AUROC
 $0.82$--$0.96$), Campanella~et~al.\cite{campanella2025eagle}
 (EAGLE, $n=8{,}461$, EGFR $\auroc=0.890$), and
@@ -70,9 +70,16 @@ arguably more useful to the community than a foundation-scale
 black box trained behind a paywall.
 
 % --- Our contribution ---
-This paper presents \lchai{}\,v2 (Lung Cancer Histologic Analysis
+The primary contribution of this paper is not a predictor but a
+\emph{way of reporting} cross-domain medical prediction, of which
+H\&E-based mutation calling is one instance: a framework in which
+per-target \emph{translatability} is the reported result and
+untranslatability is a finding rather than a failure.
+We instantiate it in \lchai{}\,v2 (Lung Cancer Histologic Analysis
 with Interpretable AI), a pattern-informed MIL system designed
-against the three problems above.
+against the three problems above, and we pre-register two further
+instantiations on public data in domains where the same structure
+holds.
 
 % --- The conceptual frame: domain translation ---
 Conceptually, we treat H\&E-based mutation prediction as an
@@ -90,17 +97,53 @@ Under this lens the six-pattern ANORAK ontology is the source
 the per-gene AUROC measures how much of the mutation ``language''
 is expressible in morphological words.
 The three-regime taxonomy (below) is then a statement about
-\emph{translational faithfulness}: TP53/EGFR translate well, KRAS
-requires a non-additive grammar (pattern co-occurrence), and
-STK11/KEAP1/RBM10 are largely \emph{untranslatable} from H\&E
-alone---bounded here to $\auroc\!\in\![0.6,0.72]$ with positive
-sets as small as $n_+\!=\!37$.
+\emph{translational faithfulness at the cohort level}: TP53/EGFR
+translate well on average, KRAS requires a non-additive grammar
+(pattern co-occurrence), and STK11/KEAP1/RBM10 resist translation
+from H\&E alone---bounded here to $\auroc\!\in\![0.6,0.72]$ with
+positive sets as small as $n_+\!=\!37$.
+The qualifier is load-bearing rather than decorative: these are
+averages over a heterogeneous population, and a gene can average
+poorly while remaining translatable on the subpopulation of slides
+that carry the relevant morphology, which is exactly what we observe
+for KRAS.
 This framing is not cosmetic: it connects our per-gene ceiling to a
 broad family of medical cross-domain inference tasks---radiogenomics,
 pathomics-to-genomics, retinal-to-cardiovascular and
 ECG-to-function mapping---where faithfulness is set by the physics
 of the source modality rather than by the estimator, a point we
 develop in the Discussion.
+
+% --- Information-theoretic grounding of the frame ---
+The translation frame would remain a metaphor if it did not commit
+to a measurable quantity, and \emph{partial information
+decomposition} (\pid{})\cite{williams2010pid,bertschinger2014unique}
+supplies exactly the one it needs.
+Our pipeline presents the aggregator with two sources of evidence
+about the same target: the $6$-d ANORAK pattern channel
+$\mathbf{P}$ (the source \emph{vocabulary}) and the $512$-d
+\ctranspath{} embedding $\mathbf{E}$ (the unrestricted morphology).
+\pid{} splits the total information these two carry about the
+mutation label $Y$ into four non-negative atoms---information
+\emph{redundantly} available in either source, information
+\emph{unique} to each, and information available only
+\emph{synergistically} from their joint state.
+Read this way the three regimes are not three groups of genes but
+the three ways that decomposition can be dominated
+(\cref{tab:pid_regimes}): saturation is redundancy, co-occurrence
+is synergy, and out-of-ontology is the absence of any pattern-side
+atom at all.
+The correspondence is operational rather than decorative, because
+the $2$-additive Choquet interaction index $I_{jk}$ that
+\fcmil{} learns is the model-side counterpart of the synergistic
+atom carried by the pattern pair $\{j,k\}$, and an additive
+aggregator is by construction blind to it.
+It also makes a prediction the AUROC table alone cannot make: a
+gene may be untranslatable because the information is \emph{absent
+from the source} or because it is \emph{present but not estimable}
+at the available positive-set size---two failures that the
+cohort-mean metric renders indistinguishable and that imply
+opposite remedies.
 
 \begin{figure}[ht!]
   \centering
@@ -113,40 +156,77 @@ develop in the Discussion.
   boundary), is mapped by a MIL \emph{translator} (\piabmil{}/\fcmil{},
   the 2-additive Choquet integral supplying a non-additive grammar)
   onto a \emph{target} domain of somatic driver mutations. The
-  per-gene AUROC measures translational faithfulness: TP53/EGFR
-  translate well (encoder saturation), KRAS requires the non-additive
-  grammar (inter-pattern co-occurrence), and STK11/KEAP1/RBM10 are
-  largely untranslatable from H\&E alone (out-of-ontology).}
+  per-gene AUROC measures translational faithfulness \emph{averaged
+  over the cohort}: TP53/EGFR translate well (encoder saturation),
+  KRAS requires the non-additive grammar (inter-pattern
+  co-occurrence), and STK11/KEAP1/RBM10 resist translation from H\&E
+  alone (out-of-ontology). A poor cohort average does not imply that
+  every case is untranslatable; see
+  \cref{tab:levels_of_analysis}.}
   \label{fig:domain_translation}
 \end{figure}
 
-Our contributions are:
+% --- Scope of the framework: two pre-registered external domains ---
+Nothing in the decomposition is specific to histology.
+It requires only two ingredients that many clinical prediction tasks
+already have: an \emph{expert-defined controlled vocabulary} on the
+source modality, and a \emph{learned encoder} of the same modality
+whose representation is unconstrained by that vocabulary.
+Wherever both exist, the same three regimes are definable and the
+same Conclusive/Inconclusive verdict is computable.
+We therefore pre-register two external instantiations on fully
+public cohorts: \textbf{glioma MRI\,$\rightarrow$\,genotype}, where
+the VASARI controlled
+terminology\cite{gutman2013vasari,vasari_tcia} plays the role of
+ANORAK, and \textbf{electrocardiogram\,$\rightarrow$\,laboratory
+state}, where the $71$ cardiologist-assigned SCP-ECG statements of
+PTB-XL\cite{wagner2020ptbxl} supply a source vocabulary that is
+already graded.
+Both were chosen because a published per-target split already
+exhibits the three regimes without naming them, and because the
+first contains MGMT promoter methylation---to our knowledge the
+best-documented untranslatable target in medical machine learning,
+currently reported as a community-wide defeat for want of a
+framework in which to report it as a
+result.\cite{kim2022mgmtvalidation}
+Cohorts, source ontologies and expected regime assignments are
+fixed in advance in the Discussion and
+\cref{tab:crossdomain_protocol}.
+
+Our contributions are the framework itself and the five artefacts
+that establish and operationalise it:
 
 \begin{itemize}
-    \item \textbf{C1.\ A three-regime taxonomy that decomposes
-    per-gene H\&E-based mutation predictability.}
+    \item \textbf{C1.\ A three-regime taxonomy of per-gene H\&E-based
+    mutation predictability, derived as the partial information
+    decomposition of the pattern and embedding channels.}
     The six target genes partition into three qualitatively distinct
     regimes that answer \emph{why} the cohort-average AUROC is
-    misleading.
+    misleading, each the empirical signature of one dominant \pid{}
+    atom
+    (\cref{tab:pid_regimes}).\cite{williams2010pid,bertschinger2014unique}
     \emph{Regime~(i)~--~encoder saturation} (TP53, EGFR):\ the
-    \ctranspath{} foundation encoder already saturates the
-    predictable morphology and the 6-d categorical pattern channel
-    adds no information ($\leq 0.02$ AUROC).
-    \emph{Regime~(ii)~--~inter-pattern co-occurrence} (KRAS):\ a
-    non-additive aggregator recovers a positive interaction index
-    $I(\text{lepidic}\!\times\!\text{solid})\!=\!{+}0.032$ that
-    matches the invasive mucinous adenocarcinoma proxy and that an
-    additive concat-fusion attention head cannot express.
-    \emph{Regime~(iii)~--~out-of-ontology} (STK11, KEAP1, RBM10):\
-    the predictive signal lives outside the 6-pattern simplex---in
-    the immune microenvironment (STK11), in a biochemical state with
-    no consistent H\&E correlate (KEAP1), or below the class-prior
-    collapse floor at $5\%$ prevalence (RBM10).
-    The taxonomy is the central empirical contribution of the paper
-    and tells the field where multimodal fusion (gene expression,
-    radiology, micro-environment channels)---rather than another loss
-    function or attention variant---is the natural next step for
-    each gene.
+    \ctranspath{} foundation encoder already carries the predictable
+    morphology, so the pattern channel is \emph{redundant} with the
+    embedding and no aggregator can convert it into a gain.
+    \emph{Regime~(ii)~--~inter-pattern co-occurrence} (KRAS):\ the
+    information is \emph{synergistic} in a pattern pair matching the
+    invasive mucinous adenocarcinoma proxy, which an additive
+    concat-fusion head cannot express and the Choquet interaction
+    index exposes.
+    \emph{Regime~(iii)~--~out-of-ontology} (STK11, KEAP1):\ the
+    predictive signal lives outside the 6-pattern simplex, in the
+    immune microenvironment or in a biochemical state with no
+    consistent H\&E correlate.
+    RBM10 fails the same threshold for a different reason that the
+    decomposition, but not the AUROC table, can see: its
+    pattern-side atoms are non-empty and merely unestimable at
+    $n_+\!=\!37$.
+    The taxonomy is grounded in an information-theoretic
+    decomposition rather than in a ranking of AUROC values, and it
+    tells the field where multimodal fusion---rather than another
+    loss function or attention variant---is the natural next step
+    for each gene.
 
     \item \textbf{C2.\ A six-level per-slide interpretability stack
     that exhibits the morphology-to-genotype translation.}
@@ -155,37 +235,41 @@ Our contributions are:
     legible}: a bilingual account that renders each prediction in
     the source vocabulary (the six growth patterns) and, crucially,
     marks where the translation breaks down.
-    For every slide and every gene we expose six interpretability
-    layers derived from a single forward pass through the MIL
-    aggregator:
-    \textbf{L1}~MIL attention overlay (where the model is looking);
-    \textbf{L2}~pattern overlay (what morphology it sees at each
-    tile);
-    \textbf{L3}~per-pattern SHAP decomposition;\cite{lundberg2017shap}
-    \textbf{L4}~Choquet--Shapley intrinsic contribution and pairwise
-    interaction indices (which pattern \emph{pairs} co-vote);
-    \textbf{L5}~per-slide channel ablation ($\Delta\auroc$ per input
-    channel);
-    \textbf{L6}~fuzzy linguistic labels
-    (\emph{very low / low / moderate / high / very high}) on every
+    From a single forward pass through the MIL aggregator we expose,
+    for every slide and every gene, MIL attention (L1), the pattern
+    overlay (L2), a per-pattern SHAP
+    decomposition (L3),\cite{lundberg2017shap} Choquet--Shapley
+    contributions and pairwise interaction indices (L4), per-channel
+    ablation (L5), and fuzzy linguistic labels (L6) on every
     continuous score.
     Each level is clickable, editable, and can be argued against by
     the pathologist; together they act as the \emph{bilingual
     dictionary} that makes the translation---and its
     failures---inspectable (\emph{where + what + why}), which an
     attention heatmap alone cannot deliver.
-    Under this view L4 (Choquet--Shapley) is the non-additive
-    \emph{grammar} of the source language, and an Inconclusive verdict
-    is reported as \emph{untranslatability} rather than as a silent
-    low score.
+    L3--L5 are not unrelated overlays but the per-slide instruments
+    of the decomposition of C1, reading out the redundant,
+    synergistic and unique atoms respectively, which is why the
+    stack remains informative on genes whose \emph{cohort} verdict is
+    Inconclusive: KRAS averages $0.609$ yet slide TCGA-55-7815
+    carries $P=0.965$ with a coherent lepidic$\times$solid Choquet
+    readout.
 
     \item \textbf{C3.\ A per-gene Conclusive/Inconclusive verdict
-    operationalising the three-regime taxonomy.}
+    operationalising the three-regime taxonomy, with an explicit
+    statement of the level at which it holds.}
     Cohort-level signal presence (mean AUROC $\geq 0.70$) is
     reported \emph{separately} from per-slide confidence (model
     probability), so a Conclusive verdict does not propagate into
     per-slide overclaim and an Inconclusive verdict does not suppress
     potentially useful per-slide ranking.
+    We make the separation structural by stating, for every quantity
+    in the paper, whether it is estimated at the population, patient,
+    slide or tile level and what a claim at that level licenses
+    (\cref{tab:levels_of_analysis}).
+    This matters because an Inconclusive verdict is a statement about
+    an average, and only one of the three states of the world
+    compatible with it is untranslatability.
     The verdict is the operational artefact that surfaces Regime~(i)
     Conclusive (TP53, EGFR) versus Regimes~(ii)--(iii) Inconclusive
     (KRAS, STK11, KEAP1, RBM10) at the user-interface level.
@@ -221,17 +305,3 @@ Our contributions are:
     full per-gene ablation and statistical analysis is reported in
     the Results and Methods below.
 \end{itemize}
-
-The paper proceeds as follows.
-The Results section reports the per-gene AUROC matrix and the
-three-regime taxonomy.
-The Discussion places those results against
-Coudray~et~al.,\cite{coudray2018classification}
-Saldanha~et~al.,\cite{saldanha2023npj}
-Zhao~et~al.,\cite{zhao2025deepgem} and
-Campanella~et~al.,\cite{campanella2025eagle}
-and outlines a path to prospective external validation (CPTAC-3,
-APOLLO, EAGLE-1, SOLCA-CISOL).
-Methods describe the TCGA-LUAD cohort, the ANORAK-trained pattern
-classifier, the MIL aggregators, the six-level interpretability
-stack, and the dual anti-hallucination explanation layer.

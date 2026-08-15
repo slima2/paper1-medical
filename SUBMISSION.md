@@ -21,7 +21,7 @@
 | Cover letter | 1 page; explain why npj Prec Onc fit; novelty vs Coudray/Saldanha | TODO |
 | Author contributions (CRediT) | Required | TODO |
 | Conflicts of interest | Required | TODO |
-| Ethics statement | Required — TCGA is publicly available; SOLCA-CISOL approval present | TODO |
+| Ethics statement | Required — TCGA is publicly available; no new human-subject data collected | TODO |
 | Initial format | PDF or Word; LaTeX accepted at acceptance | OK (we keep LaTeX) |
 | File submission | Manuscript + figures (embedded OK at submission) + supplementary as single PDF | — |
 
@@ -88,7 +88,7 @@
 - ED6: TCGA-LUAD cohort flowchart (consort-style)
 - ED7: Variant-type table + MAF processing
 - ED8: External-cohort plan (CPTAC-3, APOLLO, EAGLE-1)
-- ED9: SOLCA explainability questionnaire summary
+- ~~ED9: SOLCA explainability questionnaire summary~~ — dropped; no reader study is reported
 - ED10: Data-scarcity comparison (`tab:data_scale`)
 
 ---

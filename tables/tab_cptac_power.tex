@@ -1,0 +1,37 @@
+% Table tab:cptac_power — expected positive-set sizes for the six target
+% genes in the CPTAC-LUAD cohort (n=110), used to make the within-domain
+% cohort-transfer pre-registration honest about which targets it can and
+% cannot estimate. Prevalences are those reported for the CPTAC-LUAD
+% discovery cohort; n_+ is the implied positive count at n=110. The
+% estimation floor is the n_+=37 at which RBM10 is only underpowered in the
+% larger TCGA-LUAD cohort of this paper.
+\footnotesize
+\setlength{\tabcolsep}{6pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{l c c c}
+\toprule
+\textbf{Gene} & \textbf{Regime (LUAD)} &
+  \textbf{CPTAC prevalence} & \textbf{$n_+$ at $n\!=\!110$ (floor $37$)} \\
+\midrule
+TP53  & (i) saturation & $46\%$ & $\sim$51 \quad above \\
+KRAS  & (ii) synergy   & $33\%$ & $\sim$36 \quad borderline \\
+STK11 & (iii)          & $17\%$ & $\sim$19 \quad below \\
+KEAP1 & (iii)          & $17\%$ & $\sim$19 \quad below \\
+EGFR  & (i) saturation & $14\%$ & $\sim$15 \quad below \\
+RBM10 & estimation floor & $\sim$5--8\%$^{\dagger}$ & $\sim$6--9 \quad below \\
+\bottomrule
+\end{tabular}
+\begin{flushleft}\footnotesize
+Prevalences are those reported for the CPTAC-LUAD discovery cohort
+($n\!=\!110$)\cite{gillette2020cptacluad}; $^{\dagger}$\textit{RBM10} was
+not tabulated with a separate frequency in that report and is estimated
+from the TCGA-LUAD range (here $5.4\%$). $n_+$ is the implied positive
+count; the floor is the $n_+\!=\!37$ at which \emph{RBM10} is only
+underpowered in the $n\!=\!687$ TCGA-LUAD cohort reported here. Only
+\emph{TP53} clears the floor and \emph{KRAS} reaches it; the four
+remaining targets---including all of the regime-(iii) genes---fall
+below it, so a cohort-transfer replication on CPTAC-LUAD can confirm or
+refute the well-powered assignments (\emph{TP53}, \emph{KRAS}) with
+overlapping confidence intervals but is, by construction, underpowered
+for exactly the untranslatable candidates it would most need to check.
+\end{flushleft}

@@ -1,9 +1,8 @@
+% npj Digital Medicine: the Discussion admits no subheadings and no
+% separate limitations or conclusions sections. The content below is the
+% same as the subheaded version kept in
+% 04_discussion_SUBHEADED_backup.tex.bak, rewritten as continuous prose.
 \section*{Discussion}
-
-% =====================================================================
-\subsection*{What the three-regime taxonomy means for clinical
-deployment}
-% =====================================================================
 
 Computational pathology has converged on a single output for
 mutation prediction: a probability per gene.
@@ -15,21 +14,20 @@ The same cohort, same encoder, same MIL backbone yields
 qualitatively different gene-level behaviour: encoder
 saturation on TP53/EGFR (where additional pattern information
 adds nothing), inter-pattern co-occurrence on KRAS (where only
-a non-additive aggregator captures the IMA proxy), and
-out-of-ontology on STK11/KEAP1/RBM10 (where the signal lives
-in stromal, biochemical or splicing substrates the 6-pattern
-ontology does not encode).
+a non-additive aggregator captures the IMA proxy), and an
+unusable pattern channel on STK11/KEAP1/RBM10---out-of-ontology
+for the first two, whose signal lives in stromal or biochemical
+substrates the 6-pattern ontology does not encode, but merely
+unestimable for RBM10, whose pattern-side atoms are demonstrably
+non-empty at $n_+\!=\!37$.
 The Conclusive/Inconclusive flag we report alongside each AUROC
 is therefore not a cosmetic addition---it is a statement that
 the cohort-level metric does \emph{not} translate uniformly into
 per-slide actionability, and that downstream clinical use must
 be gene-conditional.
 
-% =====================================================================
-\subsection*{Why pattern-informed interpretability is the
-clinically useful contribution}
-% =====================================================================
-
+Reading the results gene-conditionally also changes what counts as
+the contribution.
 The pattern-informed channel does not win the cohort-mean
 benchmark---the upper tier of \cref{tab:mutation_luad_resultssec}
 is statistically tied within $\pm 0.02$ AUROC.
@@ -52,55 +50,38 @@ predictor is wrong, the explanation is most valuable}, and only a
 pattern-informed pipeline gives the explanation a vocabulary the
 pathologist can act on.\cite{rudin2019stop,holzinger2019causability}
 
-% =====================================================================
-\subsection*{Mutation prediction as an imperfect domain translation:
-analogues across medicine}
-% =====================================================================
-
 Read through the translation lens introduced above, our results
 belong to a well-established family of medical machine-learning
-tasks in which one clinically cheap or ubiquitous modality is
-mapped onto a second, more expensive or latent one, with a
+tasks in which one clinically inexpensive or ubiquitous modality is
+mapped onto a second, more costly or latent one, with a
 faithfulness that is bounded by how much of the target signal the
 source physically encodes.
 Placing our LUAD map beside these tasks clarifies both what is and
-what is not surprising about the per-gene ceiling:
-\begin{itemize}
-  \item \textbf{Radiogenomics} maps preoperative MRI onto glioma
-  genotype: IDH mutation and 1p/19q codeletion are recovered at
-  high accuracy while MGMT-promoter methylation translates
-  markedly less well\cite{chang2018radiogenomics}---a
-  \emph{per-marker} split of the same kind as our per-gene
-  regimes.
-  \item \textbf{Pathomics-to-genomics} maps the very H\&E substrate
-  we use onto molecular labels: microsatellite
-  instability\cite{kather2019msi} and a pan-cancer panel of
-  actionable alterations\cite{kather2020pancancer} are inferable
-  from morphology, but with the same gene-dependent ceiling we
-  observe.
-  \item \textbf{Retinal-to-systemic} mapping recovers cardiovascular
-  risk factors---age, sex, blood pressure, major adverse cardiac
-  events---from fundus photographs\cite{poplin2018retinal},
-  surfacing signal not previously thought to be morphologically
-  encoded: the optimistic end of the spectrum.
-  \item \textbf{ECG-to-function} mapping recovers left-ventricular
-  contractile dysfunction ($\mathrm{EF}\!\leq\!35\%$,
-  $\auroc=0.93$) from a routine
-  electrocardiogram\cite{attia2019ecg}, an electrical modality
-  that faithfully encodes a structural target.
-  \item \textbf{Virtual staining} is the literal image-to-image
-  case: unlabelled tissue autofluorescence is translated into
-  stained histology at pathologist-level
-  fidelity\cite{rivenson2019virtualstaining}, precisely because the
-  source physically contains the target.
-\end{itemize}
+what is not surprising about the per-gene ceiling
+(\cref{fig:fidelity_spectrum}).
+The family runs from virtual staining, the literal image-to-image
+case in which tissue autofluorescence is translated into stained
+histology at pathologist-level fidelity precisely because the source
+physically contains the target\cite{rivenson2019virtualstaining},
+through ECG-to-function mapping, where an electrical modality
+faithfully encodes a structural one ($\mathrm{EF}\!\leq\!35\%$,
+$\auroc=0.93$)\cite{attia2019ecg}, and retinal-to-systemic mapping,
+which recovers cardiovascular risk factors from fundus photographs
+and so surfaces signal not previously thought to be morphologically
+encoded\cite{poplin2018retinal}, to pathomics-to-genomics on the
+very H\&E substrate we use\cite{kather2019msi,kather2020pancancer}.
+Radiogenomics is the most instructive of them, because it already
+exhibits the phenomenon we formalise: IDH and 1p/19q are recovered
+at high accuracy while MGMT-promoter methylation translates markedly
+less well\cite{chang2018radiogenomics}---a \emph{per-marker} split
+of the same kind as our per-gene regimes.
 
 \begin{figure}[ht!]
   \centering
   \includegraphics[width=\linewidth]{fidelity_spectrum}
   \caption{\textbf{A fidelity spectrum of medical cross-domain mapping
-  tasks.} Each task maps a cheap or ubiquitous source modality onto a
-  more expensive or latent target; the horizontal axis is the
+tasks.} Each task maps an inexpensive or ubiquitous source modality
+onto a more costly or latent target; the horizontal axis is the
   representative reported AUROC/accuracy (translational faithfulness)
   and the vertical axis the training-cohort size (log scale).
   Analogous tasks span virtual staining (near-perfect, source
@@ -136,10 +117,49 @@ sophistication of the estimator, and transparent per-target
 reporting of that ceiling is what turns the map into a usable
 clinical tool.
 
-% =====================================================================
-\subsection*{Translational interpretability: untranslatability as a
-first-class result}
-% =====================================================================
+What lifts this from an empirical grouping to a portable claim is
+that the regimes are not a grouping at all.
+A taxonomy that merely groups genes by their AUROC is a description
+of one cohort and travels no further than that cohort.
+The three regimes are instead a decomposition: the pattern channel
+and the embedding channel are two sources of information about the
+same target, and \cref{eq:pid} states the only four ways that
+information can be
+distributed between them.\cite{williams2010pid,bertschinger2014unique}
+Regime~(i) is the redundant atom, regime~(ii) the synergistic atom,
+regime~(iii) the absence of any pattern-side atom.
+Once stated this way, the taxonomy makes commitments that can be
+checked, and the check reported in Results---that the non-additive
+aggregator wins on exactly the genes with a recoverable synergistic
+atom and loses elsewhere---is the kind of evidence a leaderboard
+comparison cannot produce.
+
+The specific bridge we draw is between the $2$-additive Choquet
+interaction index and the synergistic atom.
+These are objects of different kinds: $I_{jk}$ is a learnable,
+differentiable, per-slide parameter of an aggregation operator,
+whereas $\Isyn$ is a property of a joint distribution that is
+notoriously hard to estimate in high dimension.
+The correspondence we establish is one of sign and support---a
+supra-additive fuzzy measure on a pattern pair is the aggregator's
+way of paying for joint activation, which is what a positive
+synergistic atom licenses---and it is what makes the atom
+inspectable at the bedside rather than only in a contingency table.
+We do not claim that $I_{jk}$ is a consistent estimator of
+$\Isyn$; establishing the conditions under which it is, or bounding
+the gap, is the natural theoretical continuation of this work.
+
+The practical consequence is a change in how the field should
+decide what to build next.
+Under a cohort-mean metric, the question ``what should we add?''
+has one answer for all genes and it is usually more parameters or
+more slides.
+Under \cref{eq:pid} the question is atom-conditional: a redundant
+atom means no aggregator change will help and the encoder is the
+binding constraint; a synergistic atom means the aggregator's
+hypothesis space is the binding constraint; an empty pattern-side
+atom means the \emph{source vocabulary} is the binding constraint
+and only a new channel will move it.
 
 The translation frame does more than organise the results; it
 suggests a different stance on interpretability itself.
@@ -159,28 +179,211 @@ Interpretability becomes contrastive and bilingual rather than a
 heat-coloured monologue.
 
 The sharper consequence is that \emph{untranslatability is promoted
-to a first-class, actionable result}.
-When a gene falls in the out-of-ontology regime, the honest output
-is not a low probability presented as if it were a confident call,
-but the statement that the mutation cannot be said in morphological
-words at all---and, via the per-slide channel ablation (L5) and the
-SHAP embedding/pattern split (L3), \emph{why}: the signal is in the
-immune micro-environment (STK11), in a biochemical axis with no
-H\&E correlate (KEAP1), or below the data floor (RBM10).
+to a first-class, actionable result}---provided it is asserted at the
+level where it was established.
+This is the qualification we most want to press, because the
+temptation the framework creates is precisely to skip it.
+The Conclusive/Inconclusive verdict thresholds a mean \auroc{}, a
+property of the cohort and not of any slide, so reading a low cohort
+mean as ``this mutation cannot be seen in this tissue'' is a level
+error---and a costly one, because it discards exactly the cases
+where the morphology \emph{does} speak.
+KRAS is our counterexample and it is unambiguous: the gene averages
+$\auroc = 0.609$ and is Inconclusive as a population, yet
+TCGA-55-7815 carries $P(\text{KRAS}) = 0.965$ with a positive
+lepidic$\times$solid interaction index localised in the tissue and
+matching the IMA phenotype that pathologists already recognise.
+Nothing about that slide is untranslatable.
+What is true is that the subpopulation in which the translation holds
+is a minority of the cohort, so the average over case pairs is
+mediocre---a statement about population heterogeneity, not about the
+expressive capacity of the source modality.
+
+Untranslatability proper is therefore a narrower and stronger claim:
+that the source-side atoms of \cref{eq:pid} are empty at the level
+being discussed.
+When a gene meets it, the honest output is not a low probability
+presented as if it were a confident call, but the statement that the
+mutation cannot be said in morphological words---and, via the
+per-slide channel ablation (L5) and the SHAP embedding/pattern split
+(L3), \emph{why}: the signal is in the immune micro-environment
+(STK11) or in a biochemical axis with no H\&E correlate (KEAP1).
 A translation that returns ``this sentence has no equivalent in the
 target language, and here is the missing vocabulary'' is more useful
 to the next experiment---NRF2 immunostaining, TIL quantification,
-RNA-seq---than a fluent but ungrounded paraphrase.
-We therefore position the Conclusive/Inconclusive verdict not as a
-confidence threshold but as a \emph{translatability} flag, and we
-argue that reporting untranslatability explicitly is a distinct and
-underused mode of interpretability for cross-domain medical
-prediction.
+RNA-seq---than a fluent but ungrounded paraphrase, and it is the
+decomposition that makes the statement specific enough to act on:
+the three states an Inconclusive verdict can hide
+(\cref{tab:pid_regimes}) share a mediocre AUROC while calling for
+different experiments.
+We therefore position the Conclusive/Inconclusive verdict as a
+population-level translatability flag rather than as a per-case
+confidence threshold or as a verdict on the modality, and we argue
+that reporting untranslatability explicitly---with its level
+attached---is a distinct and underused mode of interpretability for
+cross-domain medical prediction.
 
-% =====================================================================
-\subsection*{Dual anti-hallucination as a deployment prerequisite}
-% =====================================================================
+A framework that has only ever been run on the cohort it was designed
+around is indistinguishable from a description of that cohort.
+The decomposition of \cref{eq:pid} needs exactly two ingredients---an
+expert-defined controlled vocabulary on the source modality and a
+learned encoder of that modality unconstrained by the
+vocabulary---and both are available in domains far from pathology.
+We therefore pre-register two instantiations on fully public data
+(\cref{tab:crossdomain_protocol}), specified here so that the
+framework can be falsified independently of the LUAD results.
 
+\begin{table}[h!]
+\centering
+\input{tables/tab_crossdomain_protocol}
+\caption{The translatability framework instantiated in three domains.
+Domain~A is reported in this paper; domains~B and~C are
+pre-registered, with data sources, source ontologies and the expected
+regime assignment fixed in advance.}
+\label{tab:crossdomain_protocol}
+\end{table}
+
+The level structure of \cref{tab:levels_of_analysis} transfers with
+the framework. In every domain the source channels are defined on a
+single \emph{unit}---a slide in LUAD, a scan in glioma, a record in
+ECG---but the \pid{} atoms of \cref{eq:pid} and the
+Conclusive/Inconclusive verdict of \cref{eq:conclusive_verdict} are
+expectations over the joint distribution of those channels and the
+label, and are therefore \emph{population}-level in all three cases;
+probability and the L1--L6 interpretability instruments remain
+per-unit (\cref{tab:levels_crossdomain}). Two consequences follow.
+First, the population-level synergistic atom $\mathcal{S}$ has a
+per-unit counterpart in the Choquet interaction index $I_{jk}$, so
+regime~(ii) is falsifiable at both levels in each domain---between
+growth patterns on a slide, between VASARI features on a scan, and
+between SCP-ECG statements on a record. Second, an Inconclusive
+population verdict is compatible with the same three states of the
+world in every domain (information absent at every level; present in a
+morphologically or radiologically defined subpopulation and diluted in
+the average; or present but unestimable at the available positive-set
+size), so the per-stratum readout we use to adjudicate KRAS here is the
+same instrument that separates strict MGMT untranslatability from a
+diluted VASARI stratum in domain~B. The only structural difference is
+that a slide and a scan are \emph{bags} aggregated by MIL, whereas an
+ECG record is a \emph{single instance}: its sub-unit level collapses
+and synergy is read between vocabulary statements directly.
+
+\begin{table}[h!]
+\centering
+\input{tables/tab_levels_crossdomain}
+\caption{The level structure of \cref{tab:levels_of_analysis}
+generalised to the three domains. The population level hosts the \pid{}
+decomposition and the verdict in every domain; the interpretability
+instruments are per-unit. Only the name of the unit and whether it is a
+bag or a single instance change across domains.}
+\label{tab:levels_crossdomain}
+\end{table}
+
+The first instantiation, glioma MRI $\rightarrow$ genotype, is the
+closest structural analogue: an image of a tumour mapped
+onto its molecular profile, on open data, with an expert vocabulary
+already in place.
+VASARI is a consensus-defined controlled terminology of roughly
+thirty semantic MR features---enhancement quality, necrosis, margin
+definition, oedema, ependymal contact, grey-level
+heterogeneity---published with per-subject scores and reported
+inter-observer agreement for the TCGA glioma
+collections.\cite{gutman2013vasari,vasari_tcia}
+The transfer of our pipeline is one-to-one: a VASARI-feature
+classifier trained on the TCIA-annotated subset ($n=178$ LGG,
+$n=75$ GBM) and propagated to the $\sim$1{,}251 BraTS 2021
+subjects\cite{baid2021brats} occupies the position that
+\fuzzyarc{}\,V2 trained on Zenodo-ANORAK and propagated to TCGA-LUAD
+occupies here, with the same 2-additive Choquet aggregator over the
+feature vector.
+
+What makes this domain worth the effort is the target, not the
+method.
+MGMT promoter methylation has resisted prediction from preoperative
+MRI for a decade: the BraTS 2021 radiogenomic challenge was won at
+$\auroc\!\approx\!0.62$ on its own validation split, but subsequent
+CNN, ViT and Swin variants evaluated externally collapse to chance
+($\auroc\!\approx\!0.50$--$0.56$),\cite{baid2021brats,saeed2023mgmt} a systematic
+re-evaluation concluded that the algorithms developed to date are
+``not suitable for clinical application'',\cite{robinet2023mgmt} and
+an external validation across $985$ patients concluded that the
+methylation status ``may not be predictable'' from conventional
+structural MRI even with deep
+learning.\cite{kim2022mgmtvalidation}
+That literature is, in our terms, a decade of accumulating evidence
+for a regime-(iii) verdict---reported as a community-wide defeat
+because no framework existed in which it could be reported as a
+finding.
+Our prediction is specific and falsifiable: IDH should sit in
+regime~(i) with the VASARI channel adding nothing on top of the
+encoder; 1p/19q should sit in regime~(ii), with the non-additive
+aggregator beating the additive one on that target \emph{and on no
+other}; and MGMT should sit in regime~(iii) with empty
+VASARI-side atoms.
+That last prediction is the strong one, because it asserts the
+strict form of untranslatability and therefore has to exclude the
+two weaker states that produce the same stalled AUROC: a data floor,
+which the $n\!\sim\!1{,}251$ BraTS cohort makes implausible, and a
+subpopulation effect of the kind KRAS exhibits here, which is
+excluded only if no VASARI-defined stratum recovers the signal.
+We will report the per-stratum readout for exactly that reason.
+If the strict form holds, the remedy is a different source
+modality---perfusion or diffusion sequences, or methylation-array
+fusion---rather than a further architecture; if instead a stratum
+does recover it, the field's decade of negative cohort-average
+results would have been hiding a translatable subgroup, which is a
+more consequential finding than either.
+
+The second instantiation, the electrocardiogram $\rightarrow$
+laboratory state, tests whether the taxonomy scales past six
+targets and whether it survives a change of modality family.
+PTB-XL supplies $21{,}799$ records annotated by cardiologists with
+$71$ SCP-ECG statements organised into diagnostic, form and rhythm
+categories with a proposed
+hierarchy\cite{wagner2020ptbxl}---the direct counterpart of the
+ANORAK six---and PTB-XL$+$ supplies the SNOMED-CT mapping with
+upward propagation through the ontology tree, which is our
+knowledge-graph layer already
+built.\cite{strodthoff2023ptbxlplus}
+Two properties make this domain more favourable than histology.
+First, the source vocabulary is already \emph{graded}: each
+diagnostic statement carries a $0$--$100$ likelihood extracted from
+the cardiologist's report, so the fuzzy membership our L6 layer must
+learn in LUAD is here supplied as data.
+Second, the target set is an order of magnitude larger: a recent
+foundation-model study reports $33$ of $108$ laboratory indicators
+above $\auroc=0.65$, $59$ in a borderline band the authors describe
+as information that ``may exist in the signal but is difficult to
+extract'', and $16$ below $\auroc=0.55$\cite{xiao2025anyecglab}---an
+empirical three-way partition published without a framework to
+interpret it.
+The sharpest single case is the contrast between NT-proBNP
+($\auroc\!\approx\!0.78$) and troponin~I ($\auroc<0.55$): two cardiac markers,
+one with a projection onto the electrical signal and one a purely
+biochemical state, which is precisely our EGFR-versus-KEAP1 contrast
+in a different organ system.
+Structural heart disease labels from
+EchoNext\cite{hughes2026echonext} and the paired
+ECG/chest-radiograph/laboratory records of
+MIMIC-IV-ECG\cite{gow2023mimicivecg} extend the same protocol to a
+multimodal setting in which the missingness correction of
+\citet{choi2025icym2i} becomes mandatory rather than optional.
+
+Between them the two domains buy complementary evidence.
+The glioma instantiation tests the framework against the hardest
+available negative case and puts the Conclusive/Inconclusive verdict
+where a community already agrees the answer is negative but has no
+way to say so.
+The electrocardiogram instantiation tests whether the three regimes
+remain distinguishable at $10^2$ targets rather than $6$, and whether
+a natively graded source vocabulary strengthens or weakens the fuzzy
+explanation layer.
+Neither requires new data collection, proprietary access or a
+foundation-scale cohort; both are reachable from public archives,
+which is the point.
+
+Deployment imposes one further requirement that is independent of the
+taxonomy.
 Large language models are entering the clinical pathology workflow
 as report-drafters and second readers, but the failure mode is
 the same as in the consumer setting: confident assertions
@@ -193,56 +396,119 @@ graph constrains the \emph{entity set} (the agent cannot invent
 mutations that do not exist for LUAD), and a DeepSearch literature
 layer constrains the \emph{citations} (every claim must be
 traceable to PubMed or a curated ontology IRI).
-In the SOLCA-CISOL pilot, deactivation-without-deletion of
-incorrect agent assertions preserved an audit trail that
-pathologists explicitly cited as the reason they were willing to
-endorse the system.
+Deactivation-without-deletion of contested assertions completes the
+mechanism by preserving an audit trail rather than silently
+rewriting the record.
 We argue this is the minimum bar for AI-assisted pathology
-reporting and that it should generalise beyond LUAD.
+reporting and that it should generalise beyond LUAD, while noting
+that the three constraints are architectural guarantees about what
+the agent \emph{can} emit and not measurements of what it does emit
+in the hands of a reader.
 
-% =====================================================================
-\subsection*{Limitations}
-% =====================================================================
-
-\paragraph{Single retrospective cohort.}
+Several constraints bound what the present study establishes.
 All numbers reported here are 5-fold patient-stratified CV on
-TCGA-LUAD.
-External validation on CPTAC-3, APOLLO and the EAGLE-1 silent-trial
-cohort is the natural next step and is enumerated as a prospective
-plan in the Methods.
-A multi-site reader study with SOLCA-CISOL and a Swiss
-academic medical centre is in preparation.
+a single retrospective cohort, TCGA-LUAD.
+External validation on CPTAC-LUAD (detailed below), APOLLO and the
+EAGLE-1 silent-trial cohort is the natural next step, and a multi-site
+reader study with SOLCA-CISOL and a Swiss academic medical centre is in
+preparation.
+The two cross-domain instantiations of
+\cref{tab:crossdomain_protocol} are stated as pre-registered
+predictions with their cohorts, source ontologies and expected regime
+assignments fixed in advance; until they are run, the generality of
+the framework rests on the structural argument and on the published
+per-target splits we cite, not on our own measurements in those
+domains.
+We regard the MGMT prediction---empty VASARI-side atoms rather than a
+data floor---as the single claim on which the framework should be
+judged, because it is the one that a decade of negative results makes
+easiest to refute.
 
-\paragraph{Cohort size relative to foundation-scale benchmarks.}
+Two senses of generalisation should be kept apart, because they are
+established by different experiments. The glioma and electrocardiogram
+instantiations test \emph{structural portability}---whether the three
+regimes and the falsification test recur when the modality and the
+source ontology change. They do not test whether the \emph{regime
+assignment of a given gene} is stable, because the assignment is not a
+property of the gene: it is a property of the triple (source ontology,
+learned encoder, cohort), and the \pid{} atoms of \cref{eq:pid} and the
+verdict of \cref{eq:conclusive_verdict} are expectations over the joint
+distribution of that cohort. A different cohort can therefore move a
+gene across the threshold, and KRAS already shows the mechanism
+in-sample: because the verdict averages over the case-mix, reweighting
+the lepidic$\times$solid subpopulation would change it. Calling an
+assignment near-intrinsic is licensed only by concordance across
+independent cohorts with overlapping confidence intervals, which a
+single-cohort study cannot supply.
+We therefore pre-register a within-domain cohort-transfer test on
+CPTAC-LUAD, whose whole-slide images are on The Cancer Imaging Archive
+and whose matched whole-exome/whole-genome calls are on the Genomic
+Data Commons and cBioPortal (\texttt{luad\_cptac\_2020}), and which
+carries all six of our target genes.\cite{gillette2020cptacluad,cptacluad_data}
+CPTAC-LUAD is a genuine distribution shift rather than a resample of
+TCGA---it is enriched for never-smokers and \textit{EGFR}-mutant,
+demographically more diverse tumours\cite{gillette2020cptacluad}---which
+is what makes overlapping intervals there informative. The constraint
+is power: at $n\!=\!110$ the implied positive-set sizes
+(\cref{tab:cptac_power}) clear our $n_+\!=\!37$ estimation floor only
+for \textit{TP53}, with \textit{KRAS} at the margin, so the test can
+adjudicate the well-powered saturation and synergy assignments but is,
+by construction, underpowered for the regime-(iii) candidates it would
+most need to check. We pre-register the prediction that \textit{TP53}
+and \textit{KRAS} retain their regimes with overlapping intervals, and
+state in advance that a null result on the rarer genes is a statement
+about power, not about translatability.
+
+\begin{table}[h!]
+\centering
+\input{tables/tab_cptac_power}
+\caption{Expected positive-set sizes for the six target genes in the
+pre-registered CPTAC-LUAD cohort-transfer test. Only \textit{TP53}
+clears, and \textit{KRAS} reaches, the estimation floor of this paper;
+the regime-(iii) genes fall below it, which is stated in advance.}
+\label{tab:cptac_power}
+\end{table}
+
+The cohort is also small relative to foundation-scale benchmarks.
 At $n=687$ slides, TCGA-LUAD is two orders of magnitude smaller
 than EAGLE ($n=8{,}461$) and CHIEF ($n=60{,}530$).
 Our numbers therefore underestimate what a foundation-scale
 pattern-informed pipeline could deliver and should be read as
 \emph{what is reachable from the most-used public cohort}.
-
-\paragraph{The 6-pattern simplex is a pre-committed hypothesis
-space.}
-The out-of-ontology regime is by definition unreachable inside
-the ANORAK ontology.
+The 6-pattern simplex is likewise a pre-committed hypothesis space,
+which means the out-of-ontology regime is by definition unreachable
+inside the ANORAK ontology.
 Adding micro-environment channels (tumour-infiltrating
 lymphocytes,\cite{brambilla2016til} budding,\cite{kadota2015budding}
 tumour-stroma ratio\cite{zhang2015tsr}) is the principled next
-step for STK11 and KEAP1.
-Multimodal fusion with RNA-seq is the principled next step for
-KEAP1 and RBM10.
+step for STK11 and KEAP1, and multimodal fusion with RNA-seq is the
+principled next step for KEAP1 and RBM10.
 
-\paragraph{Single-pathologist validation.}
-The current explanation-layer audit was performed with the
-SOLCA-CISOL team and the two pathologist co-authors of this
-manuscript.
-A formal multi-rater concordance study is in preparation; the
-preliminary numbers should not be over-interpreted.
+The information decomposition itself is bounded rather than measured.
+\Cref{eq:pid} is estimated on scalar sufficient statistics of the
+two channels rather than on the channels themselves, because a
+$512$-dimensional source is not tractable at $n=687$; the
+discretisation into quantile bins and the choice of the
+Bertschinger~et~al.\ construction\cite{bertschinger2014unique}
+are both estimator choices that other definitions of redundancy
+would not share, and at the prevalences available here the atoms are
+too noisy to quote individually, which is why we report the
+decomposition through its three model-side signatures.
+A larger cohort, and the inverse-probability-weighting correction
+required once the additional channels are observed on a
+non-random subset,\cite{choi2025icym2i} are prerequisites for
+turning the structural claim into a measured one; the
+instance-level latent-variable estimator of modality
+impact\cite{madaan2026primo} is the principled replacement for the
+plug-in L5 ablation at the per-slide level.
+Finally, the explanation layer has not been validated against
+readers.
+Its two constraints are enforced by construction, but whether they
+change what a pathologist concludes, and at what cost in reading
+time, is an empirical question this paper does not answer; the
+multi-rater study noted above is designed to settle it.
 
-% =====================================================================
-\subsection*{Outlook}
-% =====================================================================
-
-The clinically actionable verdict from this work is not that the
+The actionable verdict from this work is therefore not that the
 LCHAI predictor outperforms the published competition---it does
 not, and is not expected to at this cohort size---but that
 \emph{the explanation layer it offers is what enables a
@@ -254,7 +520,12 @@ rather than a research add-on, and that the gene-conditional
 three-regime taxonomy we propose is a more honest scaffold for
 cross-paper comparison than the cohort-average metric currently
 in use.
-
+Because that scaffold is a partial information decomposition
+rather than a naming convention, it applies unchanged to any
+cross-domain medical prediction task that pairs an expert source
+ontology with a learned encoder, and it converts the perennial
+question of what to build next from a leaderboard argument into an
+atom-conditional one.
 The live system---live-pathologist user interface, six-level
 explanation stack, NCIt+MONDO knowledge graph, fuzzy LLM agent
 and the active-learning loop that ingests pathologist

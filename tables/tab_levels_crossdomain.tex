@@ -1,0 +1,56 @@
+% Table tab:levels_crossdomain — the level structure of tab:levels_of_analysis
+% generalised to the three domains. The point is that the PID atoms and the
+% Conclusive/Inconclusive verdict are population-level in every domain, while
+% probability and the interpretability instruments are per-unit; only the name
+% of the unit (slide -> scan -> record) and whether it is a bag or a single
+% instance change across domains.
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}p{3.0cm} X X X}
+\toprule
+\textbf{Level (quantities estimated here)} &
+  \textbf{A. LUAD} &
+  \textbf{B. Glioma} &
+  \textbf{C. ECG} \\
+\midrule
+\textbf{Population} \newline mean $\auroc$, the \pid{} atoms of
+  \cref{eq:pid}, regime assignment, and the verdict of
+  \cref{eq:conclusive_verdict}
+  & target $\times$ cohort; 6 mutations over 668 patients
+  & target $\times$ cohort; IDH, 1p/19q, MGMT
+  & target $\times$ cohort; 108 laboratory indicators $+$ 12 SHD \\
+\midrule
+\textbf{Patient} \newline label; fold membership; $P(\cdot)$ pooled
+  over that patient's units
+  & patient (668)
+  & subject ($\sim$1{,}251)
+  & patient (18{,}869) \\
+\midrule
+\textbf{Unit} \newline per-unit $P(\cdot)$; the L1--L6 stack;
+  Choquet--Shapley $\Phi_k$ and interaction indices $I_{jk}$
+  & WSI slide (687); \emph{bag} of tiles
+  & MRI scan ($\sim$1{,}251); \emph{bag} of slices/patches
+  & ECG record (21{,}799); \emph{single instance} \\
+\midrule
+\textbf{Sub-unit} \newline local evidence; where in the signal it sits
+  & tile $224\!\times\!224$ px ($\leq\!200$/slide)
+  & slice / patch
+  & --- collapses (optional: beat / lead) \\
+\bottomrule
+\end{tabularx}
+\begin{flushleft}\footnotesize
+Every row is the same object renamed, not an analogy. The \pid{} atoms
+and the Conclusive/Inconclusive verdict are \emph{population}-level in
+all three domains---they are expectations over the joint distribution
+of the source channels and the label, so a single unit cannot carry
+them---while probability and the interpretability instruments are
+\emph{per-unit}. The synergistic atom $\mathcal{S}$ of \cref{eq:pid}
+(population) has its per-unit counterpart in the Choquet interaction
+index $I_{jk}$, which is why regime~(ii) is testable at both levels.
+The only structural difference is that in A and B the unit is a
+\emph{bag} (MIL aggregation over sub-units), whereas an ECG record is a
+\emph{single instance}: the sub-unit level collapses, and synergy is
+read between vocabulary statements (e.g.\ LVH$\times$strain) rather than
+between sub-unit patterns.
+\end{flushleft}
