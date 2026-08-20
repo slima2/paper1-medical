@@ -384,6 +384,37 @@ preserving an audit trail).
 Both constraints are architectural: they are enforced by the prompt
 grammar and the knowledge-graph guard described in Methods, and we
 report no reader-study measurement of their effect.
+A live-system view of the complete stack on the KRAS case is shown in
+\cref{fig:lchai_ui_stack}.
+
+\begin{figure}[p]
+  \centering
+  \includegraphics[width=\linewidth,height=0.8\textheight,keepaspectratio]{lchai_ui_six_levels}
+  \caption{\textbf{The six-level explanation stack as the pathologist
+  sees it in the deployed \lchai{}~v2 interface}
+  (\href{https://lchai.gptfy.biz}{lchai.gptfy.biz}), for KRAS on
+  TCGA-55-7815---the case whose cohort verdict is Inconclusive
+  ($\auroc=0.609$) yet whose slide-level prediction is
+  $P(\mathrm{mut})=0.965$. The top strip carries the population
+  verdict and slide-level prediction with the automatic
+  molecular-testing flag raised whenever $\auroc<0.70$. The six
+  interpretability layers of \cref{fig:lchai_six_levels} are then
+  materialised live from a single forward pass:
+  \textbf{L1} ABMIL attention (\emph{where}),
+  \textbf{L2} pattern overlay (\emph{what}),
+  \textbf{L3} SHAP embedding/pattern split,
+  \textbf{L4} Choquet--Shapley singleton values and pairwise
+  interaction indices,
+  \textbf{L5} channel ablation, and
+  \textbf{L6} the fuzzy-label LLM explanation with its
+  knowledge-graph--grounded references. The bottom panel is the
+  case-specific NCIt+MONDO knowledge graph linking diagnosis,
+  histopathological patterns, mutations and candidate therapies, with
+  asserted and DeepSearch-inferred edges distinguished. All imagery is
+  from the public TCGA-LUAD cohort; the system is a research tool and
+  is not for clinical diagnosis.}
+  \label{fig:lchai_ui_stack}
+\end{figure}
 
 % =====================================================================
 \subsection*{Per-gene case studies}
