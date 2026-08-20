@@ -3,26 +3,25 @@
 % 01_abstract_LONG_backup.tex.bak for journals without a hard limit.
 \begin{abstract}
 \noindent
-Medical tasks mapping a low-cost, widely available source modality
-onto a costly target are reported as a cohort-average metric that
-hides which targets are reachable and why others are not.
+Medical tasks mapping a low-cost source modality onto a costly target
+are reported as a cohort-average metric that hides which targets are
+reachable.
 We treat them as imperfect translation and report per-target
 translatability.
 Our three-regime taxonomy---encoder saturation, inter-pattern
-co-occurrence, out-of-ontology---is derived as the redundant,
-synergistic and unique atoms of a partial information decomposition of
-the source ontology against the encoder, paired with a
-population-level Conclusive/Inconclusive verdict and the six-level
-\lchai{} explanation stack.
+co-occurrence, out-of-ontology---is the redundant, synergistic and
+unique atoms of a partial information decomposition of the source
+ontology against the encoder, paired with a Conclusive/Inconclusive
+verdict and the six-level \lchai{} explanation stack.
 On TCGA-LUAD (687 slides, 668 patients) TP53 and EGFR saturate the
-encoder, KRAS is synergistic, STK11 and KEAP1 fall outside it, and
-RBM10 is only underpowered.
-KRAS forces the levels apart: Inconclusive at 0.609 cohort-wide, yet
-0.965 on one slide.
-Needing only an expert source ontology and a learned encoder, the
-decomposition supports two pre-registered public-data tests: glioma
-{MRI} to genotype under {VASARI}, and electrocardiogram to laboratory
-state under {PTB-XL}'s graded {SCP-ECG} statements.
+encoder, KRAS is synergistic, STK11 and KEAP1 fall outside it; KRAS is
+Inconclusive at 0.609 yet 0.965 on one slide.
+A cohort transfer to CPTAC-LUAD fails---TP53 collapses from 0.72 to
+0.53 off-the-shelf and 0.48 after stain normalisation---so no
+assignment is near-intrinsic.
+The framework transfers: on {PTB-XL} it recovers physiological state
+from the electrocardiogram (AUROC 0.90), and supports a pre-registered
+glioma test under {VASARI}.
 \end{abstract}
 
 \paragraph{Keywords.}

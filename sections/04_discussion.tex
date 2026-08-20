@@ -41,7 +41,7 @@ A model that instead reports $P(\text{KEAP1}) = 0.610$ with a
 negligible Choquet interaction and a SHAP/ablation split that places
 almost all of the slide-level signal in the embedding channel and
 essentially none in the pattern channel
-(\cref{tab:pid_regimes}, with the exact figures in Results) is honest
+(\cref{tab:pid_regimes}, with the exact figures in Results) is transparent
 about what the slide cannot answer, and points the next investigation
 toward NRF2 immunostaining or RNA-seq rather than another loss
 function.
@@ -200,7 +200,7 @@ expressive capacity of the source modality.
 Untranslatability proper is therefore a narrower and stronger claim:
 that the source-side atoms of \cref{eq:pid} are empty at the level
 being discussed.
-When a gene meets it, the honest output is not a low probability
+When a gene meets it, the principled output is not a low probability
 presented as if it were a confident call, but the statement that the
 mutation cannot be said in morphological words---and, via the
 per-slide channel ablation (L5) and the SHAP embedding/pattern split
@@ -380,6 +380,47 @@ Neither requires new data collection, proprietary access or a
 foundation-scale cohort; both are reachable from public archives,
 which is the point.
 
+The electrocardiogram domain, however, need not remain purely
+pre-registered for its most immediately available target. Patient sex and age are recorded
+for every PTB-XL case and are not derivable from the SCP-ECG statements
+(which are diagnostic, form and rhythm terms), so they furnish a clean,
+leakage-free target on which the framework can be run now, with the same
+two channels: the $71$ graded SCP-ECG statements as the source
+vocabulary $\mathbf{P}$ and a compact 1D convolutional encoder of the raw
+twelve-lead signal as $\mathbf{E}$. This is the electrocardiographic
+counterpart of the retinal$\rightarrow$systemic mapping we cite---
+recovering a physiological state from a modality not designed to report
+it\cite{poplin2018retinal,attia2019ecg}.
+Running the identical four-condition protocol used for LUAD, five-fold
+patient-disjoint on the PTB-XL folds (\cref{tab:ecg_domainc}), reproduces
+the machinery end to end. Both targets are Conclusive---sex at
+$\auroc\!=\!0.90$ and age$\,\geq\!65$ at $0.84$ under the best
+aggregator---and both sit in regime~(i): the fusion conditions match the
+encoder to within a fold's standard deviation ($\Delta\auroc\!<\!0.01$)
+while the source vocabulary alone is far weaker ($0.62$ and $0.73$), so
+the raw signal saturates the target and the statement channel adds
+essentially nothing on top. This is the same encoder-saturated signature
+\textit{EGFR} and \textit{TP53} show in LUAD, now recovered in a
+different modality family with a natively graded source vocabulary.
+The run does not exhibit an Inconclusive electrocardiogram target---sex
+and age are, as expected, strongly written into the electrical
+signal---so the untranslatable end of the spectrum stays anchored by
+LUAD and by the pre-registered laboratory targets, whose partition into
+translatable, borderline and untranslatable bands the literature already
+reports.\cite{xiao2025anyecglab} What the PTB-XL run establishes is
+narrower but real: the two-channel decomposition, the four-condition
+protocol and the Conclusive verdict transfer intact across a modality
+family, not merely in principle.
+
+\begin{table}[h!]
+\centering
+\input{tables/tab_ecg_domainc}
+\caption{Empirical domain-C run: physiological-state translation on
+PTB-XL. Both targets are Conclusive and encoder-saturated (regime~(i)),
+reproducing the LUAD machinery in a different modality family.}
+\label{tab:ecg_domainc}
+\end{table}
+
 Deployment imposes one further requirement that is independent of the
 taxonomy.
 Large language models are entering the clinical pathology workflow
@@ -404,19 +445,25 @@ the agent \emph{can} emit and not measurements of what it does emit
 in the hands of a reader.
 
 Several constraints bound what the present study establishes.
-All numbers reported here are 5-fold patient-stratified CV on
-a single retrospective cohort, TCGA-LUAD.
-External validation on CPTAC-LUAD (detailed below), APOLLO and the
-EAGLE-1 silent-trial cohort is the natural next step, and a multi-site
-reader study with SOLCA-CISOL and a Swiss academic medical centre is in
-preparation.
+All primary numbers reported here are 5-fold patient-stratified CV on
+a single retrospective cohort, TCGA-LUAD; the one external cohort we do
+score, CPTAC-LUAD (detailed below), does not reproduce them off-the-shelf.
+Harmonised external validation on CPTAC-LUAD with domain adaptation,
+APOLLO and the EAGLE-1 silent-trial cohort is the natural next step, and a
+multi-site reader study with SOLCA-CISOL and a Swiss academic medical
+centre is in preparation.
 The two cross-domain instantiations of
 \cref{tab:crossdomain_protocol} are stated as pre-registered
 predictions with their cohorts, source ontologies and expected regime
-assignments fixed in advance; until they are run, the generality of
-the framework rests on the structural argument and on the published
-per-target splits we cite, not on our own measurements in those
-domains.
+assignments fixed in advance. One of them is no longer purely
+predicted: the electrocardiogram domain carries the empirical
+physiological-state result of \cref{tab:ecg_domainc}, which shows the
+two-channel decomposition and the Conclusive verdict transferring intact
+to a different modality family. The glioma domain, and the laboratory
+and structural-heart-disease targets of the electrocardiogram domain,
+remain pre-registered; for those the generality of the framework rests
+on the structural argument and on the published per-target splits we
+cite, not on our own measurements.
 We regard the MGMT prediction---empty VASARI-side atoms rather than a
 data floor---as the single claim on which the framework should be
 judged, because it is the one that a decade of negative results makes
@@ -436,33 +483,95 @@ threshold---as the KRAS case-mix dilution already shows in-sample.
 Calling an assignment near-intrinsic is therefore licensed only by
 concordance across independent cohorts with overlapping confidence
 intervals, which a single-cohort study cannot supply.
-We therefore pre-register a within-domain cohort-transfer test on
+We therefore ran a within-domain cohort-transfer test on
 CPTAC-LUAD, whose whole-slide images are on The Cancer Imaging Archive
 and whose matched whole-exome/whole-genome calls are on the Genomic
 Data Commons and cBioPortal (\texttt{luad\_cptac\_2020}), and which
 carries all six of our target genes.\cite{gillette2020cptacluad,cptacluad_data}
 CPTAC-LUAD is a genuine distribution shift rather than a resample of
-TCGA---it is enriched for never-smokers and \textit{EGFR}-mutant,
-demographically more diverse tumours\cite{gillette2020cptacluad}---which
-is what makes overlapping intervals there informative. The constraint
-is power: at $n\!=\!110$ the implied positive-set sizes
-(\cref{tab:cptac_power}) clear our $n_+\!=\!37$ estimation floor only
-for \textit{TP53}, with \textit{KRAS} at the margin, so the test can
-adjudicate the well-powered saturation and synergy assignments but is,
-by construction, underpowered for the regime-(iii) candidates it would
-most need to check. We pre-register the prediction that \textit{TP53}
-and \textit{KRAS} retain their regimes with overlapping intervals, and
-state in advance that a null result on the rarer genes is a statement
-about power, not about translatability.
+TCGA---enriched for never-smokers and \textit{EGFR}-mutant,
+demographically more diverse tumours\cite{gillette2020cptacluad}---and
+we processed it off-the-shelf: the frozen TCGA-trained pipeline applied
+to the $498$ CPTAC slides from the $106$ genotyped patients with matched
+H\&E, with no stain normalisation, colour calibration or domain
+adaptation, and slide scores mean-pooled to the patient exactly as
+pre-registered (\cref{tab:cptac_power,tab:cptac_transfer}).
+
+The result is a clean negative. In the genotyped-with-imaging subset only
+\textit{TP53} clears the $n_+\!=\!37$ estimation floor ($n_+\!=\!55$); its
+CPTAC AUROC is $0.53$ ($95\%$ CI $0.42$--$0.64$), an interval that
+excludes the TCGA point estimate ($0.717$) and moves the verdict from
+Conclusive to Inconclusive. The collapse is not an artefact of
+patient-level pooling: a slide-level read-out ($n\!=\!498$), a max, a
+top-$2$/top-$3$ mean and a single-largest-slide read-out all place
+\textit{TP53} between $0.49$ and $0.57$, and across all six genes and
+five aggregators no CPTAC AUROC exceeds $0.62$. The remaining five
+targets are underpowered---\textit{EGFR}, at $n_+\!=\!36$ in this subset,
+falls just short of the floor the full cohort had cleared---so their
+near-chance values are, as stated in advance, claims about power; but the
+one well-powered gene is unambiguous.
+
+Two readings survive this and a single external cohort cannot separate
+them. The first is genuine cohort-relativity: the morphology-to-genotype
+coupling learned on TCGA does not hold in CPTAC, so a regime assignment
+is a property of the (source ontology, learned encoder, cohort) triple
+and not of the gene. The second is an uncorrected technical domain gap:
+CPTAC reaches the model through a DICOM-to-pyramidal-TIFF conversion on
+different scanners, and TCGA-trained models are known to encode
+site-specific batch signatures that correlate with mutation prevalence,
+inflating in-cohort accuracy while collapsing out of it---a bias that
+stain normalisation only partly removes.\cite{howard2021site}
+We tested the colour component of this directly: re-running the transfer
+with Reinhard stain normalisation of every tile to a representative
+TCGA-LUAD reference does not recover it---\textit{TP53} stays at $0.48$
+at the patient level and at most $0.54$ across the slide, mean, max,
+top-$2$/top-$3$ and largest-slide aggregators, its $95\%$ CI still
+excluding the TCGA point, and no aggregator recovers the TCGA value for
+any gene (\cref{tab:cptac_transfer})---so a global colour/stain cast is
+not the driver, and any technical account must rest on deeper scanner- or
+site-level batch signatures beyond colour (Macenko stain-matrix
+normalisation remains untested).
+The pattern here---the high-TCGA-AUROC genes fall the most while genes
+already near the floor are roughly preserved, a uniform regression toward
+chance---does not by itself separate this residual technical reading from
+genuine cohort-relativity, but both
+carry the same consequence for the claim at issue: read off-the-shelf,
+the TCGA verdicts are not portable, and no assignment in this paper is
+licensed as near-intrinsic. Establishing near-intrinsic assignment would
+require multi-cohort validation with stain harmonisation and explicit
+domain adaptation; we treat that as a precondition for any translatability
+claim at the level of an individual gene, as distinct from the structural
+portability of the framework that the glioma and electrocardiogram
+instantiations test separately.
 
 \begin{table}[h!]
 \centering
 \input{tables/tab_cptac_power}
-\caption{Expected positive-set sizes for the six target genes in the
-pre-registered CPTAC-LUAD cohort-transfer test. Only \textit{TP53}
-clears, and \textit{KRAS} reaches, the estimation floor of this paper;
-the regime-(iii) genes fall below it, which is stated in advance.}
+\caption{Observed positive-set sizes for the six target genes in the
+CPTAC-LUAD cohort-transfer test, from the actual non-silent mutation
+frequencies in cBioPortal \texttt{luad\_cptac\_2020} ($n\!=\!110$). These
+fix, in advance of the imaging read-out, which targets the transfer can
+estimate: in the genotyped-with-imaging subset ($n\!=\!106$) only
+\textit{TP53} clears the $n_+\!=\!37$ floor, \textit{EGFR} falls just
+short, and the regime-(iii) genes and \textit{RBM10} fall well below.}
 \label{tab:cptac_power}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\input{tables/tab_cptac_transfer}
+\caption{Empirical within-domain cohort-transfer result on CPTAC-LUAD
+($498$ slides, $106$ genotyped patients), the frozen TCGA-trained pipeline
+applied off-the-shelf. The one well-powered gene, \textit{TP53}, collapses
+from a TCGA AUROC of $0.717$ to $0.53$ ($95\%$ CI $0.42$--$0.64$), and no
+gene under any aggregator exceeds $0.62$. Reinhard stain normalisation to a
+TCGA-LUAD reference does not recover transfer (\textit{TP53} $0.48$), ruling
+out a global colour/stain cast. Read off-the-shelf, the TCGA
+verdicts do not transfer; whether the residual reflects cohort-relativity of
+the assignment or an uncorrected scanner/site domain gap\cite{howard2021site}
+cannot be disentangled with a single external cohort, but either way no
+assignment is licensed as near-intrinsic.}
+\label{tab:cptac_transfer}
 \end{table}
 
 The cohort is also small relative to foundation-scale benchmarks.
@@ -513,7 +622,7 @@ We argue that mutation prediction at the public-cohort scale
 should be reported with per-gene Conclusive/Inconclusive flags,
 that pattern-informed interpretability should be the default
 rather than a research add-on, and that the gene-conditional
-three-regime taxonomy we propose is a more honest scaffold for
+three-regime taxonomy we propose is a more rigorous scaffold for
 cross-paper comparison than the cohort-average metric currently
 in use.
 Because that scaffold is a partial information decomposition

@@ -1,0 +1,54 @@
+% Table tab:cptac_transfer — empirical within-domain cohort-transfer result.
+% CPTAC-LUAD (498 slides, 106 genotyped patients with matched H&E), the frozen
+% TCGA-trained pipeline applied off-the-shelf (no stain normalisation, colour
+% calibration or domain adaptation). "CPTAC AUROC" is the patient-level read-out
+% (slides mean-pooled, the pre-registered aggregation) with a 2000-sample
+% bootstrap 95% CI; the slide-level column assigns each of the 498 slides its
+% patient's genotype. Reproducible via scripts/eval_cptac_transfer.py and
+% scripts/reaggregate_cptac.py; TCGA AUROC is the best-aggregator value reported
+% for the LUAD cohort in this paper. The "Reinhard" column re-runs the same
+% patient-level read-out after Reinhard stain normalisation of every tile to a
+% representative TCGA-LUAD reference (run_cptac_inference.py --stain-normalize
+% --stain-method reinhard); it isolates a global colour/stain cast as a cause.
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{l c c c c c c}
+\toprule
+\textbf{Gene} & \textbf{Regime (TCGA)} & \textbf{TCGA} & \textbf{$n_+$} &
+  \textbf{CPTAC AUROC} & \textbf{Reinhard} & \textbf{slide} \\
+              &                        & \textbf{AUROC} & \textbf{(/$106$)} &
+  \textbf{($95\%$ CI)} & \textbf{AUROC} & \textbf{AUROC} \\
+\midrule
+\textit{TP53}$^\dagger$  & (i) saturation   & $0.717$ & $55$ & $0.53$ ($0.42$--$0.64$) & $0.48$ & $0.49$ \\
+\textit{EGFR}            & (i) saturation   & $0.701$ & $36$ & $0.57$ ($0.45$--$0.70$) & $0.57$ & $0.55$ \\
+\textit{KRAS}            & (ii) synergy     & $0.609$ & $32$ & $0.59$ ($0.48$--$0.71$) & $0.59$ & $0.57$ \\
+\textit{STK11}           & (iii)            & $0.695$ & $20$ & $0.46$ ($0.34$--$0.59$) & $0.48$ & $0.43$ \\
+\textit{KEAP1}           & (iii)            & $0.610$ & $12$ & $0.43$ ($0.23$--$0.64$) & $0.41$ & $0.50$ \\
+\textit{RBM10}           & est.\ floor      & $0.661$ & $5$  & $0.40$ ($0.23$--$0.55$) & $0.51$ & $0.43$ \\
+\bottomrule
+\end{tabular}
+\begin{flushleft}\footnotesize
+$^\dagger$Only \textit{TP53} clears the $n_+\!=\!37$ estimation floor in the
+genotyped-with-imaging subset ($n\!=\!106$); the other rows are underpowered
+and their near-chance values are, as pre-registered, statements about power.
+CPTAC AUROC is the patient-level read-out (slides mean-pooled, the
+pre-registered aggregation) with a $2000$-sample bootstrap $95\%$ CI; the
+slide-level column ($n\!=\!498$, each slide inheriting its patient's genotype)
+and the max, top-$2$, top-$3$ and largest-slide aggregators (not shown) place
+every gene within $\pm0.06$ of the tabulated value, so the collapse is not an
+artefact of patient-level pooling. No off-the-shelf CPTAC AUROC exceeds $0.62$;
+the well-powered \textit{TP53} interval excludes its TCGA point estimate and
+flips the verdict from Conclusive to Inconclusive. The \textbf{Reinhard} column
+repeats the patient-level read-out after Reinhard stain normalisation of every
+tile to a representative TCGA-LUAD reference
+(\texttt{--stain-method reinhard}): it does not recover transfer
+(\textit{TP53} $0.48$ at the patient level, at most $0.54$ across the five
+aggregators, its $95\%$ CI still excluding the TCGA point; no aggregator
+recovers the TCGA value for any gene), so the collapse is not a global
+colour/stain cast either. Macenko stain-matrix normalisation was
+not tested and is left to future work. Reproducible with
+\texttt{scripts/eval\_cptac\_transfer.py},
+\texttt{scripts/reaggregate\_cptac.py} and the stain flags in
+\texttt{scripts/run\_cptac\_inference.py}.
+\end{flushleft}

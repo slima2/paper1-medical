@@ -1,0 +1,32 @@
+% Table tab:ecg_domainc — empirical domain-C run on PTB-XL. Physiological-state
+% targets (sex, age) predicted from the raw 12-lead signal, with the 71 graded
+% SCP-ECG statements as the source vocabulary channel. Five patient-disjoint
+% PTB-XL folds. Reproducible via scripts/run_ecg_domainC.py.
+\footnotesize
+\setlength{\tabcolsep}{5pt}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{l cccc c l}
+\toprule
+\textbf{Target} & \textbf{B2} & \textbf{B3} & \textbf{PI} & \textbf{FC} &
+  \textbf{Verdict} & \textbf{Regime} \\
+ & {\scriptsize encoder} & {\scriptsize SCP} & {\scriptsize concat} &
+   {\scriptsize Choquet} & & \\
+\midrule
+Sex           & $0.898{\pm}0.009$ & $0.616{\pm}0.041$ & $0.899{\pm}0.008$ &
+  $\mathbf{0.901}{\pm}0.010$ & Conclusive & (i) saturation \\
+Age $\geq 65$ & $0.836{\pm}0.008$ & $0.732{\pm}0.017$ &
+  $\mathbf{0.841}{\pm}0.006$ & $0.839{\pm}0.006$ & Conclusive & (i) saturation \\
+\bottomrule
+\end{tabular}
+\begin{flushleft}\footnotesize
+Mean test $\auroc\pm$SD over five patient-disjoint PTB-XL folds
+($21{,}799$ records, $18{,}869$ patients). Source channel $\mathbf{P}$:
+the $71$ graded SCP-ECG statements; encoder channel $\mathbf{E}$: a
+1D convolutional network over the raw $12$-lead signal ($100$\,Hz).
+Conditions match the LUAD protocol: $\mathrm{B2}$ encoder only,
+$\mathrm{B3}$ statements only, $\mathrm{PI}$ concat fusion, $\mathrm{FC}$
+encoder $+$ 2-additive Choquet over the statements. In both targets the
+fusion conditions match the encoder to within a fold's standard deviation
+while $\mathrm{B3}$ trails far behind---the encoder-saturated signature of
+regime~(i). Reproducible with \texttt{scripts/run\_ecg\_domainC.py}.
+\end{flushleft}
