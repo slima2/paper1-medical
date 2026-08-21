@@ -57,8 +57,8 @@ cross-references.
 **Moved to SI:** 4 figures (S1–S4) + 6 tables (ST1–ST6).
 
 This keeps the argument spine intact: *framing → taxonomy → headline result →
-KRAS linchpin → interpretability in the real system → benchmark → honesty
-(CPTAC) → conceptual scaffold*. Everything methodological or corroborative
+KRAS linchpin → interpretability in the real system → benchmark → conservative
+reporting (CPTAC) → conceptual scaffold*. Everything methodological or corroborative
 moves to SI.
 
 ### Rationale for the two judgement calls

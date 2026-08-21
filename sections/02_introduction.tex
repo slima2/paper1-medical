@@ -77,9 +77,9 @@ per-target \emph{translatability} is the reported result and
 untranslatability is a finding rather than a failure.
 We instantiate it in \lchai{}\,v2 (Lung Cancer Histologic Analysis
 with Interpretable AI), a pattern-informed MIL system designed
-against the three problems above, and we pre-register two further
-instantiations on public data in domains where the same structure
-holds.
+against the three problems above, and we probe its generality along
+two axes---two further public modalities and a within-domain cohort
+transfer---developed below.
 
 % --- The conceptual frame: domain translation ---
 Conceptually, we treat H\&E-based mutation prediction as an
@@ -167,7 +167,7 @@ opposite remedies.
   \label{fig:domain_translation}
 \end{figure}
 
-% --- Scope of the framework: two pre-registered external domains ---
+% --- Scope of the framework: two external modalities + a cohort transfer ---
 Nothing in the decomposition is specific to histology.
 It requires only two ingredients that many clinical prediction tasks
 already have: an \emph{expert-defined controlled vocabulary} on the
@@ -175,8 +175,9 @@ source modality, and a \emph{learned encoder} of the same modality
 whose representation is unconstrained by that vocabulary.
 Wherever both exist, the same three regimes are definable and the
 same Conclusive/Inconclusive verdict is computable.
-We therefore pre-register two external instantiations on fully
-public cohorts: \textbf{glioma MRI\,$\rightarrow$\,genotype}, where
+We therefore instantiate the framework in two further external
+modalities on fully public cohorts: \textbf{glioma
+MRI\,$\rightarrow$\,genotype}, where
 the VASARI controlled
 terminology\cite{gutman2013vasari,vasari_tcia} plays the role of
 ANORAK, and \textbf{electrocardiogram\,$\rightarrow$\,laboratory
@@ -193,6 +194,22 @@ result.\cite{kim2022mgmtvalidation}
 Cohorts, source ontologies and expected regime assignments are
 fixed in advance in the Discussion and
 \cref{tab:crossdomain_protocol}.
+
+These instantiations probe the framework along two independent axes of
+generalisation, and it is their combination---not either alone---that
+establishes what actually travels. Across \emph{modalities}, the same
+decomposition and Conclusive/Inconclusive verdict transfer intact from
+histology to glioma MRI and to the electrocardiogram (a v1 glioma pilot and
+a full ECG run, both below). Across \emph{cohorts within a modality}, we
+deliberately ask whether a regime assignment is intrinsic to a gene by
+applying the frozen TCGA-LUAD pipeline off-the-shelf to CPTAC-LUAD; it is
+not---under genuine distribution shift the model weights do not transfer and
+the one well-powered gene collapses to chance, yet the framework's own
+verdict correctly turns Inconclusive rather than overclaiming. The first
+axis shows the method travels; the second shows that what travels is the
+\emph{diagnostic}, not a frozen predictor, and that the diagnostic reports
+its own limits rather than hiding them---the same
+untranslatability-as-finding stance, now applied to cohort transfer.
 
 Our contributions are the framework itself and the five artefacts
 that establish and operationalise it:
@@ -272,6 +289,12 @@ that establish and operationalise it:
     The verdict is the operational artefact that surfaces Regime~(i)
     Conclusive (TP53, EGFR) versus Regimes~(ii)--(iii) Inconclusive
     (KRAS, STK11, KEAP1, RBM10) at the user-interface level.
+    The same verdict is what makes the within-domain cohort transfer
+    legible: applied off-the-shelf to CPTAC-LUAD it turns Inconclusive
+    under distribution shift, showing that a regime assignment is a
+    property of the (source ontology, learned encoder, cohort) triple
+    rather than of the gene, and that the diagnostic detects its own
+    failure to transfer instead of reporting a confident but wrong call.
 
     \item \textbf{C4.\ A dual anti-hallucination LLM explanation
     layer grounded in NCIt$+$MONDO.}

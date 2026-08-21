@@ -450,9 +450,22 @@ def train_eval(condition, tr_ds, te_ds, edim, pdim, epochs, bs, lr, device):
 def regime_signature(cond_means: dict) -> str:
     """Assign the model-side regime signature from the condition means.
 
-    Ported verbatim from run_ecg_domainC.py. Expected glioma outcomes:
-        IDH    -> 'encoder saturation'         (regime i)
-        1p/19q -> 'synergy (fusion beats ...)'  (regime ii)
+    The synergy verdict (regime ii) uses the SAME falsification criterion as
+    the LUAD and ECG tables (tab:mutation_luad, tab:ecg_domainc): the
+    non-additive 2-additive fuzzy Choquet integral (FC) must beat the *additive*
+    concatenation (PI), not merely the encoder. A gain of PI over the encoder
+    that FC does not exceed is additive fusion, not a non-additive interaction,
+    and is reported separately so it cannot masquerade as synergy. This mirrors
+    the LUAD KRAS read ("FC beats PI by +0.019") and the ECG regime-(i) read
+    ("on Age the additive PI in fact outscores FC").
+
+    Expected glioma outcomes:
+        IDH    -> 'encoder saturation' / 'additive fusion' (regime i):
+                  B2 already high, FC does NOT beat PI.
+        1p/19q -> 'synergy (non-additive Choquet beats concat)' (regime ii):
+                  FC > PI.  (Requires enough n_+ to resolve the interaction;
+                  under-powered cohorts shrink the Choquet pairs toward 0 and
+                  fall back to 'additive fusion'.)
         MGMT   -> 'pattern-side unique/floor' if B3>B2 (a DATA FLOOR), else
                   'encoder saturation' with all conditions ~chance, which is
                   the OUT-OF-ONTOLOGY prediction (empty VASARI-side atom).
@@ -460,11 +473,16 @@ def regime_signature(cond_means: dict) -> str:
     b2, b3 = cond_means.get("B2"), cond_means.get("B3")
     pi, fc = cond_means.get("PI"), cond_means.get("FC")
     best = max(v for v in cond_means.values())
-    fused = max([v for v in (pi, fc) if v is not None] or [b2])
     if b3 is not None and b2 is not None and b3 > b2 + 0.01:
         return "pattern-side unique/floor (B3 > B2)"
-    if fused > b2 + 0.015:
-        return "synergy (fusion beats encoder)"
+    # regime (ii): the non-additive aggregator must beat the additive concat
+    # (and clear the encoder), matching the LUAD/ECG falsification criterion.
+    if (fc is not None and pi is not None and b2 is not None
+            and fc > pi + 0.01 and fc > b2 + 0.015):
+        return "synergy (non-additive Choquet beats concat)"
+    # additive-only lift: concat helps but the interaction operator does not
+    if pi is not None and b2 is not None and pi > b2 + 0.015:
+        return "additive fusion (concat helps, Choquet does not)"
     if best - (b2 or 0) <= 0.02:
         return "encoder saturation (fusion ~ encoder)"
     return "mixed"
