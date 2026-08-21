@@ -28,3 +28,7 @@ __pycache__/
 .DS_Store
 Thumbs.db
 *~
+
+# ---- data caches / venvs (not versioned) ----
+figures/_ptbxl_cache/
+.venv*/

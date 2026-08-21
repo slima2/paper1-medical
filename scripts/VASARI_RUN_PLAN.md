@@ -1,0 +1,246 @@
+# VASARI / Glioma (Domain B) — Run Plan
+
+Pre-registered instantiation of the translatability framework in a third
+modality: **preoperative multiparametric MRI → glioma genotype**. This is the
+glioma counterpart of the TCGA-LUAD paper and of `run_ecg_domainC.py`. The
+framework, the four-condition protocol, the 2-additive fuzzy Choquet operator,
+the Conclusive/Inconclusive verdict and the model-side regime signature are
+**identical across domains** — only the source channel `P` and the encoder
+channel `E` change.
+
+Reference: `tables/tab_crossdomain_protocol.tex` (column B) is the
+pre-registration; nothing below overrides it.
+
+---
+
+## 0. What is already locked (do not change)
+
+From `tab:crossdomain_protocol`, column B:
+
+| Element | Fixed value |
+|---|---|
+| Source modality | Preoperative multiparametric MRI (T1, T1c, T2, FLAIR) |
+| Targets | **IDH, 1p/19q, MGMT** |
+| Source ontology | **VASARI**, ~30 semantic MR features |
+| Vocabulary renderer | VASARI-feature classifier on the TCIA-annotated seed (**178 LGG + 75 GBM**) |
+| Propagated to | **~1,251 BraTS 2021 subjects** |
+| Target lexicon (KG) | NCIt + MONDO + **RadLex** |
+| Regime (i) saturation | **IDH** (AUROC ≈ 0.88) |
+| Regime (ii) synergy | **1p/19q** (feature combinations) |
+| Regime (iii) out-of-ontology | **MGMT** (≈ 0.50–0.56 across architectures) |
+| Falsification test | Non-additive aggregator wins on **1p/19q but not IDH or MGMT** |
+| Access | TCIA/IDC + BraTS 2021, public |
+
+**MGMT is the make-or-break claim** (`04_discussion.tex`, ~L467): it must come
+out as an **empty VASARI-side atom** (out-of-ontology), *not* a data floor. The
+run distinguishes the two exactly as LUAD separated KEAP1 (empty) from RBM10
+(floor): via the model-side signatures `B3-vs-B2` and the Choquet interactions,
+not a single AUROC.
+
+---
+
+## 1. Fixed design decisions (v1)
+
+These are the choices made in `run_glioma_domainB.py`; documented here so the
+DGX run is reproducible and the rationale is on record.
+
+- **Encoder `E` = 2.5D CNN + ABMIL.** Each subject is a **bag of axial
+  slices**; a 2D CNN (`SliceEncoder`) embeds each 4-sequence slice and gated
+  ABMIL pools the bag. Chosen over full-3D for **maximal methodological
+  consistency with LUAD** (tile-bag + ABMIL), lower compute, and a free L1
+  "where" read-out (slice-level attention). Full-3D is a later ablation, not v1.
+- **Sequences = 4 co-registered BraTS channels** (T1, T1c, T2, FLAIR) as input
+  channels `C = 4`.
+- **Slice selection = K=24 axial slices** centred on the tumour centroid
+  (from the BraTS segmentation mask). Fixed K → fixed `[K, C, H, W]` tensors,
+  so batching is trivial. `SLICE_HW = 128` in-plane crop.
+- **Source channel `P` = ~30 VASARI features in [0,1]**, ordinal expert scores
+  min-max scaled per feature, propagated to every BraTS subject.
+- **Four conditions** (identical to LUAD/ECG): `B2` encoder-only (ceiling),
+  `B3` VASARI-only, `PI` concat fusion, `FC` encoder + 2-additive Choquet over
+  the VASARI features.
+- **Splits = 5-fold patient-stratified**, built once and frozen in the manifest.
+- **Verdict threshold = AUROC ≥ 0.70** under the best condition.
+- **Seed = 42.**
+
+---
+
+## 2. Data contract (what the run expects on disk)
+
+All under `$DATA_ROOT/glioma/`. The run is fully defined; only these artefacts
+are stubbed and must be produced first.
+
+| Artefact | Path | Producer | Status |
+|---|---|---|---|
+| VASARI seed table | `vasari/vasari_features.parquet` | `fetch_vasari.py` | script ready |
+| VASARI propagated | `vasari/vasari_propagated.parquet` | `propagate_vasari.py` | script ready |
+| Genotype labels | `derived/glioma_labels.parquet` | `build_glioma_labels.py` | script ready |
+| Subject manifest | `derived/manifest.parquet` | `prepare_glioma_slices.py` | script ready |
+| Per-subject slices | `derived/slices/<subject>.npy` `[K,C,H,W]` f32 | `prepare_glioma_slices.py` | script ready |
+
+All five producer scripts now exist under `scripts/`. Two artefacts still
+need manual acquisition before they run (see the runbook, §3): the
+BraTS↔TCIA **crosswalk XLSX** and the **`tcga_genotype.csv`** (IDH/1p19q),
+which are the only pieces that cannot be scripted end-to-end.
+
+Column contracts (enforced by the loaders in `run_glioma_domainB.py`):
+- `manifest.parquet`: `subject_id`, `strat_fold` (1..5), `slices_path`.
+- `vasari_propagated.parquet`: index `subject_id`, ~30 feature columns in [0,1].
+- `glioma_labels.parquet`: index `subject_id`, columns `idh`, `onep19q`,
+  `mgmt` (1/0, NaN allowed → dropped per target).
+
+---
+
+## 2b. DGX runbook (copy-paste)
+
+```bash
+# 0. environment
+cd scripts
+source env.sh                 # sets DATA_ROOT (+ any tokens)
+pip install torch nibabel wfdb pandas pyarrow scikit-learn requests idc-index kaggle
+
+# 1. data (idempotent; accept Kaggle rules once in a browser)
+bash download_glioma.sh --vasari      # VASARI feature key + score CSVs
+bash download_glioma.sh --brats       # BraTS 2021 imaging + train_labels.csv (MGMT)
+#   also drop by hand into $DATA_ROOT/glioma/ :
+#     - the BraTS<->TCIA crosswalk XLSX  (TCIA BraTS 2021 page)
+#     - tcga_genotype.csv  with columns  tcga_id,idh,onep19q
+#       (from cBioPortal lgg_tcga + gbm_tcga; or try:
+#        python build_glioma_labels.py --fetch-cbioportal )
+
+# 2. source channel P (seed table -> classifier -> full-cohort propagation)
+python fetch_vasari.py                 # -> vasari/vasari_features.parquet
+
+# 3. encoder input + folds  (writes derived/slices/*.npy and manifest.parquet)
+python prepare_glioma_slices.py        # add --limit 20 for a quick smoke first
+
+# 4. targets  (-> derived/glioma_labels.parquet ; prints n_+ power check)
+python build_glioma_labels.py
+
+# 5. propagate VASARI to all subjects (needs manifest + labels for folds)
+python propagate_vasari.py             # -> vasari/vasari_propagated.parquet
+#   inspect vasari/propagation_quality.csv; optionally --min-auroc 0.6
+
+# 6. the run
+python run_glioma_domainB.py --smoke   # 1 fold, 3 epochs, sanity
+python run_glioma_domainB.py           # full: idh onep19q mgmt, 5 folds
+#   -> derived/domainB/{results.json,regimes.json,choquet_interactions.csv}
+```
+
+Dependency order is strict: `prepare_glioma_slices.py` and
+`build_glioma_labels.py` must both run before `propagate_vasari.py` (which
+needs the manifest and uses MGMT for stratification), and all three before
+`run_glioma_domainB.py`. Re-runs are incremental (slices are cached).
+
+**Power gate before believing MGMT:** step 4 prints `n_+` per target.
+If MGMT clears the floor (`n_+ ≳ 37`) a near-chance result is a real
+out-of-ontology finding; if it does not, it is a power statement, not a
+regime verdict — do not report the make-or-break MGMT claim until the gate
+is passed.
+
+## 3. Execution plan (ordered)
+
+### Step 1 — Acquire raw data
+- **BraTS 2021** imaging (~1,251 subjects, 4 sequences + segmentation) from
+  TCIA/IDC (`download_glioma.sh`).
+- **VASARI score CSVs** (TCGA-GBM/LGG) → seed for `fetch_vasari.py`
+  (`download_glioma.sh --vasari`; manual drop into `vasari/raw/` per its
+  instructions).
+- **BraTS↔TCIA crosswalk** XLSX (BraTS 2021 TCIA page) to resolve BraTS ids to
+  canonical TCGA/TCIA `subject_id`.
+- **Genotype calls**: IDH mutation and 1p/19q codeletion from GDC/TCGA
+  (cBioPortal `lgg_tcga` / `gbm_tcga`); **MGMT methylation** from the BraTS 2021
+  MGMT table (RSNA-MICCAI) and/or TCGA methylation.
+
+### Step 2 — `propagate_vasari.py` (source channel P) — **TODO**
+- Train the VASARI-feature classifier on the annotated seed
+  (`vasari_features.parquet`, 253 cases) — the ANORAK→LUAD analogue.
+- Input = the SAME 2.5D slice embedding as `E` (or an independent MRI encoder);
+  output = ~30 VASARI feature scores.
+- **Propagate** to all BraTS subjects → `vasari_propagated.parquet`.
+- **Report propagation quality** (held-out per-feature AUC/MAE on the seed);
+  weak propagation contaminates `B3` and must be flagged.
+
+### Step 3 — `prepare_glioma_slices.py` (encoder input) — **TODO**
+- For each subject: load 4 co-registered sequences + segmentation, z-score each
+  sequence within the brain mask, pick K=24 axial slices around the tumour
+  centroid, centre-crop to 128², stack → `[K, 4, 128, 128]` float32 `.npy`.
+- Build 5-fold patient-stratified `strat_fold` (stratify on the scarcest target,
+  MGMT) and write `manifest.parquet`.
+
+### Step 4 — `build_glioma_labels.py` (targets) — **TODO**
+- Join IDH / 1p19q / MGMT calls to `subject_id`; write
+  `glioma_labels.parquet`. Leave missing calls NaN.
+- **Power check first** (LUAD/CPTAC lesson): report `n_+` per target on the
+  imaging∩genotype intersection. Only targets clearing the estimation floor
+  (n_+ ≳ 37, as in LUAD) yield a Conclusive-capable read; below that a
+  near-chance MGMT is a **power** statement, not out-of-ontology. This gate is
+  what protects the make-or-break MGMT claim.
+
+### Step 5 — Run
+```bash
+source env.sh
+python run_glioma_domainB.py --smoke          # sanity: 1 fold, 3 epochs
+python run_glioma_domainB.py                  # full: idh onep19q mgmt, 5 folds
+```
+Outputs under `$DATA_ROOT/glioma/derived/domainB/`: `results.json`,
+`regimes.json`, `choquet_interactions.csv`.
+
+### Step 6 — Paper integration
+- New table `tab_glioma_domainB` mirroring `tab:mutation_luad` (per-target,
+  per-condition AUROC + verdict + signature).
+- Confirm/deny the three pre-registered regime predictions and the falsification
+  test (non-additive wins on 1p/19q only).
+
+---
+
+## 4. How the protocol maps to the pre-registered regimes
+
+For each target, the regime is read from the **contrast** across conditions
+(never a single head):
+
+| Target | Predicted regime | Expected signature | Reads as |
+|---|---|---|---|
+| **IDH** | (i) saturation | `B2 ≈ best`, `FC/PI ≈ B2`, `B3` weaker | `encoder saturation` |
+| **1p/19q** | (ii) synergy | `FC/PI > B2` (>+0.015), positive Choquet pair | `synergy (fusion beats encoder)` — **the only target where the non-additive aggregator should win** |
+| **MGMT** | (iii) out-of-ontology | all conditions ≈ chance (0.50–0.56); `B3` at chance and fusion no help | `encoder saturation`-style but at chance = **empty atom**. If instead `B3 > B2` at low `n_+` → `pattern-side unique/floor` = **data floor**, a different sub-state to be flagged via SD vs effect size |
+
+The MGMT branch is the whole point: the run must be able to say **empty vs
+unestimable**, which is why it re-instantiates the four-condition protocol
+rather than reapplying frozen weights (cf. the CPTAC model-transfer test, which
+by construction cannot produce a regime).
+
+---
+
+## 5. Risks and open decisions
+
+1. **Encoder design (largest unknown).** 2.5D+ABMIL is the v1 choice for
+   consistency; 3D CNN is a pre-planned ablation if 2.5D underfits IDH
+   (which should saturate near 0.88 — a low IDH ceiling would indicate an
+   encoder problem, not a translatability result).
+2. **Small annotated seed (n=253)** for the VASARI classifier → noisy
+   propagation. Mitigation: report seed held-out propagation quality; consider
+   feature-wise dropping of poorly propagated VASARI items from `P`.
+3. **Label availability on imaging∩genotype** may shrink effective `n_+`,
+   especially for MGMT — the exact CPTAC-style power risk that could
+   masquerade as out-of-ontology. Step 4 power check is mandatory before any
+   MGMT claim.
+4. **Compute:** encoder × 3 targets × 4 conditions × 5 folds. Manageable on one
+   H100 with 2.5D; batch size 8 subjects × 24 slices.
+5. **Global norm / leakage:** per-fold intensity normalisation is preferable to
+   a global one; v1 uses per-subject within-mask z-score (leakage-free), matching
+   the ECG note about per-fold vs global stats.
+
+---
+
+## 6. Effort estimate
+
+| Task | Estimate |
+|---|---|
+| Data + genotype labels (download + GDC/BraTS join) | 1–2 days |
+| `propagate_vasari.py` (classifier + propagation + QA) | 2–3 days |
+| `prepare_glioma_slices.py` (preprocessing + manifest) | 1–2 days |
+| Runs + analysis + `tab_glioma_domainB` | 2 days |
+
+`run_glioma_domainB.py` itself is done (this scaffold); only the four
+preprocessing artefacts in §2 remain.

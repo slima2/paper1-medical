@@ -293,7 +293,7 @@ $n=75$ GBM) and propagated to the $\sim$1{,}251 BraTS 2021
 subjects\cite{baid2021brats} occupies the position that
 \fuzzyarc{}\,V2 trained on Zenodo-ANORAK and propagated to TCGA-LUAD
 occupies here, with the same 2-additive Choquet aggregator over the
-feature vector.
+feature vector (\cref{fig:pipeline_glioma}).
 
 What makes this domain worth the effort is the target, not the
 method.
@@ -331,6 +331,27 @@ fusion---rather than a further architecture; if instead a stratum
 does recover it, the field's decade of negative cohort-average
 results would have been hiding a translatable subgroup, which is a
 more consequential finding than either.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{pipeline_glioma_domainB}
+\caption{\textbf{The glioma MRI\,$\rightarrow$\,genotype pipeline
+(Domain~B, pre-registered) as a one-to-one transfer of the LUAD
+architecture.} An unconstrained learned encoder $\mathbf{E}$---a 2.5D
+CNN with \abmil{} over axial MRI slices, occupying the position
+\ctranspath{} with tile-level \abmil{} holds in LUAD---and the expert
+source vocabulary $\mathbf{P}$---the $\sim$30 VASARI semantic MR
+features, a classifier trained on the TCIA-annotated seed and propagated
+to BraTS, occupying the position ANORAK growth patterns hold in
+LUAD---feed the same four conditions: B2 encoder only, B3 ontology only,
+PI concat fusion and FC 2-additive fuzzy Choquet over $\mathbf{P}$. The
+pre-registered regime predictions are IDH in regime~(i), 1p/19q in
+regime~(ii) with the non-additive FC aggregator beating the additive PI
+\emph{on that target alone}, and MGMT in regime~(iii) as an empty
+VASARI-side atom, distinguished from a data floor by the
+B3-versus-B2 signature.}
+\label{fig:pipeline_glioma}
+\end{figure}
 
 The second instantiation, the electrocardiogram $\rightarrow$
 laboratory state, tests whether the taxonomy scales past six
@@ -387,12 +408,31 @@ for every PTB-XL case and are not derivable from the SCP-ECG statements
 leakage-free target on which the framework can be run now, with the same
 two channels: the $71$ graded SCP-ECG statements as the source
 vocabulary $\mathbf{P}$ and a compact 1D convolutional encoder of the raw
-twelve-lead signal as $\mathbf{E}$. This is the electrocardiographic
+twelve-lead signal as $\mathbf{E}$ (\cref{fig:ecg_ptbxl}). This is the
+electrocardiographic
 counterpart of the retinal$\rightarrow$systemic mapping we cite---
 recovering a physiological state from a modality not designed to report
 it\cite{poplin2018retinal,attia2019ecg}.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{ecg_ptbxl_example}
+\caption{\textbf{A real 12-lead electrocardiogram from PTB-XL}
+(a $37$-year-old woman, sinus rhythm, reported normal ECG), shown in the
+standard clinical $3\times4$ format with a lead-II rhythm strip on an ECG
+grid ($25$\,mm/s, $10$\,mm/mV). This is the raw $100$\,Hz signal the
+encoder $\mathbf{E}$ ingests---the electrocardiographic counterpart of the
+whole-slide histopathology images in LUAD. Patient age and sex are
+recorded for every PTB-XL case but are absent from the $71$ SCP-ECG
+diagnostic statements that form the source channel $\mathbf{P}$, so the
+framework recovers both from exactly this signal
+(\cref{tab:ecg_domainc,fig:pipeline_ecg}), a leakage-free
+physiological-state translation.\cite{wagner2020ptbxl}}
+\label{fig:ecg_ptbxl}
+\end{figure}
 Running the identical four-condition protocol used for LUAD, five-fold
-patient-disjoint on the PTB-XL folds (\cref{tab:ecg_domainc}), reproduces
+patient-disjoint on the PTB-XL folds
+(\cref{tab:ecg_domainc,fig:pipeline_ecg}), reproduces
 the machinery end to end. Both targets are Conclusive---sex at
 $\auroc\!=\!0.90$ and age$\,\geq\!65$ at $0.84$ under the best
 aggregator---and both sit in regime~(i): the fusion conditions match the
@@ -402,6 +442,15 @@ the raw signal saturates the target and the statement channel adds
 essentially nothing on top. This is the same encoder-saturated signature
 \textit{EGFR} and \textit{TP53} show in LUAD, now recovered in a
 different modality family with a natively graded source vocabulary.
+The two-pattern synergy analysis was run for these targets as well: the
+2-additive Choquet head emits a pairwise interaction index over all
+$\binom{71}{2}$ statement pairs, exactly the read-out that surfaces the
+$I(\text{lepidic}\!\times\!\text{solid})\!=\!+0.032$ for KRAS in LUAD.
+For sex and age no statement pair reaches an interaction that lets
+$\mathrm{FC}$ improve on the additive $\mathrm{PI}$
+($\mathrm{FC}-\mathrm{PI}\!=\!+0.002$ and $-0.002$ respectively), so the
+synergy channel is empty and both targets remain in regime~(i)---the
+negative result the model-side signature is designed to report.
 The run does not exhibit an Inconclusive electrocardiogram target---sex
 and age are, as expected, strongly written into the electrical
 signal---so the untranslatable end of the spectrum stays anchored by
@@ -411,6 +460,22 @@ reports.\cite{xiao2025anyecglab} What the PTB-XL run establishes is
 narrower but real: the two-channel decomposition, the four-condition
 protocol and the Conclusive verdict transfer intact across a modality
 family, not merely in principle.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{pipeline_ecg_domainC}
+\caption{\textbf{The electrocardiogram\,$\rightarrow$\,physiological-state
+pipeline (Domain~C) running the identical four-condition protocol in a
+different modality family.} The encoder $\mathbf{E}$---a 1D convolutional
+network over the raw 12-lead signal---and the source vocabulary
+$\mathbf{P}$---the $71$ graded SCP-ECG statements---feed B2 encoder only,
+B3 statements only, PI concat fusion and FC 2-additive Choquet, exactly
+as \ctranspath{} embeddings and ANORAK patterns do in LUAD. Both targets
+are Conclusive and encoder-saturated (regime~(i)): the fusion conditions
+match the encoder to within a fold's standard deviation while the
+statement channel alone trails (\cref{tab:ecg_domainc}).}
+\label{fig:pipeline_ecg}
+\end{figure}
 
 \begin{table}[h!]
 \centering
@@ -543,6 +608,35 @@ domain adaptation; we treat that as a precondition for any translatability
 claim at the level of an individual gene, as distinct from the structural
 portability of the framework that the glioma and electrocardiogram
 instantiations test separately.
+
+It is worth being explicit about what this frozen-pipeline test can and
+cannot establish, because two different notions of transfer are easily
+conflated. What we froze and applied to CPTAC is the \emph{entire trained
+predictor}---the \ctranspath{} encoder, the ANORAK pattern head and the
+selected per-gene MIL aggregator---so the read-out is a single probability
+per gene. This measures whether the \emph{learned decision function}
+transfers, and it does not. It is deliberately \emph{not} a test of whether
+the \emph{regime assignment} transfers, because a regime is never read off
+a single head: it is the contrast across the four conditions
+(B2 embedding-only, B3 pattern-only, \piabmil{} concat fusion, \fcmil{}
+Choquet), and one number per gene cannot express that contrast. The
+pipeline that would probe regime transfer is the one the electrocardiogram
+instantiation uses in a new modality: freeze only the \emph{representation}
+---the \ctranspath{} encoder and the ANORAK channel that define the
+saturation and out-of-ontology atoms---while re-fitting B2/B3/\piabmil{}/%
+\fcmil{} with CPTAC-internal cross-validation and re-deriving the per-gene
+signature. Two obstacles make this infeasible on CPTAC as a single external
+cohort. First, that comparison is only meaningful if the frozen encoder
+operates in-distribution, yet stain normalisation does not restore it
+(\textit{TP53} $0.48$; \cref{tab:cptac_transfer}), so any within-CPTAC refit
+would be confounded by an off-distribution encoder rather than reporting an
+intrinsic regime. Second, the four-condition contrast needs enough positives
+per gene to separate the conditions, and only \textit{TP53} clears the
+estimation floor here (\cref{tab:cptac_power}). CPTAC can therefore establish
+that the model does not transfer off-the-shelf, but not whether the regime
+does; the latter is precisely what the glioma and electrocardiogram
+instantiations, which re-instantiate the four-condition protocol rather than
+reapply frozen weights, are designed to settle.
 
 \begin{table}[h!]
 \centering
