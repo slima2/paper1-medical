@@ -1,6 +1,7 @@
 % Table tab:crossdomain_protocol — the framework instantiated in three domains.
 % Column 1 = framework element; columns 2-4 = its realisation per domain.
-% Domain A (LUAD) is reported in this paper; B and C are pre-registered.
+% Domain A (LUAD) is reported in this paper; B and C are external validations,
+% partly measured (glioma v1 pilot, ECG sex/age) and partly pre-registered.
 \footnotesize
 \setlength{\tabcolsep}{4pt}
 \renewcommand{\arraystretch}{1.15}
@@ -8,8 +9,8 @@
 \toprule
 \textbf{Framework element} &
   \textbf{A. LUAD (this paper)} &
-  \textbf{B. Glioma (pre-registered)} &
-  \textbf{C. ECG (pre-registered)} \\
+  \textbf{B. Glioma (external)} &
+  \textbf{C. ECG (external)} \\
 \midrule
 Source modality
   & H\&E whole-slide image
@@ -45,11 +46,12 @@ Target lexicon (KG)
 \midrule
 Regime (i) saturation
   & TP53, EGFR
-  & IDH ($\auroc\!\approx\!0.88$)\cite{chang2018radiogenomics}
+  & IDH ($\auroc\!\approx\!0.88$\cite{chang2018radiogenomics};
+    v1 pilot $0.90$)
   & NT-proBNP ($\auroc\!\approx\!0.78$)\cite{xiao2025anyecglab} \\
 Regime (ii) synergy
   & KRAS (lepidic$\times$solid)
-  & 1p/19q (feature combinations)
+  & 1p/19q (v1 pilot $0.74$ by fusion)
   & Candidate pairs, e.g.\ LVH$\times$strain \\
 Regime (iii) out-of-ontology
   & STK11, KEAP1 (RBM10: estimation floor)
@@ -60,7 +62,8 @@ Regime (iii) out-of-ontology
 \midrule
 Falsification test
   & Non-additive aggregator wins on regime-(ii) targets only
-  & Same, on 1p/19q but not IDH or MGMT
+  & Same, on 1p/19q but not IDH or MGMT (v1 underpowered;
+    deferred to the full cohort)
   & Same, on the borderline band but not the recoverable one \\
 Access
   & GDC, public
