@@ -2,11 +2,20 @@
 """Assemble the glioma genotype targets IDH / 1p19q / MGMT for domain B.
 
 Writes $DATA_ROOT/glioma/derived/glioma_labels.parquet with
-    index = subject_id  (the BraTS subject folder name, e.g. BraTS2021_00495)
-    columns = idh, onep19q, mgmt   (1/0, NaN where unknown)
+    index = subject_id
+    columns = idh, onep19q, mgmt [, sex, age]   (1/0, NaN where unknown)
 consumed by run_glioma_domainB.py.
 
-Where each label comes from (they do NOT share a source):
+Two modes (chosen by --source, default auto):
+  * clinical-csv (TCGA-LGG-centric v1): index = TCGA subjects that carry real
+    VASARI scores; IDH / 1p19q / sex / age read straight from the TCIA VASARI
+    clinical CSV ($DATA_ROOT/glioma/vasari/TCGA_clinical_INFO.csv). No BraTS,
+    no crosswalk, no cBioPortal. MGMT is left NaN (absent from that source).
+    Used automatically when TCGA_clinical_INFO.csv is present.
+  * crosswalk (BraTS-centric): index = BraTS subject folder names; MGMT from the
+    BraTS 2021 table and IDH/1p19q joined through the BraTS<->TCIA crosswalk.
+
+Where each label comes from in the crosswalk mode (they do NOT share a source):
   * MGMT   : BraTS 2021 (RSNA-MICCAI) train_labels.csv -> MGMT_value, available
              for the whole classification cohort. This is the target that makes
              the domain worth doing.
@@ -190,12 +199,105 @@ def fetch_cbioportal(glioma_root: Path) -> None:
 
 
 # --------------------------------------------------------------------------
+# Clinical-CSV mode (TCGA-LGG-centric v1)
+# --------------------------------------------------------------------------
+
+def load_clinical_csv(glioma_root: Path) -> pd.DataFrame:
+    """Read IDH / 1p19q / sex / age directly from the TCIA VASARI clinical CSV.
+
+    File: $DATA_ROOT/glioma/vasari/TCGA_clinical_INFO.csv (downloaded alongside
+    the VASARI scores). This is the TCGA-LGG-centric path: the same TCGA
+    subjects that carry real VASARI scores also carry molecular calls here, so
+    IDH and 1p/19q need no cBioPortal round-trip and no BraTS crosswalk.
+
+    Encoding in the source file:
+        IDH1                 1 = mutant, 0 = wildtype
+        1p_19q_co_del_status 1 = codeleted, 0 = intact
+        gender               FEMALE / MALE  -> sex 1 / 0
+        age_at_initial_...   integer years
+    Returns a frame indexed by TCGA subject_id with columns
+        idh, onep19q, sex, age  (NaN where unknown).
+    """
+    path = glioma_root / "vasari" / "TCGA_clinical_INFO.csv"
+    if not path.exists():
+        return pd.DataFrame(columns=["idh", "onep19q", "sex", "age"])
+    df = pd.read_csv(path)
+    subj = df["Tumor"].astype(str).str.upper().str.extract(
+        f"({TCGA_RE.pattern})", expand=False)
+    out = pd.DataFrame(index=pd.Index(subj, name="subject_id"))
+    out["idh"] = pd.to_numeric(df["IDH1"], errors="coerce").values
+    out["onep19q"] = pd.to_numeric(df["1p_19q_co_del_status"], errors="coerce").values
+    gender = df["gender"].astype(str).str.upper()
+    out["sex"] = np.where(gender.eq("FEMALE"), 1.0,
+                          np.where(gender.eq("MALE"), 0.0, np.nan))
+    out["age"] = pd.to_numeric(df["age_at_initial_pathologic"], errors="coerce").values
+    out = out[out.index.notna()]
+    out = out[~out.index.duplicated(keep="last")]
+    print(f"[ok] clinical CSV: {len(out)} TCGA subjects "
+          f"(idh n_+={int(np.nansum(out['idh'].values))}, "
+          f"onep19q n_+={int(np.nansum(out['onep19q'].values))})")
+    return out
+
+
+def vasari_subjects(glioma_root: Path) -> list[str]:
+    """Subjects that carry real VASARI scores (the runnable LGG cohort)."""
+    for name in ("vasari_features.parquet", "vasari_features.csv"):
+        p = glioma_root / "vasari" / name
+        if p.exists():
+            df = pd.read_parquet(p) if p.suffix == ".parquet" else pd.read_csv(p, index_col=0)
+            return sorted(str(s).upper() for s in df.index)
+    return []
+
+
+def build_from_clinical(glioma_root: Path) -> None:
+    """TCGA-LGG-centric labels: index = VASARI subjects, molecular calls from
+    the clinical CSV, MGMT left NaN (not in this source; needs BraTS)."""
+    clin = load_clinical_csv(glioma_root)
+    if clin.empty:
+        sys.exit(f"clinical CSV not found under {glioma_root / 'vasari'}; "
+                 "download TCGA_clinical_INFO.csv (see VASARI_RUN_PLAN.md step 1a)")
+    cohort = vasari_subjects(glioma_root)
+    index = pd.Index(cohort if cohort else list(clin.index), name="subject_id")
+    labels = pd.DataFrame(index=index,
+                          columns=["idh", "onep19q", "mgmt", "sex", "age"],
+                          dtype="float64")
+    for col in ("idh", "onep19q", "sex", "age"):
+        labels[col] = clin[col].reindex(index)
+    # MGMT is not in the clinical CSV; fill from BraTS if that table happens to
+    # be present, else leave NaN (run_glioma_domainB.py will report it skipped).
+    mgmt = load_mgmt(glioma_root)
+    if len(mgmt):
+        labels["mgmt"] = mgmt.reindex(index)
+
+    derived = glioma_root / "derived"
+    derived.mkdir(parents=True, exist_ok=True)
+    out = derived / "glioma_labels.parquet"
+    labels.to_parquet(out)
+    labels.to_csv(out.with_suffix(".csv"))
+
+    print("\nlabel coverage (n positive / n labelled), floor ~37:")
+    for c in ("idh", "onep19q", "mgmt", "sex"):
+        s = labels[c]
+        n_pos = int(np.nansum(s.values)); n_lab = int(s.notna().sum())
+        tag = "OK" if n_pos >= 37 and (n_lab - n_pos) >= 37 else "LOW/NA"
+        print(f"  {c:8s} n_+={n_pos:4d}  labelled={n_lab:4d}  {tag}")
+    age = labels["age"]
+    print(f"  age      labelled={int(age.notna().sum()):4d}  "
+          f"range=({np.nanmin(age.values):.0f},{np.nanmax(age.values):.0f})")
+    print(f"\nwrote {out}")
+
+
+# --------------------------------------------------------------------------
 # Main
 # --------------------------------------------------------------------------
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--data-root", default=None)
+    ap.add_argument("--source", choices=["auto", "clinical-csv", "crosswalk"],
+                    default="auto",
+                    help="auto: use clinical CSV if present (LGG v1), else the "
+                         "BraTS crosswalk path")
     ap.add_argument("--fetch-cbioportal", action="store_true",
                     help="build tcga_genotype.csv from cBioPortal, then exit")
     args = ap.parse_args()
@@ -205,6 +307,15 @@ def main() -> None:
         fetch_cbioportal(glioma_root)
         return
 
+    clinical_csv = glioma_root / "vasari" / "TCGA_clinical_INFO.csv"
+    use_clinical = args.source == "clinical-csv" or (
+        args.source == "auto" and clinical_csv.exists())
+    if use_clinical:
+        print("[mode] clinical-csv (TCGA-LGG-centric v1)")
+        build_from_clinical(glioma_root)
+        return
+
+    print("[mode] crosswalk (BraTS-centric)")
     subjects = brats_subjects(glioma_root)
     if not subjects:
         sys.exit(f"no BraTS2021_* subject folders under {glioma_root}; "
