@@ -65,18 +65,55 @@ DGX run is reproducible and the rationale is on record.
 
 ---
 
+## 1b. v1 scope: TCGA-LGG-centric (the path we are running)
+
+The full BraTS-centric design above (propagation to ~1,251 subjects, MGMT) is
+retained as the target v2. **v1 is a lighter, cleaner instantiation** that
+reuses the same four-condition machinery but avoids the two hardest data joins
+(the BraTS↔TCIA crosswalk and cBioPortal), because everything is already keyed
+by TCGA id:
+
+- **Cohort = the ~187 TCGA-LGG subjects** that carry **real VASARI scores**
+  (`TCGA_vasari_INFO.csv`, 188 rows) intersected with molecular calls.
+- **Source channel `P` = the real VASARI expert scores** (26 features), min-max
+  rescaled to [0,1] in `run_glioma_domainB.py`. **No propagation** — these are
+  ground-truth annotations, so `propagate_vasari.py` is skipped in v1.
+- **Targets = IDH and 1p/19q**, read straight from `TCGA_clinical_INFO.csv`
+  (`IDH1`, `1p_19q_co_del_status`). Measured power on the 187:
+  **IDH n₊=136/186, 1p/19q n₊=49/184** — both clear the ~37 floor.
+  (Bonus binary target available: **sex** from `gender`.)
+- **MGMT is deferred to v2** (absent from this clinical source; needs BraTS).
+  `run_glioma_domainB.py` reports it *underpowered/unavailable → Inconclusive*
+  rather than failing.
+- **Encoder input = BraTS-TCGA-LGG NIfTI** (Bakas 2017): skull-stripped,
+  co-registered T1/T1-Gd/T2/FLAIR + expert segmentation, **named by TCGA id**
+  → direct join to VASARI and labels, no crosswalk. Public training arm = **65
+  LGG subjects**; the test arm (43) is helpdesk-gated. So the imaging∩VASARI
+  cohort is ~65 in v1: IDH stays well-powered; **1p/19q may fall below the
+  floor on 65** — if so the framework correctly returns *Inconclusive*, and the
+  full-power 1p/19q read moves to v2 (add BraTS-TCGA-GBM + test arm).
+
+This v1 hits **2 of the 3 pre-registered regimes** (IDH = i, 1p/19q = ii) with
+zero crosswalk risk; v2 adds MGMT (iii) and full 1p/19q power.
+
+---
+
 ## 2. Data contract (what the run expects on disk)
 
 All under `$DATA_ROOT/glioma/`. The run is fully defined; only these artefacts
 are stubbed and must be produced first.
 
-| Artefact | Path | Producer | Status |
+| Artefact | Path | Producer | Used in |
 |---|---|---|---|
-| VASARI seed table | `vasari/vasari_features.parquet` | `fetch_vasari.py` | script ready |
-| VASARI propagated | `vasari/vasari_propagated.parquet` | `propagate_vasari.py` | script ready |
-| Genotype labels | `derived/glioma_labels.parquet` | `build_glioma_labels.py` | script ready |
-| Subject manifest | `derived/manifest.parquet` | `prepare_glioma_slices.py` | script ready |
-| Per-subject slices | `derived/slices/<subject>.npy` `[K,C,H,W]` f32 | `prepare_glioma_slices.py` | script ready |
+| VASARI real scores | `vasari/vasari_features.parquet` | `fetch_vasari.py` | v1 + v2 |
+| Clinical calls (IDH/1p19q/sex/age) | `vasari/TCGA_clinical_INFO.csv` | download (step 1a) | v1 |
+| VASARI propagated | `vasari/vasari_propagated.parquet` | `propagate_vasari.py` | v2 only |
+| Genotype labels | `derived/glioma_labels.parquet` | `build_glioma_labels.py` | v1 + v2 |
+| Subject manifest | `derived/manifest.parquet` | `prepare_glioma_slices.py` | v1 + v2 |
+| Per-subject slices | `derived/slices/<subject>.npy` `[K,C,H,W]` f32 | `prepare_glioma_slices.py` | v1 + v2 |
+
+In **v1** the source channel `P` is read directly from `vasari_features.parquet`
+(min-max rescaled in the run); `vasari_propagated.parquet` is a **v2** artefact.
 
 All five producer scripts now exist under `scripts/`. Two artefacts still
 need manual acquisition before they run (see the runbook, §3): the
@@ -91,7 +128,10 @@ Column contracts (enforced by the loaders in `run_glioma_domainB.py`):
 
 ---
 
-## 2b. DGX runbook (copy-paste)
+## 2b. DGX runbook — v2 / BraTS-centric (copy-paste)
+
+> This is the full BraTS-centric path (propagation + MGMT). For what we are
+> actually running now, use **§2c (v1, TCGA-LGG-centric)** below.
 
 ```bash
 # 0. environment
@@ -137,6 +177,52 @@ If MGMT clears the floor (`n_+ ≳ 37`) a near-chance result is a real
 out-of-ontology finding; if it does not, it is a power statement, not a
 regime verdict — do not report the make-or-break MGMT claim until the gate
 is passed.
+
+## 2c. DGX runbook — v1 / TCGA-LGG-centric (copy-paste, the one we run)
+
+Real VASARI + clinical calls, keyed by TCGA id. **No propagation, no crosswalk,
+no cBioPortal.** `build_glioma_labels.py` and `run_glioma_domainB.py`
+auto-detect this mode when the clinical CSV and real VASARI table are present.
+
+```bash
+cd scripts && source env.sh          # DATA_ROOT set; venv active (numpy 1.26.4)
+
+# 1a. VASARI scores + feature key + clinical  (already downloaded in step 1a)
+#   $DATA_ROOT/glioma/vasari/raw/TCGA_vasari_INFO.csv
+#   $DATA_ROOT/glioma/vasari/raw/VASARI_MR_featurekey.pdf
+#   $DATA_ROOT/glioma/vasari/TCGA_clinical_INFO.csv     (IDH/1p19q/sex/age)
+python fetch_vasari.py               # -> vasari/vasari_features.parquet (188 x 26)
+
+# 1b. imaging: BraTS-TCGA-LGG *processed NIfTI* (65 subj, folders named TCGA-XX-XXXX
+#     with *_t1 *_t1Gd *_t2 *_flair + *ManuallyCorrected*/*GlistrBoost* seg).
+#     Source = TCIA Aspera Faspex, Training set (zip, 536 MB):
+#       https://faspex.cancerimagingarchive.net/aspera/faspex/external_deliveries/89?passcode=48c6c69da7d44989c20f6cf366b7103e19565cfc
+#     Get the zip via the Faspex "Download" button (HTTP fallback) or aspera-cli,
+#     then unzip into $DATA_ROOT/glioma/brats_tcga_lgg/ :
+mkdir -p "$DATA_ROOT/glioma/brats_tcga_lgg"
+# unzip <downloaded.zip> -d "$DATA_ROOT/glioma/brats_tcga_lgg"
+
+# 2. labels from the clinical CSV  (auto: clinical-csv mode)
+python build_glioma_labels.py        # -> derived/glioma_labels.parquet
+#   prints: idh n_+=~136, onep19q n_+=~49 over the VASARI cohort; mgmt = NaN
+
+# 3. encoder input + folds  (auto-detects TCGA-* NIfTI, t1Gd, ManuallyCorrected)
+python prepare_glioma_slices.py --limit 8    # smoke first
+python prepare_glioma_slices.py              # all -> derived/manifest.parquet
+#   NB: manifest∩labels∩VASARI is what actually runs (~65 with public imaging)
+
+# 4. the run  (real VASARI auto-used; MGMT auto-skipped as underpowered)
+python run_glioma_domainB.py --smoke --targets idh onep19q
+python run_glioma_domainB.py --targets idh onep19q sex
+#   -> derived/domainB/{results.json,regimes.json,choquet_interactions.csv}
+```
+
+`propagate_vasari.py` is **not used in v1** (VASARI here is ground truth, not
+propagated). If 1p/19q comes back Inconclusive at n≈65, that is the correct
+framework output; the full-power 1p/19q read is a v2 item (add BraTS-TCGA-GBM
+and the helpdesk-gated LGG test arm).
+
+---
 
 ## 3. Execution plan (ordered)
 

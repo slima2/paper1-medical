@@ -94,6 +94,8 @@ N_SEQUENCES = 4          # T1, T1c, T2, FLAIR (BraTS co-registered channels)
 SLICES_PER_SUBJECT = 24  # K axial slices selected around the tumour centroid
 SLICE_HW = 128           # in-plane crop fed to the slice encoder
 TARGETS_DEFAULT = ["idh", "onep19q", "mgmt"]
+MIN_POS = 10             # min positives (or negatives) to attempt a target;
+                         # below this a target is reported underpowered, not run
 
 
 def resolve_root(cli_root: str | None) -> Path:
@@ -136,32 +138,51 @@ def load_manifest(glioma_root: Path) -> pd.DataFrame:
 
 
 def load_vasari_channel(glioma_root: Path, subjects: pd.Index) -> tuple[np.ndarray, list[str]]:
-    """The propagated VASARI source channel P, aligned to `subjects`.
+    """The VASARI source channel P in [0, 1], aligned to `subjects`.
 
-    Expected file: $DATA_ROOT/glioma/vasari/vasari_propagated.parquet
-        index = subject_id, columns = the ~30 VASARI features in [0, 1]
-        (ordinal expert scores min-max scaled per feature; propagated from the
-        253-case annotated seed to every BraTS subject by propagate_vasari.py).
-    fetch_vasari.py builds the *seed* table; propagate_vasari.py trains the
-    feature classifier on it and writes this full-cohort table.
+    Two sources are supported, in priority order:
+      1. vasari_propagated.parquet -- the full-cohort table written by
+         propagate_vasari.py (BraTS-centric run). Values already in [0, 1].
+      2. vasari_features.parquet   -- the *real* expert scores written by
+         fetch_vasari.py (TCGA-LGG-centric v1). These are ordinal integer
+         scores, so each feature is min-max rescaled to [0, 1] here. The
+         rescale is a fixed monotone map of an expert ordinal (not learned
+         from labels), so it introduces no target leakage.
+    Non-numeric bookkeeping columns (e.g. source_file) are dropped.
     """
-    path = glioma_root / "vasari" / "vasari_propagated.parquet"
-    if not path.exists():
+    prop = glioma_root / "vasari" / "vasari_propagated.parquet"
+    real = glioma_root / "vasari" / "vasari_features.parquet"
+    if prop.exists():
+        df = pd.read_parquet(prop)
+        source = "propagated"
+    elif real.exists():
+        df = pd.read_parquet(real)
+        source = "real"
+    else:
         sys.exit(
-            f"missing {path}\n"
-            "run: python fetch_vasari.py   (seed table), then\n"
-            "     python propagate_vasari.py  (classifier -> full cohort).\n"
+            f"missing both {prop} and {real}\n"
+            "run: python fetch_vasari.py   (real seed scores; LGG-centric v1), or\n"
+            "     python propagate_vasari.py  (full-cohort propagated; BraTS run).\n"
             "See VASARI_RUN_PLAN.md step 2."
         )
-    df = pd.read_parquet(path)
+
+    df = df.drop(columns=[c for c in ("source_file",) if c in df.columns],
+                 errors="ignore")
+    df = df.apply(pd.to_numeric, errors="coerce")
     df = df.reindex(subjects)
+
+    if source == "real":
+        lo = df.min(axis=0)
+        span = (df.max(axis=0) - lo).replace(0.0, 1.0)
+        df = (df - lo) / span
+
     if df.isna().any().any():
         n_bad = int(df.isna().any(axis=1).sum())
         print(f"[warn] {n_bad} subjects missing VASARI features; filling 0.5 (neutral)")
         df = df.fillna(0.5)
     feature_cols = list(df.columns)
-    P = df.to_numpy(dtype=np.float32)
-    P = np.clip(P, 0.0, 1.0)
+    P = np.clip(df.to_numpy(dtype=np.float32), 0.0, 1.0)
+    print(f"[ok] VASARI channel: {source}, {P.shape[0]} subjects x {P.shape[1]} features")
     return P, feature_cols
 
 
@@ -416,7 +437,10 @@ def train_eval(condition, tr_ds, te_ds, edim, pdim, epochs, bs, lr, device):
             ys.append(yb.numpy())
     prob = np.concatenate(scores)
     ytrue = np.concatenate(ys)
-    auroc = roc_auc_score(ytrue, prob)
+    try:
+        auroc = roc_auc_score(ytrue, prob)   # NaN if a fold is single-class
+    except ValueError:
+        auroc = float("nan")
     inter = None
     if condition == "FC":
         inter = model.choquet.interaction_matrix().detach().cpu().numpy()
@@ -491,8 +515,24 @@ def main():
     for target in args.targets:
         y_full = Y_all[target].to_numpy(dtype=np.float32)
         keep = ~np.isnan(y_full)                     # drop subjects lacking this call
-        print(f"\n=== target: {target}  (n={int(keep.sum())}, "
-              f"prev {np.nanmean(y_full[keep]):.3f}, n_+={int(np.nansum(y_full[keep]))}) ===")
+        n_kept = int(keep.sum())
+        n_pos = int(np.nansum(y_full[keep])) if n_kept else 0
+        n_neg = n_kept - n_pos
+        print(f"\n=== target: {target}  (n={n_kept}, "
+              f"prev {np.nanmean(y_full[keep]) if n_kept else float('nan'):.3f}, "
+              f"n_+={n_pos}) ===")
+        if n_pos < MIN_POS or n_neg < MIN_POS:
+            reason = ("no labels" if n_kept == 0
+                      else f"underpowered (n_+={n_pos}, n_-={n_neg}, floor={MIN_POS})")
+            print(f"  -> SKIP: {reason}")
+            regimes[target] = {
+                "best_auroc": None, "verdict": "Inconclusive",
+                "signature": "underpowered / unavailable",
+                "n": n_kept, "n_pos": n_pos, "n_neg": n_neg,
+            }
+            results[target] = {"skipped": reason, "n": n_kept,
+                               "n_pos": n_pos, "n_neg": n_neg}
+            continue
         per_cond = {c: [] for c in conditions}
         fc_inter_acc = None
         for gf in folds_to_run:
@@ -510,8 +550,8 @@ def main():
                 if c == "FC" and inter is not None:
                     fc_inter_acc = inter if fc_inter_acc is None else fc_inter_acc + inter
 
-        cond_means = {c: float(np.mean(v)) for c, v in per_cond.items()}
-        cond_sds = {c: float(np.std(v)) for c, v in per_cond.items()}
+        cond_means = {c: float(np.nanmean(v)) for c, v in per_cond.items()}
+        cond_sds = {c: float(np.nanstd(v)) for c, v in per_cond.items()}
         results[target] = {"mean": cond_means, "sd": cond_sds, "folds": per_cond}
         best = max(cond_means.values())
         regimes[target] = {
