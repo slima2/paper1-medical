@@ -1,7 +1,7 @@
 % Table tab:ecg_domainc — empirical domain-C run on PTB-XL. Physiological-state
 % targets (sex, age) predicted from the raw 12-lead signal, with the 71 graded
 % SCP-ECG statements as the source vocabulary channel. Five patient-disjoint
-% PTB-XL folds. Reproducible via scripts/run_ecg_domainC.py.
+% PTB-XL folds.
 \footnotesize
 \setlength{\tabcolsep}{5pt}
 \renewcommand{\arraystretch}{1.2}
@@ -28,5 +28,12 @@ $\mathrm{B3}$ statements only, $\mathrm{PI}$ concat fusion, $\mathrm{FC}$
 encoder $+$ 2-additive Choquet over the statements. In both targets the
 fusion conditions match the encoder to within a fold's standard deviation
 while $\mathrm{B3}$ trails far behind---the encoder-saturated signature of
-regime~(i). Reproducible with \texttt{scripts/run\_ecg\_domainC.py}.
+regime~(i). The regime is assigned by the decomposition structure, not by
+the top point estimate: although $\mathrm{FC}$ is numerically highest on
+Sex it exceeds $\mathrm{B2}$ by only $+0.003$ (below one fold's SD) and
+does not beat the additive $\mathrm{PI}$ ($+0.002$), so no non-additive
+pattern interaction is exploited; on Age the additive $\mathrm{PI}$ in
+fact outscores $\mathrm{FC}$. This is the criterion that separates
+regime~(i) from the synergy of regime~(ii), where $\mathrm{FC}$ beats
+$\mathrm{PI}$ by $+0.019$ on KRAS.
 \end{flushleft}

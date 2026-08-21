@@ -4,12 +4,11 @@
 % calibration or domain adaptation). "CPTAC AUROC" is the patient-level read-out
 % (slides mean-pooled, the pre-registered aggregation) with a 2000-sample
 % bootstrap 95% CI; the slide-level column assigns each of the 498 slides its
-% patient's genotype. Reproducible via scripts/eval_cptac_transfer.py and
-% scripts/reaggregate_cptac.py; TCGA AUROC is the best-aggregator value reported
+% patient's genotype. TCGA AUROC is the best-aggregator value reported
 % for the LUAD cohort in this paper. The "Reinhard" column re-runs the same
 % patient-level read-out after Reinhard stain normalisation of every tile to a
-% representative TCGA-LUAD reference (run_cptac_inference.py --stain-normalize
-% --stain-method reinhard); it isolates a global colour/stain cast as a cause.
+% representative TCGA-LUAD reference; it isolates a global colour/stain cast
+% as a cause.
 \footnotesize
 \setlength{\tabcolsep}{4pt}
 \renewcommand{\arraystretch}{1.2}
@@ -47,8 +46,5 @@ tile to a representative TCGA-LUAD reference
 aggregators, its $95\%$ CI still excluding the TCGA point; no aggregator
 recovers the TCGA value for any gene), so the collapse is not a global
 colour/stain cast either. Macenko stain-matrix normalisation was
-not tested and is left to future work. Reproducible with
-\texttt{scripts/eval\_cptac\_transfer.py},
-\texttt{scripts/reaggregate\_cptac.py} and the stain flags in
-\texttt{scripts/run\_cptac\_inference.py}.
+not tested and is left to future work.
 \end{flushleft}
