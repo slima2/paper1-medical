@@ -134,6 +134,21 @@ statistic.
 KRAS is thus Inconclusive but \emph{not} untranslatable, and it is
 the clearest reason in this cohort to keep the two words apart.
 
+\begin{table}[h!]
+\centering
+\input{tables/tab_levels_of_analysis}
+\caption{\textbf{The four levels of analysis, the quantities estimated
+at each and the scope of the claims each supports.} The
+Conclusive/Inconclusive verdict and the three-regime taxonomy are
+population-level objects; the six-level explanation stack is a
+slide-level and tile-level object; neither transfers to the other. The
+KRAS case above is the canonical illustration: a mediocre
+population statistic ($0.609$) coexists with a well-calibrated,
+clinically argumentative slide-level call because the two live at
+different levels.}
+\label{tab:levels_of_analysis}
+\end{table}
+
 \begin{figure}[ht!]
   \centering
   \begin{subfigure}[t]{0.48\linewidth}
@@ -314,28 +329,6 @@ this bound are specified in Methods.
 \subsection*{Six-level interpretability and dual anti-hallucination}
 % =====================================================================
 
-\begin{figure}[ht!]
-  \centering
-  \includegraphics[width=\linewidth]{lchai_six_level_stack}
-  \caption{\textbf{\lchai{} v2 system overview and six-level
-  interpretability stack.} Each WSI passes through tiling, the
-  frozen \ctranspath{} foundation encoder, the ANORAK-trained
-  pattern classifier (6-d fuzzy membership $\mathbf{p}\!\in\!\Delta^5$),
-  and the \fcmil{} 2-additive Choquet aggregator. From a single
-  forward pass through the aggregator the system materialises six
-  interpretability layers: \textbf{L1} ABMIL attention,
-  \textbf{L2} pattern overlay, \textbf{L3} SHAP channel
-  decomposition, \textbf{L4} Choquet--Shapley values and pairwise
-  interaction indices,   \textbf{L5} channel ablation, and \textbf{L6} fuzzy linguistic
-  labels.
-  The explanation layer wraps these six artefacts in an LLM agent
-  grounded in a three-layer knowledge graph
-  (NCIt+MONDO+curated PMID edges), with the fuzzy labels
-  constraining \emph{how} the agent speaks and the KG constraining
-  \emph{what} entities and edges may appear.}
-  \label{fig:lchai_six_levels}
-\end{figure}
-
 \lchai{} exposes six interpretability layers per slide per gene,
 all derived from the same forward pass through the MIL aggregator
 (\cref{fig:lchai_six_levels}):
@@ -420,56 +413,6 @@ A live-system view of the complete stack on the KRAS case is shown in
 \subsection*{Per-gene case studies}
 % =====================================================================
 
-\begin{figure}[ht!]
-  \centering
-  \begin{subfigure}[t]{0.32\linewidth}
-    \casepanel{lchai_v2_TP53_TCGA-99-8025_combined}
-    \caption{TP53, TCGA-99-8025 ($P=0.951$, TP).}
-    \label{fig:case_tp53}
-  \end{subfigure}\hfill
-  \begin{subfigure}[t]{0.32\linewidth}
-    \casepanel{lchai_v2_EGFR_TCGA-86-8280_combined}
-    \caption{EGFR, TCGA-86-8280 (TP).}
-    \label{fig:case_egfr}
-  \end{subfigure}\hfill
-  \begin{subfigure}[t]{0.32\linewidth}
-    \casepanel{lchai_v2_KRAS_TCGA-55-7815_combined}
-    \caption{KRAS, TCGA-55-7815 ($P=0.965$, IMA proxy).}
-    \label{fig:case_kras}
-  \end{subfigure}\\[1.2ex]
-  \begin{subfigure}[t]{0.32\linewidth}
-    \casepanel{lchai_v2_STK11_TCGA-49-AAR0_combined}
-    \caption{STK11, TCGA-49-AAR0 (TP).}
-    \label{fig:case_stk11}
-  \end{subfigure}\hfill
-  \begin{subfigure}[t]{0.32\linewidth}
-    \casepanel{lchai_v2_KEAP1_TCGA-49-AAR9_combined}
-    \caption{KEAP1, TCGA-49-AAR9 (TP).}
-    \label{fig:case_keap1}
-  \end{subfigure}\hfill
-  \begin{subfigure}[t]{0.32\linewidth}
-    \casepanel{lchai_v2_RBM10_TCGA-78-7148_combined}
-    \caption{RBM10, TCGA-78-7148 (TP).}
-    \label{fig:case_rbm10}
-  \end{subfigure}
-  \caption{\textbf{Per-gene case studies.} For each of the six
-  target genes, one representative true-positive slide is shown
-  with the four-panel \lchai{} composite: (top-left)~\ctranspath{}
-  thumbnail of the whole-slide image; (top-right)~pattern overlay
-  (L2) coloured by the dominant ANORAK pattern at each tile;
-  (bottom-left)~ABMIL attention map (L1) showing where the
-  aggregator weighed evidence; (bottom-right)~combined L1+L2
-  overlay localising the high-attention, high-pattern-saliency
-  regions. The KRAS panel illustrates the value of decoupling the
-  cohort-level verdict (Inconclusive at $0.609$ mean AUROC) from
-  the per-slide explanation: TCGA-55-7815 is per-slide confident
-  ($P=0.965$) and the L4 Choquet readout (\cref{fig:kras_proxy_b})
-  localises the confidence in the lepidic$\times$solid
-  co-activation. Per-slide additional examples and full SHAP
-  channel decompositions appear in Extended Data.}
-  \label{fig:case_grid}
-\end{figure}
-
 \cref{fig:case_grid} shows one representative true-positive slide
 per gene, juxtaposing the \ctranspath{} thumbnail, the pattern
 overlay (L2), the ABMIL attention map (L1) and the combined overlay.
@@ -495,14 +438,13 @@ cohorts an order of magnitude larger (CHIEF, EAGLE).}
 
 \cref{tab:literature_comparison_resultssec} places our results
 beside the published competition.
-On TP53 our $0.717$ is comparable to Saldanha's $0.65$ but below
-Coudray's $0.733$.
+On TP53 our $0.717$ sits below Coudray's $0.733$.
 On EGFR our pattern-informed $0.694$ sits just under the
 encoder-only ceiling ($0.701$, the value that places EGFR in the
-Conclusive, encoder-saturated regime~(i)) and well below Coudray's
-$0.826$ and Campanella's EAGLE $0.890$, both of which use proprietary
-cohorts an order of magnitude larger and architectures tuned
-end-to-end for EGFR specifically.
+Conclusive, encoder-saturated regime~(i)) and below Saldanha's $0.76$
+(external CPTAC validation), Coudray's $0.826$ and Campanella's EAGLE
+$0.890$; the last of these uses a proprietary cohort an order of magnitude
+larger and a foundation model fine-tuned end-to-end for EGFR.
 On STK11 ($0.695$), KEAP1 ($0.610$) and RBM10 ($0.661$) our
 upper-tier conditions deliver per-gene numbers that are
 \emph{not} reported in most prior work; STK11 and KEAP1 are
