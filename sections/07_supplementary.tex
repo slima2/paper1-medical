@@ -1,0 +1,189 @@
+% ======================================================================
+% Supplementary Information
+% Display items demoted from the main text for npj Digital Medicine.
+% Figures renumber as S1, S2, ...; tables as ST1, ST2, ...
+% All cross-references keep their original labels and auto-resolve.
+% ======================================================================
+\clearpage
+\setcounter{figure}{0}
+\setcounter{table}{0}
+\renewcommand{\thefigure}{S\arabic{figure}}
+\renewcommand{\thetable}{S\arabic{table}}
+
+\section*{Supplementary Information}
+
+% ----------------------------------------------------------------------
+% Supplementary figures
+% ----------------------------------------------------------------------
+
+% --- S1: six-level schematic stack ---
+\begin{figure}[ht!]
+  \centering
+  \includegraphics[width=\linewidth]{lchai_six_level_stack}
+  \caption{\textbf{\lchai{} v2 system overview and six-level
+  interpretability stack.} Each WSI passes through tiling, the
+  frozen \ctranspath{} foundation encoder, the ANORAK-trained
+  pattern classifier (6-d fuzzy membership $\mathbf{p}\!\in\!\Delta^5$),
+  and the \fcmil{} 2-additive Choquet aggregator. From a single
+  forward pass through the aggregator the system materialises six
+  interpretability layers: \textbf{L1} ABMIL attention,
+  \textbf{L2} pattern overlay, \textbf{L3} SHAP channel
+  decomposition, \textbf{L4} Choquet--Shapley values and pairwise
+  interaction indices,   \textbf{L5} channel ablation, and \textbf{L6} fuzzy linguistic
+  labels.
+  The explanation layer wraps these six artefacts in an LLM agent
+  grounded in a three-layer knowledge graph
+  (NCIt+MONDO+curated PMID edges), with the fuzzy labels
+  constraining \emph{how} the agent speaks and the KG constraining
+  \emph{what} entities and edges may appear.}
+  \label{fig:lchai_six_levels}
+\end{figure}
+
+% --- S2: per-gene case grid ---
+\begin{figure}[ht!]
+  \centering
+  \begin{subfigure}[t]{0.32\linewidth}
+    \casepanel{lchai_v2_TP53_TCGA-99-8025_combined}
+    \caption{TP53, TCGA-99-8025 ($P=0.951$, TP).}
+    \label{fig:case_tp53}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.32\linewidth}
+    \casepanel{lchai_v2_EGFR_TCGA-86-8280_combined}
+    \caption{EGFR, TCGA-86-8280 (TP).}
+    \label{fig:case_egfr}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.32\linewidth}
+    \casepanel{lchai_v2_KRAS_TCGA-55-7815_combined}
+    \caption{KRAS, TCGA-55-7815 ($P=0.965$, IMA proxy).}
+    \label{fig:case_kras}
+  \end{subfigure}\\[1.2ex]
+  \begin{subfigure}[t]{0.32\linewidth}
+    \casepanel{lchai_v2_STK11_TCGA-49-AAR0_combined}
+    \caption{STK11, TCGA-49-AAR0 (TP).}
+    \label{fig:case_stk11}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.32\linewidth}
+    \casepanel{lchai_v2_KEAP1_TCGA-49-AAR9_combined}
+    \caption{KEAP1, TCGA-49-AAR9 (TP).}
+    \label{fig:case_keap1}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.32\linewidth}
+    \casepanel{lchai_v2_RBM10_TCGA-78-7148_combined}
+    \caption{RBM10, TCGA-78-7148 (TP).}
+    \label{fig:case_rbm10}
+  \end{subfigure}
+  \caption{\textbf{Per-gene case studies.} For each of the six
+  target genes, one representative true-positive slide is shown
+  with the four-panel \lchai{} composite: (top-left)~\ctranspath{}
+  thumbnail of the whole-slide image; (top-right)~pattern overlay
+  (L2) coloured by the dominant ANORAK pattern at each tile;
+  (bottom-left)~ABMIL attention map (L1) showing where the
+  aggregator weighed evidence; (bottom-right)~combined L1+L2
+  overlay localising the high-attention, high-pattern-saliency
+  regions. The KRAS panel illustrates the value of decoupling the
+  cohort-level verdict (Inconclusive at $0.609$ mean AUROC) from
+  the per-slide explanation: TCGA-55-7815 is per-slide confident
+  ($P=0.965$) and the L4 Choquet readout (\cref{fig:kras_proxy_b})
+  localises the confidence in the lepidic$\times$solid
+  co-activation. Per-slide additional examples and full SHAP
+  channel decompositions appear in Extended Data.}
+  \label{fig:case_grid}
+\end{figure}
+
+% --- S3: three-layer knowledge graph ---
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\linewidth]{kg_three_layers_method}
+  \caption{\textbf{Three-layer knowledge graph
+  $\mathcal{K} = (V_C \cup V_D \cup V_L,\, E)$ used to ground the
+  LLM explanation layer.}
+  $V_C$: NCIt~\cite{sioutos2007ncit} concept nodes (genes,
+  pathways, histological patterns).
+  $V_D$: MONDO~\cite{mondo_shefchek2020} disease nodes
+  (e.g.\ \emph{lung adenocarcinoma},
+  \emph{invasive mucinous adenocarcinoma}).
+  $V_L$: a per-case dynamic literature layer built by DeepSearch
+  at query time, each node carrying a PMID provenance tag that is
+  exposed to the user as a click-through citation.
+  The agent's prompt grammar permits it to invoke only entities
+  and edges in $V$ and $E$; this constrains \emph{what} the
+  narrative can claim. \cref{eq:trap_mf} constrains \emph{how}
+  evidence strength is verbalised.}
+  \label{fig:kg_three_layers}
+\end{figure}
+
+% --- S4: real ECG example ---
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{ecg_ptbxl_example}
+\caption{\textbf{A real 12-lead electrocardiogram from PTB-XL}
+(a $37$-year-old woman, sinus rhythm, reported normal ECG), shown in the
+standard clinical $3\times4$ format with a lead-II rhythm strip on an ECG
+grid ($25$\,mm/s, $10$\,mm/mV). This is the raw $100$\,Hz signal the
+encoder $\mathbf{E}$ ingests---the electrocardiographic counterpart of the
+whole-slide histopathology images in LUAD. Patient age and sex are
+recorded for every PTB-XL case but are absent from the $71$ SCP-ECG
+diagnostic statements that form the source channel $\mathbf{P}$, so the
+framework recovers both from exactly this signal
+(\cref{tab:ecg_domainc,fig:pipeline_ecg}), a leakage-free
+physiological-state translation.\cite{wagner2020ptbxl}}
+\label{fig:ecg_ptbxl}
+\end{figure}
+
+% --- S5: real glioma MRI example ---
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{glioma_example}
+\caption{\textbf{A real preoperative multiparametric MRI from a TCGA-LGG
+glioma} (an IDH-mutant, 1p/19q-codeleted case)---the four co-registered
+sequences (T1, T1-Gd, T2, FLAIR) the encoder $\mathbf{E}$ ingests, shown at
+the tumour-centroid axial slice with the expert tumour segmentation contour
+(red). Below, the neuroradiologist VASARI scores
+for the same case---the source channel $\mathbf{P}$ the framework fuses---are
+the radiological counterpart of the ANORAK growth patterns in LUAD and the
+SCP-ECG statements in the electrocardiogram
+(\cref{tab:glioma_domainb,fig:pipeline_glioma}). This is the raw signal from
+which IDH and 1p/19q are read, the imaging analogue of the whole-slide
+histopathology in LUAD and the twelve-lead trace in
+\cref{fig:ecg_ptbxl}.}
+\label{fig:glioma_example}
+\end{figure}
+
+% ----------------------------------------------------------------------
+% Supplementary tables
+% ----------------------------------------------------------------------
+
+% --- ST1: CPTAC power ---
+\begin{table}[h!]
+\centering
+\input{tables/tab_cptac_power}
+\caption{Observed positive-set sizes for the six target genes in the
+CPTAC-LUAD cohort-transfer test, from the actual non-silent mutation
+frequencies in cBioPortal \texttt{luad\_cptac\_2020} ($n\!=\!110$). These
+fix, in advance of the imaging read-out, which targets the transfer can
+estimate: in the genotyped-with-imaging subset ($n\!=\!106$) only
+\textit{TP53} clears the $n_+\!=\!37$ floor, \textit{EGFR} falls just
+short, and the regime-(iii) genes and \textit{RBM10} fall well below.}
+\label{tab:cptac_power}
+\end{table}
+
+% --- ST2: mutation prevalence ---
+\begin{table}[h!]
+\centering
+\input{tables/tab_mutation_prevalence}
+\caption{Mutation prevalence in the analysable TCGA-LUAD cohort
+($n\!=\!687$ slides from $668$ patients).
+The Conclusive-verdict column anticipates the cohort-level outcome
+of the five-fold cross-validation reported in Results.}
+\label{tab:mutation_prevalence}
+\end{table}
+
+% --- ST3: verdict bands ---
+\begin{table}[h!]
+\centering
+\input{tables/tab_viz_folds_methods}
+\caption{Conclusive/Inconclusive verdict bands and their assignment
+to the six target genes under the five-fold patient-stratified CV
+protocol used throughout the paper.}
+\label{tab:viz_folds_methods}
+\end{table}

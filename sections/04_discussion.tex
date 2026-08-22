@@ -223,13 +223,12 @@ cross-domain medical prediction.
 
 A framework that has only ever been run on the cohort it was designed
 around is indistinguishable from a description of that cohort.
-The decomposition of \cref{eq:pid} needs exactly two ingredients---an
-expert-defined controlled vocabulary on the source modality and a
-learned encoder of that modality unconstrained by the
-vocabulary---and both are available in domains far from pathology.
-We therefore pre-register two instantiations on fully public data
-(\cref{tab:crossdomain_protocol}), specified here so that the
-framework can be falsified independently of the LUAD results.
+Because the decomposition of \cref{eq:pid} needs only its two
+ingredients---an expert controlled vocabulary and an unconstrained learned
+encoder of the same modality---both available far from pathology, we
+instantiate it on two further public cohorts
+(\cref{tab:crossdomain_protocol}), specified so that the framework can be
+falsified independently of the LUAD results.
 
 \begin{table}[h!]
 \centering
@@ -272,11 +271,12 @@ and synergy is read between vocabulary statements directly.
 \begin{table}[h!]
 \centering
 \input{tables/tab_levels_crossdomain}
-\caption{The level structure of \cref{tab:levels_of_analysis}
-generalised to the three domains. The population level hosts the \pid{}
+\caption{\textbf{The level structure of \cref{tab:levels_of_analysis}
+generalised to the three domains.} The population level hosts the \pid{}
 decomposition and the verdict in every domain; the interpretability
 instruments are per-unit. Only the name of the unit and whether it is a
-bag or a single instance change across domains.}
+bag or a single instance change across domains---which is the precise
+sense in which the framework, not the model weights, transfers.}
 \label{tab:levels_crossdomain}
 \end{table}
 
@@ -295,8 +295,51 @@ classifier trained on the TCIA-annotated subset ($n=178$ LGG,
 $n=75$ GBM) and propagated to the $\sim$1{,}251 BraTS 2021
 subjects\cite{baid2021brats} occupies the position that
 \fuzzyarc{}\,V2 trained on Zenodo-ANORAK and propagated to TCGA-LUAD
-occupies here, with the same 2-additive Choquet aggregator over the
-feature vector (\cref{fig:pipeline_glioma}).
+occupies here in the LUAD two-channel architecture
+(\cref{fig:two_channels}), with the same 2-additive Choquet aggregator
+over the feature vector (\cref{fig:pipeline_glioma}).
+
+\begin{figure}[ht!]
+  \centering
+  \includegraphics[width=\linewidth]{two_channel_architecture}
+  \caption{\textbf{The two channels over which the decomposition is
+  taken (Domain~A, LUAD)}---the reference architecture the glioma
+  (\cref{fig:pipeline_glioma}) and electrocardiogram
+  (\cref{fig:pipeline_ecg}) pipelines transfer to new modalities. The
+  morphology channel carries the \ctranspath{} tile embeddings
+  $\mathbf{h}_i$ into the \piabmil{} gated-attention aggregator; the
+  composition channel carries the 6-d fuzzy pattern probabilities
+  $\mathbf{p}_i$ into the \fcmil{} 2-additive Choquet integral. The two
+  are disjoint until the classifier head, where $\mathbf{c}_s$ and
+  $\mathbf{z}_\mathrm{attn}$ are concatenated and projected. This
+  separation is what makes \cref{eq:pid} well posed as a statement about
+  two sources: neither channel can route information through the other,
+  so an empty pattern-side atom cannot be an artefact of the
+  architecture.}
+  \label{fig:two_channels}
+\end{figure}
+
+\begin{figure}[ht!]
+\centering
+\includegraphics[width=\linewidth]{pipeline_glioma_domainB}
+\caption{\textbf{The glioma MRI\,$\rightarrow$\,genotype pipeline
+(Domain~B) as a one-to-one transfer of the LUAD
+architecture.} An unconstrained learned encoder $\mathbf{E}$---a 2.5D
+CNN with \abmil{} over axial MRI slices, occupying the position
+\ctranspath{} with tile-level \abmil{} holds in LUAD---and the expert
+source vocabulary $\mathbf{P}$---the $\sim$30 VASARI semantic MR
+features, a classifier trained on the TCIA-annotated seed and propagated
+to BraTS, occupying the position ANORAK growth patterns hold in
+LUAD---feed the same four conditions: B2 encoder only, B3 ontology only,
+PI concat fusion and FC 2-additive fuzzy Choquet over $\mathbf{P}$. The
+regime predictions are IDH in regime~(i), 1p/19q in
+regime~(ii), and MGMT in regime~(iii) as an empty VASARI-side atom,
+distinguished from a data floor by the B3-versus-B2 signature. A v1 pilot on
+the TCGA-LGG subset (\cref{tab:glioma_domainb}) confirms the first two at the
+complementarity level; the stronger non-additive form (FC beating the
+additive PI) and the MGMT test await the full-power cohort.}
+\label{fig:pipeline_glioma}
+\end{figure}
 
 What makes this domain worth the effort is the target, not the
 method.
@@ -335,28 +378,6 @@ does recover it, the field's decade of negative cohort-average
 results would have been hiding a translatable subgroup, which is a
 more consequential finding than either.
 
-\begin{figure}[t]
-\centering
-\includegraphics[width=\linewidth]{pipeline_glioma_domainB}
-\caption{\textbf{The glioma MRI\,$\rightarrow$\,genotype pipeline
-(Domain~B, pre-registered) as a one-to-one transfer of the LUAD
-architecture.} An unconstrained learned encoder $\mathbf{E}$---a 2.5D
-CNN with \abmil{} over axial MRI slices, occupying the position
-\ctranspath{} with tile-level \abmil{} holds in LUAD---and the expert
-source vocabulary $\mathbf{P}$---the $\sim$30 VASARI semantic MR
-features, a classifier trained on the TCIA-annotated seed and propagated
-to BraTS, occupying the position ANORAK growth patterns hold in
-LUAD---feed the same four conditions: B2 encoder only, B3 ontology only,
-PI concat fusion and FC 2-additive fuzzy Choquet over $\mathbf{P}$. The
-pre-registered regime predictions are IDH in regime~(i), 1p/19q in
-regime~(ii), and MGMT in regime~(iii) as an empty VASARI-side atom,
-distinguished from a data floor by the B3-versus-B2 signature. A v1 pilot on
-the TCGA-LGG subset (\cref{tab:glioma_domainb}) confirms the first two at the
-complementarity level; the stronger non-additive form (FC beating the
-additive PI) and the MGMT test await the full-power cohort.}
-\label{fig:pipeline_glioma}
-\end{figure}
-
 A first, deliberately small instantiation is runnable without any of the
 propagation machinery: the ${\sim}63$ TCGA-LGG subjects that carry real
 neuroradiologist VASARI scores, co-registered preoperative MRI from
@@ -381,10 +402,9 @@ rather than asserted, and the pre-registered expectation that the
 non-additive aggregator would win on 1p/19q was our modelling hypothesis, not
 an established radiogenomic result. And MGMT is absent from this clinical
 source and is reported underpowered, so the regime-(iii) untranslatability
-test---the claim on which we ask the framework to be judged---remains the
-pre-registered v2 experiment on the full BraTS cohort.
+test remains the pre-registered v2 experiment on the full BraTS cohort.
 
-\begin{table}[h!]
+\begin{table}[ht!]
 \centering
 \input{tables/tab_glioma_domainb}
 \caption{Domain-B v1 pilot: glioma MRI\,$\rightarrow$\,genotype on the
@@ -394,24 +414,6 @@ captures alone); a sex control is correctly Inconclusive. The non-additive
 interaction form and MGMT are deferred to the full-power cohort.}
 \label{tab:glioma_domainb}
 \end{table}
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=\linewidth]{glioma_example}
-\caption{\textbf{A real preoperative multiparametric MRI from a TCGA-LGG
-glioma} (an IDH-mutant, 1p/19q-codeleted case)---the four co-registered
-sequences (T1, T1-Gd, T2, FLAIR) the encoder $\mathbf{E}$ ingests, shown at
-the tumour-centroid axial slice with the expert tumour segmentation contour
-(red). Below, the neuroradiologist VASARI scores
-for the same case---the source channel $\mathbf{P}$ the framework fuses---are
-the radiological counterpart of the ANORAK growth patterns in LUAD and the
-SCP-ECG statements in the electrocardiogram
-(\cref{tab:glioma_domainb,fig:pipeline_glioma}). This is the raw signal from
-which IDH and 1p/19q are read, the imaging analogue of the whole-slide
-histopathology in LUAD and the twelve-lead trace in
-\cref{fig:ecg_ptbxl}.}
-\label{fig:glioma_example}
-\end{figure}
 
 The second instantiation, the electrocardiogram $\rightarrow$
 laboratory state, tests whether the taxonomy scales past six
@@ -448,18 +450,14 @@ MIMIC-IV-ECG\cite{gow2023mimicivecg} extend the same protocol to a
 multimodal setting in which the missingness correction of
 \citet{choi2025icym2i} becomes mandatory rather than optional.
 
-Between them the two domains buy complementary evidence.
-The glioma instantiation tests the framework against the hardest
-available negative case and puts the Conclusive/Inconclusive verdict
-where a community already agrees the answer is negative but has no
-way to say so.
-The electrocardiogram instantiation tests whether the three regimes
-remain distinguishable at $10^2$ targets rather than $6$, and whether
-a natively graded source vocabulary strengthens or weakens the fuzzy
-explanation layer.
-Neither requires new data collection, proprietary access or a
-foundation-scale cohort; both are reachable from public archives,
-which is the point.
+Between them the two domains buy complementary evidence: the glioma
+instantiation tests the framework against the hardest available negative
+case (MGMT), while the electrocardiogram instantiation tests whether the
+three regimes remain distinguishable at $10^2$ targets rather than $6$ and
+whether a natively graded source vocabulary strengthens or weakens the fuzzy
+explanation layer. Neither requires new data collection, proprietary access
+or a foundation-scale cohort; both are reachable from public archives, which
+is the point.
 
 The electrocardiogram domain, however, need not remain purely
 pre-registered for its most immediately available target. Patient sex and age are recorded
@@ -474,22 +472,6 @@ counterpart of the retinal$\rightarrow$systemic mapping we cite---
 recovering a physiological state from a modality not designed to report
 it\cite{poplin2018retinal,attia2019ecg}.
 
-\begin{figure}[t]
-\centering
-\includegraphics[width=\linewidth]{ecg_ptbxl_example}
-\caption{\textbf{A real 12-lead electrocardiogram from PTB-XL}
-(a $37$-year-old woman, sinus rhythm, reported normal ECG), shown in the
-standard clinical $3\times4$ format with a lead-II rhythm strip on an ECG
-grid ($25$\,mm/s, $10$\,mm/mV). This is the raw $100$\,Hz signal the
-encoder $\mathbf{E}$ ingests---the electrocardiographic counterpart of the
-whole-slide histopathology images in LUAD. Patient age and sex are
-recorded for every PTB-XL case but are absent from the $71$ SCP-ECG
-diagnostic statements that form the source channel $\mathbf{P}$, so the
-framework recovers both from exactly this signal
-(\cref{tab:ecg_domainc,fig:pipeline_ecg}), a leakage-free
-physiological-state translation.\cite{wagner2020ptbxl}}
-\label{fig:ecg_ptbxl}
-\end{figure}
 Running the identical four-condition protocol used for LUAD, five-fold
 patient-disjoint on the PTB-XL folds
 (\cref{tab:ecg_domainc,fig:pipeline_ecg}), reproduces
@@ -521,7 +503,7 @@ narrower but real: the two-channel decomposition, the four-condition
 protocol and the Conclusive verdict transfer intact across a modality
 family, not merely in principle.
 
-\begin{figure}[t]
+\begin{figure}[ht!]
 \centering
 \includegraphics[width=\linewidth]{pipeline_ecg_domainC}
 \caption{\textbf{The electrocardiogram\,$\rightarrow$\,physiological-state
@@ -537,7 +519,7 @@ statement channel alone trails (\cref{tab:ecg_domainc}).}
 \label{fig:pipeline_ecg}
 \end{figure}
 
-\begin{table}[h!]
+\begin{table}[ht!]
 \centering
 \input{tables/tab_ecg_domainc}
 \caption{Empirical domain-C run: physiological-state translation on
@@ -673,47 +655,21 @@ claim at the level of an individual gene, as distinct from the structural
 portability of the framework that the glioma and electrocardiogram
 instantiations test separately.
 
-It is worth being explicit about what this frozen-pipeline test can and
-cannot establish, because two different notions of transfer are easily
-conflated. What we froze and applied to CPTAC is the \emph{entire trained
-predictor}---the \ctranspath{} encoder, the ANORAK pattern head and the
-selected per-gene MIL aggregator---so the read-out is a single probability
-per gene. This measures whether the \emph{learned decision function}
-transfers, and it does not. It is deliberately \emph{not} a test of whether
-the \emph{regime assignment} transfers, because a regime is never read off
-a single head: it is the contrast across the four conditions
-(B2 embedding-only, B3 pattern-only, \piabmil{} concat fusion, \fcmil{}
-Choquet), and one number per gene cannot express that contrast. The
-pipeline that would probe regime transfer is the one the electrocardiogram
-instantiation uses in a new modality: freeze only the \emph{representation}
----the \ctranspath{} encoder and the ANORAK channel that define the
-saturation and out-of-ontology atoms---while re-fitting B2/B3/\piabmil{}/%
-\fcmil{} with CPTAC-internal cross-validation and re-deriving the per-gene
-signature. Two obstacles make this infeasible on CPTAC as a single external
-cohort. First, that comparison is only meaningful if the frozen encoder
-operates in-distribution, yet stain normalisation does not restore it
-(\textit{TP53} $0.48$; \cref{tab:cptac_transfer}), so any within-CPTAC refit
-would be confounded by an off-distribution encoder rather than reporting an
-intrinsic regime. Second, the four-condition contrast needs enough positives
-per gene to separate the conditions, and only \textit{TP53} clears the
-estimation floor here (\cref{tab:cptac_power}). CPTAC can therefore establish
-that the model does not transfer off-the-shelf, but not whether the regime
-does; the latter is precisely what the glioma and electrocardiogram
-instantiations, which re-instantiate the four-condition protocol rather than
-reapply frozen weights, are designed to settle.
-
-\begin{table}[h!]
-\centering
-\input{tables/tab_cptac_power}
-\caption{Observed positive-set sizes for the six target genes in the
-CPTAC-LUAD cohort-transfer test, from the actual non-silent mutation
-frequencies in cBioPortal \texttt{luad\_cptac\_2020} ($n\!=\!110$). These
-fix, in advance of the imaging read-out, which targets the transfer can
-estimate: in the genotyped-with-imaging subset ($n\!=\!106$) only
-\textit{TP53} clears the $n_+\!=\!37$ floor, \textit{EGFR} falls just
-short, and the regime-(iii) genes and \textit{RBM10} fall well below.}
-\label{tab:cptac_power}
-\end{table}
+This frozen-pipeline test measures whether the \emph{learned decision
+function} transfers---the \ctranspath{} encoder, the ANORAK pattern head and
+the selected per-gene aggregator applied as one predictor, read out as a
+single probability per gene---and it does not. It is deliberately not a test
+of whether the \emph{regime assignment} transfers, because a regime is the
+contrast across the four conditions (B2/B3/\piabmil{}/\fcmil{}), not a single
+head, and one number per gene cannot express it. Probing regime transfer
+would instead mean freezing only the \emph{representation} and re-fitting the
+four conditions with CPTAC-internal cross-validation, as the glioma and
+electrocardiogram instantiations do in a new modality---but this is
+infeasible on a single external cohort here: stain normalisation does not
+return the encoder to distribution (\textit{TP53} $0.48$;
+\cref{tab:cptac_transfer}), so any within-CPTAC refit is confounded by an
+off-distribution encoder, and only \textit{TP53} clears the estimation floor
+needed to separate the conditions (\cref{tab:cptac_power}).
 
 \begin{table}[h!]
 \centering

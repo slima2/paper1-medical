@@ -31,15 +31,6 @@ LUAD-relevance and prevalence $\geq 5\%$ in the cohort
 (28.5\%), \textit{STK11} (9.9\%), \textit{KEAP1} (14.3\%) and
 \textit{RBM10} (5.4\%).
 
-\begin{table}[h!]
-\centering
-\input{tables/tab_mutation_prevalence}
-\caption{Mutation prevalence in the analysable TCGA-LUAD cohort
-($n\!=\!687$ slides from $668$ patients).
-The Conclusive-verdict column anticipates the cohort-level outcome
-of the five-fold cross-validation reported in Results.}
-\label{tab:mutation_prevalence}
-\end{table}
 The corresponding mutation calls (MAF files) were obtained from
 GDC and only non-silent variants retained: missense, nonsense,
 frameshift, splice-site, in-frame insertion/deletion.
@@ -165,23 +156,6 @@ and projected to the per-gene prediction.
 \fcmil{} is the architectural primitive that exposes
 pattern--pattern interactions as the $15$ scalars $I_{jk}$ for
 direct clinical inspection at inference time.
-
-\begin{figure}[ht!]
-  \centering
-  \includegraphics[width=\linewidth]{two_channel_architecture}
-  \caption{\textbf{The two channels over which the decomposition is
-  taken.} The morphology channel carries the \ctranspath{} tile
-  embeddings $\mathbf{h}_i$ into the \piabmil{} gated-attention
-  aggregator; the composition channel carries the 6-d fuzzy pattern
-  probabilities $\mathbf{p}_i$ into the \fcmil{} 2-additive Choquet
-  integral. The two are disjoint until the classifier head, where
-  $\mathbf{c}_s$ and $\mathbf{z}_\mathrm{attn}$ are concatenated and
-  projected. This separation is what makes \cref{eq:pid} well posed as
-  a statement about two sources: neither channel can route information
-  through the other, so an empty pattern-side atom cannot be an
-  artefact of the architecture.}
-  \label{fig:two_channels}
-\end{figure}
 
 % =====================================================================
 \subsection*{Partial information decomposition of the pattern and
@@ -314,15 +288,6 @@ softmax-normalised mutation probability of the gene-specific head)
 is reported independently and inherits the calibration of the
 underlying \piabmil{} or \fcmil{} classifier.
 
-\begin{table}[h!]
-\centering
-\input{tables/tab_viz_folds_methods}
-\caption{Conclusive/Inconclusive verdict bands and their assignment
-to the six target genes under the five-fold patient-stratified CV
-protocol used throughout the paper.}
-\label{tab:viz_folds_methods}
-\end{table}
-
 % =====================================================================
 \subsection*{Levels of analysis and the scope of a verdict}
 % =====================================================================
@@ -381,17 +346,6 @@ The LLM agent receives both, together with the level at which each
 was estimated, and is constrained (\cref{eq:trap_mf} and the
 knowledge-graph guard below) from asserting a cohort property of a
 single case or a case property of the cohort.
-
-\begin{table}[h!]
-\centering
-\input{tables/tab_levels_of_analysis}
-\caption{The four levels of analysis, the quantities estimated at
-each and the scope of the claims each supports.
-The Conclusive/Inconclusive verdict and the three-regime taxonomy are
-population-level objects; the six-level explanation stack is a
-slide-level and tile-level object; neither transfers to the other.}
-\label{tab:levels_of_analysis}
-\end{table}
 
 % =====================================================================
 \subsection*{Six-level interpretability stack}
@@ -470,27 +424,6 @@ provenance attached to every $e\in E$
 \textit{(c)} to surface any deactivated edges as
 ``previously hypothesised, now contested'' rather than deleting
 them, preserving full auditability.
-
-\begin{figure}[h!]
-  \centering
-  \includegraphics[width=\linewidth]{kg_three_layers_method}
-  \caption{\textbf{Three-layer knowledge graph
-  $\mathcal{K} = (V_C \cup V_D \cup V_L,\, E)$ used to ground the
-  LLM explanation layer.}
-  $V_C$: NCIt~\cite{sioutos2007ncit} concept nodes (genes,
-  pathways, histological patterns).
-  $V_D$: MONDO~\cite{mondo_shefchek2020} disease nodes
-  (e.g.\ \emph{lung adenocarcinoma},
-  \emph{invasive mucinous adenocarcinoma}).
-  $V_L$: a per-case dynamic literature layer built by DeepSearch
-  at query time, each node carrying a PMID provenance tag that is
-  exposed to the user as a click-through citation.
-  The agent's prompt grammar permits it to invoke only entities
-  and edges in $V$ and $E$; this constrains \emph{what} the
-  narrative can claim. \cref{eq:trap_mf} constrains \emph{how}
-  evidence strength is verbalised.}
-  \label{fig:kg_three_layers}
-\end{figure}
 
 % =====================================================================
 \subsection*{Reproducibility, data and code availability}
