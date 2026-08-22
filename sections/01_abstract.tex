@@ -3,7 +3,7 @@
 % 01_abstract_LONG_backup.tex.bak for journals without a hard limit.
 \begin{abstract}
 \noindent
-Medical tasks predicting a target the source modality does not
+Medical tasks predicting a target the source modality cannot
 directly measure are reported as a cohort-average hiding which
 targets are reachable.
 We treat them as imperfect translation, reporting per-target
@@ -12,17 +12,17 @@ Our three-regime taxonomy---encoder saturation, inter-pattern
 co-occurrence, out-of-ontology---is the redundant, synergistic and
 unique atoms of a partial information decomposition of the source
 ontology against the encoder, paired with a Conclusive/Inconclusive
-verdict and the six-level \lchai{} stack.
+verdict and a six-level explanation stack.
 On TCGA-LUAD (687 slides) TP53 and EGFR saturate the
 encoder, KRAS is synergistic, STK11 and KEAP1 fall outside it; KRAS is
 Inconclusive at 0.609 yet 0.965 on one slide.
 A cohort transfer to CPTAC-LUAD fails---TP53 collapses from 0.72 to
 0.53 off-the-shelf and 0.48 after stain normalisation---so the
 assignments are cohort-specific.
-The framework transfers: on {PTB-XL} it recovers physiological state
-from the signal (AUROC 0.90), and a glioma MRI pilot under
-{VASARI} reproduces the regime structure (IDH saturated, 1p/19q
-fusion-recovered).
+The framework transfers: on the public electrocardiogram dataset
+{PTB-XL} it recovers physiological state (AUROC 0.90), and a glioma MRI pilot with
+standardised imaging features reproduces the regimes (IDH saturated,
+1p/19q fusion-recovered).
 \end{abstract}
 
 \paragraph{Keywords.}
