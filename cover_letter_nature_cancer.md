@@ -1,7 +1,7 @@
 # Cover letter — *Nature Cancer* (Article)
 
 **To:** Editor-in-Chief, *Nature Cancer*
-**Re:** Submission of original Article — *Translating Histology into Genotype: A Three-Regime, Six-Level Framework for Interpretable Mutation Prediction in Lung Adenocarcinoma.*
+**Re:** Submission of original Article — *A three-regime translatability framework for cross-domain medical prediction with an instantiation in lung adenocarcinoma.*
 
 Dear Editor,
 
@@ -21,6 +21,8 @@ Most reports collapse six genes into a single average AUROC. We show that *the g
 
 The taxonomy is *immediately actionable* for the field: it identifies which genes would benefit from another architectural variant (KRAS — by adopting a non-additive aggregator) and which would benefit from multimodal fusion with RNA-seq or radiology (STK11, KEAP1, RBM10) rather than another loss function.
 
+**The framework is not LUAD-specific.** Because the taxonomy is a decomposition of any expert vocabulary against any learned encoder, it is portable, and the manuscript demonstrates this on two further public cohorts. In glioma MRI → genotype it recovers the same regimes (*IDH* encoder-saturated at AUROC 0.86; *1p/19q* recovered only by channel fusion at 0.74), and in the electrocardiogram it transfers the identical protocol to a different modality family (sex 0.90, age 0.84). Critically, an off-the-shelf transfer of the LUAD predictor to the independent CPTAC-LUAD cohort collapses (*TP53* 0.72 → 0.53, and 0.48 after stain normalisation) and the verdict correctly turns Inconclusive — a built-in guard against the over-confident deployment that clinical oncology cannot tolerate.
+
 ## Why *Nature Cancer*
 
 Three reasons.
@@ -38,10 +40,10 @@ We deliberately *do not* claim to outperform CHIEF or EAGLE on cohort-mean AUROC
 ## Compliance summary
 
 - **Length:** main text within the 3,500–6,000 word window.
-- **Display items:** 5 main figures + ≤ 10 Extended Data items planned; figure inventory in `figures/README_figures.md`.
+- **Display items:** the manuscript currently carries 8 main figures and 9 main tables plus supplementary figures (S1–S5) and tables (ST1–ST3); we are glad to rebalance main and Extended Data items to *Nature Cancer*'s display-item guidance.
 - **Reporting summary, editorial-policy checklist, data-availability and code-availability statements:** included.
 - **Ethics:** TCGA-LUAD is a publicly available NIH GDC dataset; SOLCA pilot approved by CEISH 2026-014.
-- **No competing interests.**
+- **Competing interests:** three of the four authors are affiliated with GPTfy Medical, which developed and hosts the LCHAI system reported here; this is declared in full in the manuscript's Competing interests statement.
 - **Not under consideration elsewhere.**
 
 We would welcome a presubmission inquiry at the editor's discretion. We can provide the live demo URL, a 5-minute demonstration video, and the compiled PDF on request.

@@ -1,7 +1,7 @@
 # Cover letter — npj Precision Oncology
 
 **To:** Editor-in-Chief, *npj Precision Oncology*
-**Re:** Submission of original Article — *Translating Histology into Genotype: A Three-Regime, Six-Level Framework for Interpretable Mutation Prediction in Lung Adenocarcinoma.*
+**Re:** Submission of original Article — *A three-regime translatability framework for cross-domain medical prediction with an instantiation in lung adenocarcinoma.*
 
 Dear Editor,
 
@@ -25,6 +25,8 @@ The contribution is instead three-fold:
 
 A per-gene Conclusive/Inconclusive flag (mean AUROC ≥ 0.70) gates the explanation pathway and decouples cohort-level signal presence from per-slide morphological confidence.
 
+Although lung adenocarcinoma is the primary instantiation, the framework is portable — it is a decomposition of any expert vocabulary against any learned encoder — and the manuscript validates it beyond LUAD. In glioma MRI → genotype it recovers the same regimes (*IDH* encoder-saturated, AUROC 0.86; *1p/19q* recovered only by channel fusion, 0.74), and an off-the-shelf transfer of the LUAD predictor to the independent CPTAC-LUAD cohort collapses (*TP53* 0.72 → 0.53, and 0.48 after stain normalisation) with the verdict correctly turning Inconclusive — demonstrating that the diagnostic reports its own limits under distribution shift rather than issuing an over-confident call.
+
 ## Fit with *npj Precision Oncology*
 
 We selected *npj Precision Oncology* over the broader *Nature* family because the journal's audience — translational oncologists, computational pathologists, biomarker developers — is precisely the readership we want to engage. Our work continues the line opened by Saldanha *et al.* (*npj Prec Oncol* 2023) on H&E-only mutation prediction and adds the interpretability and per-gene-verdict layers that have not yet been published.
@@ -35,7 +37,7 @@ The live system is publicly accessible at **https://lchai.gptfy.biz** (anonymous
 
 - The TCGA-LUAD cohort is publicly available under the NIH GDC controlled-access policy; no further IRB approval is required for the retrospective analysis reported here.
 - The SOLCA-CISOL preliminary validation was approved by the Comité de Ética de Investigación en Seres Humanos (CEISH) of SOLCA Ecuador (approval 2026-014).
-- No competing interests to declare.
+- Competing interests: three of the four authors are affiliated with GPTfy Medical, which developed and hosts the LCHAI system reported here; this is declared in full in the manuscript's Competing interests statement.
 - All authors consented to the submission and have approved the final manuscript.
 - The manuscript is not under consideration elsewhere; no prior version is in press.
 - LLM use during manuscript preparation is documented in the Methods section.

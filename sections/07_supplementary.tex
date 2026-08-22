@@ -73,14 +73,13 @@
     \label{fig:case_rbm10}
   \end{subfigure}
   \caption{\textbf{Per-gene case studies.} For each of the six
-  target genes, one representative true-positive slide is shown
-  with the four-panel \lchai{} composite: (top-left)~\ctranspath{}
-  thumbnail of the whole-slide image; (top-right)~pattern overlay
-  (L2) coloured by the dominant ANORAK pattern at each tile;
-  (bottom-left)~ABMIL attention map (L1) showing where the
-  aggregator weighed evidence; (bottom-right)~combined L1+L2
-  overlay localising the high-attention, high-pattern-saliency
-  regions. The KRAS panel illustrates the value of decoupling the
+  target genes, one representative true-positive slide is shown as
+  the combined \lchai{} overlay: the \ctranspath{} tissue thumbnail
+  of the whole-slide image with the L1 ABMIL attention map and the
+  L2 ANORAK pattern saliency superimposed, so that the warm regions
+  localise where high attention and high pattern-saliency coincide---
+  the evidence the aggregator weighed---over the green tissue field.
+  The KRAS panel illustrates the value of decoupling the
   cohort-level verdict (Inconclusive at $0.609$ mean AUROC) from
   the per-slide explanation: TCGA-55-7815 is per-slide confident
   ($P=0.965$) and the L4 Choquet readout (\cref{fig:kras_proxy_b})
