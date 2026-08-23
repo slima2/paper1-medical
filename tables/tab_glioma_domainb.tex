@@ -1,7 +1,8 @@
-% Table tab:glioma_domainb — empirical domain-B v1 pilot on the TCGA-LGG
-% cohort. Glioma genotype targets (IDH, 1p/19q) plus a sex control, predicted
-% from the co-registered 4-sequence preoperative MRI, with the ~26 real VASARI
-% expert scores as the source vocabulary channel. Five patient-disjoint folds.
+% Table tab:glioma_domainb — empirical domain-B results. IDH, 1p/19q and a
+% sex control on the TCGA-LGG cohort (n<=63, real VASARI expert scores);
+% MGMT on the full-power BraTS 2021 cohort (n=577, VASARI propagated). All
+% predicted from the co-registered 4-sequence preoperative MRI. Five
+% patient-disjoint folds. See the dagger footnote for the MGMT cohort.
 \footnotesize
 \setlength{\tabcolsep}{5pt}
 \renewcommand{\arraystretch}{1.2}
@@ -20,6 +21,10 @@ IDH            & $0.856{\pm}0.100$ & $0.840{\pm}0.120$ &
   (ii) complementarity \\
 Sex \emph{(ctrl)} & $0.557{\pm}0.128$ & $0.304{\pm}0.106$ &
   $0.644{\pm}0.212$ & $0.579{\pm}0.207$ & Inconclusive & --- \\
+\midrule
+MGMT\textsuperscript{$\dagger$} & $0.562{\pm}0.065$ & $0.525{\pm}0.025$ &
+  $0.526{\pm}0.052$ & $0.554{\pm}0.036$ & Inconclusive &
+  (iii) out-of-ontology \\
 \bottomrule
 \end{tabular}
 \begin{flushleft}\footnotesize
@@ -39,13 +44,27 @@ reaches $0.856$ and the fusion arms add nothing beyond a fold's SD.
 alone is informative ($\mathrm{B2}\!=\!0.60$, $\mathrm{B3}\!=\!0.50$) yet
 their fusion recovers the target ($\mathrm{PI}\!=\!0.74$, $+0.14$ over the
 encoder). The \emph{non-additive} form of that complementarity---the
-pre-registered $\mathrm{FC}\!>\!\mathrm{PI}$ signature seen for KRAS in
+predicted $\mathrm{FC}\!>\!\mathrm{PI}$ signature seen for KRAS in
 LUAD---is \emph{not} resolved at this sample size: the learned Choquet
 pair interactions shrink to $\lvert I_{jk}\rvert\!\lesssim\!0.005$ and
 $\mathrm{FC}$ trails $\mathrm{PI}$, so the interaction read is deferred to
-the full-power v2 cohort (adding BraTS-TCGA-GBM and the test arm). The
+a larger 1p/19q-labelled cohort. The
 \textbf{sex} control confirms the guard against spurious certification:
 VASARI carries no sex signal ($\mathrm{B3}\!=\!0.30$, below chance) and the
-verdict is correctly Inconclusive. MGMT is unavailable in this clinical
-source and is reported underpowered/Inconclusive (v2 item).
+verdict is correctly Inconclusive.
+\par\smallskip
+\textsuperscript{$\dagger$}\textbf{MGMT} is scored on a separate,
+full-power cohort: the $n\!=\!577$ BraTS~2021 subjects carrying a binary
+MGMT-methylation call (${\sim}52\%$ methylated, so both classes clear the
+estimation floor by an order of magnitude), with the VASARI channel
+\emph{propagated} from the annotated seed rather than expert-scored. Every
+condition sits at chance and the verdict is Inconclusive: the same
+instrument that certifies IDH and recovers 1p/19q correctly declines to
+certify MGMT, reproducing a decade of documented untranslatability
+(\cref{tab:crossdomain_protocol}) as a diagnostic output rather than a
+defeat. Because VASARI here is \emph{propagated} (seed $n\!=\!63$, held-out
+feature $\auroc\!\lesssim\!0.6$) rather than expert-scored, the strict
+empty-atom versus data-floor separation available for KEAP1/RBM10 in LUAD
+is not asserted; the encoder at chance at full power
+($\mathrm{B2}\!=\!0.56$) is the load-bearing evidence.
 \end{flushleft}

@@ -224,6 +224,114 @@ and the helpdesk-gated LGG test arm).
 
 ---
 
+## 2d. DGX runbook — MGMT v2 (the make-or-break regime-(iii) test)
+
+This is the run that removes the "MGMT deferred" caveat. MGMT is not in the
+TCGA clinical CSV, so v1 could not test it; the MGMT status lives in the
+**BraTS 2021 / RSNA-MICCAI** classification cohort (~585 subjects, ~53%
+methylated → both classes clear the floor by a wide margin). The four-condition
+protocol is unchanged; only the data joins differ.
+
+**Why this needs propagation (unlike v1).** Real VASARI scores exist only for
+the ~188 TCGA seed subjects. The MGMT cohort is BraTS2021_XXXXX, which has *no*
+real VASARI, so the B3 (VASARI-only) and FC (Choquet) arms need VASARI
+**propagated** onto those subjects — that is exactly what tells an *empty
+VASARI-side atom* (out-of-ontology, the prediction) apart from a *data floor*.
+Propagation now maps the seed by **identity** to the BraTS-TCGA-LGG imaging you
+already have, so **no BraTS↔TCIA crosswalk is required**.
+
+### What to acquire (two artefacts)
+
+1. **NIfTI BraTS 2021 imaging with segmentation** — the 4 co-registered
+   sequences (`*_t1 *_t1ce *_t2 *_flair`) plus `*_seg`, folders named
+   `BraTS2021_XXXXX`. **Not** the RSNA-MICCAI *DICOM* competition set (it has no
+   segmentation, which `prepare_glioma_slices.py` needs for the tumour
+   centroid). The Kaggle NIfTI mirror is the practical route
+   (e.g. `dschettler8845/brats2021-task1`; verify the folder layout after
+   unzip). ~15 GB.
+2. **MGMT labels** — `train_labels.csv` (`BraTS21ID`, `MGMT_value`) from the
+   RSNA-MICCAI competition; a tiny CSV.
+
+```bash
+cd scripts && source env.sh          # DATA_ROOT set; venv active (numpy 1.26.4)
+#   (kaggle CLI needs ~/.kaggle/kaggle.json; accept each page's terms once in a
+#    browser the first time.)
+
+# 1. imaging: NIfTI BraTS 2021 Task 1 (with *_seg). Kaggle DATASET (not the
+#    competition): dschettler8845/brats-2021-task1. Ships BraTS2021_Training_Data.tar
+#    with BraTS2021_XXXXX/{_flair,_t1,_t1ce,_t2,_seg}.nii.gz (matches the loader).
+mkdir -p "$DATA_ROOT/glioma/brats2021_nifti"
+kaggle datasets download -d dschettler8845/brats-2021-task1 \
+  -p "$DATA_ROOT/glioma/brats2021_nifti"
+cd "$DATA_ROOT/glioma/brats2021_nifti"
+unzip -n brats-2021-task1.zip                 # -> BraTS2021_Training_Data.tar (+ val)
+tar -xf BraTS2021_Training_Data.tar           # -> BraTS2021_XXXXX/ folders (~1,251)
+cd -   # back to scripts
+#   ~15 GB zip, ~40 GB extracted; only the ~585 MGMT-labelled subjects are used
+#   by the run, but prepare processes every folder it finds.
+
+# 2. MGMT labels (tiny CSV) into the path load_mgmt() expects:
+mkdir -p "$DATA_ROOT/glioma/brats2021"
+kaggle competitions download -c rsna-miccai-brain-tumor-radiogenomic-classification \
+  -f train_labels.csv -p "$DATA_ROOT/glioma/brats2021"
+( cd "$DATA_ROOT/glioma/brats2021" && unzip -n train_labels.csv.zip 2>/dev/null || true )
+#   -> $DATA_ROOT/glioma/brats2021/train_labels.csv  (585 rows: BraTS21ID, MGMT_value)
+
+# 3. slices for BOTH cohorts in one manifest: the TCGA seed (v1 imaging,
+#    named by TCGA id → propagation trainer) and the BraTS2021_* target cohort.
+#    prepare auto-detects both patterns; folds stratify on MGMT when present.
+python prepare_glioma_slices.py --limit 8        # smoke
+python prepare_glioma_slices.py                  # all (~1,251 subj; heavy I/O)
+
+# 4. labels indexed by BraTS2021_* with MGMT populated (force crosswalk mode so
+#    it does NOT fall back to the clinical CSV, which lacks MGMT). IDH/1p19q stay
+#    NaN here — fine, the MGMT run only needs mgmt.
+python build_glioma_labels.py --source crosswalk
+#   prints  mgmt n_+≈307  labelled≈585  OK
+
+# 5. propagate VASARI onto every manifest subject (seed = TCGA real scores,
+#    identity-mapped to their imaging; predicts for the BraTS2021_* cohort).
+#    Inspect vasari/propagation_quality.csv BEFORE trusting the B3 arm.
+python propagate_vasari.py --smoke               # sanity
+python propagate_vasari.py                        # -> vasari/vasari_propagated.parquet
+
+# 6. the run: MGMT only (full power)
+python run_glioma_domainB.py --smoke --targets mgmt
+python run_glioma_domainB.py --targets mgmt       # 5 folds, 4 conditions
+#   -> derived/domainB/{results.json,regimes.json,choquet_interactions.csv}
+```
+
+### How to read the outcome (regime iii vs data floor vs propagation artefact)
+
+MGMT clears the power floor here (n_+ ≈ 307, n_− ≈ 278 ≫ 37), so a near-chance
+result is a **finding**, not a power statement. Read the signatures, not one
+AUROC:
+
+| Observed | Verdict |
+|---|---|
+| B2 ≈ B3 ≈ PI ≈ FC ≈ 0.50–0.56, and `propagation_quality.csv` shows VASARI **is** recoverable from MRI (so B3-at-chance is not a broken channel) | **regime (iii), empty VASARI-side atom** — the pre-registered untranslatability, now *reported as a finding*. This is the result that removes "deferred". |
+| B3 > B2 (VASARI beats the encoder) at chance-level B2 | **data floor / pattern-side unique**, a different sub-state — report as such, not as out-of-ontology |
+| B3 at chance **but** propagation quality is poor (features not recoverable) | **inconclusive B3** — the empty-atom claim is not established; fix propagation or fall back to real-VASARI subjects only |
+
+That third row is the one caveat this design introduces: propagated VASARI can
+be weak, and a weak channel looks like an empty atom. `propagation_quality.csv`
+(held-out per-feature MAE/AUROC on the seed) is the guard — cite it alongside
+the MGMT verdict.
+
+**Caveat on VASARI source once propagation exists.** `load_vasari_channel`
+prefers `vasari_propagated.parquet` over the real scores, so after step 5 the
+v1 IDH/1p19q run would silently switch to *propagated* VASARI. Keep the MGMT v2
+run under a **separate `DATA_ROOT`** (or move/rename `vasari_propagated.parquet`
+away) if you want to reproduce the v1 real-VASARI numbers.
+
+### Compute
+
+Encoder × 4 conditions × 5 folds on ~585 MGMT subjects × 24 slices, plus one
+propagation trainer. A few hours on one H100; slices are cached so re-runs are
+cheap.
+
+---
+
 ## 3. Execution plan (ordered)
 
 ### Step 1 — Acquire raw data
