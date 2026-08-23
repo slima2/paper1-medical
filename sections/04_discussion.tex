@@ -29,8 +29,12 @@ be gene-conditional.
 Reading the results gene-conditionally also changes what counts as
 the contribution.
 The pattern-informed channel does not win the cohort-mean
-benchmark---the upper tier of \cref{tab:mutation_luad_resultssec}
-is statistically tied within $\pm 0.02$ AUROC.
+benchmark---across the upper tier of
+\cref{tab:mutation_luad_resultssec} the fusion arms and the
+embedding-only baseline sit within about $0.02$ AUROC of one another
+on every gene, a gap well inside a single fold's standard deviation
+($\sim\!0.05$--$0.08$) and therefore not a cohort-mean improvement we
+would defend.
 What pattern-informed MIL does win is the \emph{argument} with the
 pathologist.
 A model that says ``P(KRAS) = 0.965 because the
@@ -52,8 +56,8 @@ pathologist can act on.\cite{rudin2019stop,holzinger2019causability}
 
 Read through the translation lens introduced above, our results
 belong to a well-established family of medical machine-learning
-tasks in which one clinically inexpensive or ubiquitous modality is
-mapped onto a second, more costly or latent one, with a
+tasks in which one modality is mapped onto a target it does not
+directly measure, with a
 faithfulness that is bounded by how much of the target signal the
 source physically encodes.
 Placing our LUAD map beside these tasks clarifies both what is and
@@ -80,8 +84,8 @@ of the same kind as our per-gene regimes.
   \centering
   \includegraphics[width=\linewidth]{fidelity_spectrum}
   \caption{\textbf{A fidelity spectrum of medical cross-domain mapping
-tasks.} Each task maps an inexpensive or ubiquitous source modality
-onto a more costly or latent target; the horizontal axis is the
+tasks.} Each task maps a source modality onto a target it does not
+directly measure; the horizontal axis is the
   representative reported AUROC/accuracy (translational faithfulness)
   and the vertical axis the training-cohort size (log scale).
   Analogous tasks span virtual staining (near-perfect, source
@@ -184,7 +188,7 @@ temptation the framework creates is precisely to skip it.
 The Conclusive/Inconclusive verdict thresholds a mean \auroc{}, a
 property of the cohort and not of any slide, so reading a low cohort
 mean as ``this mutation cannot be seen in this tissue'' is a level
-error---and a costly one, because it discards exactly the cases
+error---and a consequential one, because it discards exactly the cases
 where the morphology \emph{does} speak.
 KRAS is our counterexample and it is unambiguous
 (\cref{fig:kras_lepidic_solid_proxy}): a gene that is Inconclusive as
