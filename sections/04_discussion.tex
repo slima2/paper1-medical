@@ -39,7 +39,8 @@ What pattern-informed MIL does win is the \emph{argument} with the
 pathologist.
 A model that says ``P(KRAS) = 0.965 because the
 lepidic$\,\times\,$solid Choquet interaction is $+0.032$ on the
-top-200 attended tiles'' invites a textbook reply about the
+top-200 attended tiles'' (\cref{fig:kras_lepidic_solid_proxy})
+invites a textbook reply about the
 invasive mucinous adenocarcinoma proxy.
 A model that instead reports $P(\text{KEAP1}) = 0.610$ with a
 negligible Choquet interaction and a SHAP/ablation split that places
@@ -373,9 +374,9 @@ same stalled AUROC: a data floor, which the $n\!=\!577$ balanced BraTS
 cohort (${\sim}52\%$ methylated) excludes outright, and a subpopulation
 effect of the kind KRAS exhibits here.
 Scored at full power the unconstrained encoder itself stays at chance
-(numbers below), so the verdict is Inconclusive and the framework reports
-the field's decade of negative results as a diagnostic finding rather than a
-defeat.
+(\cref{tab:glioma_domainb}), so the verdict is Inconclusive and the framework
+reports the field's decade of negative results as a diagnostic finding rather
+than a defeat.
 If that strict verdict holds, the remedy is a different source
 modality---perfusion or diffusion sequences, or methylation-array
 fusion---rather than a further architecture on structural MRI.
@@ -398,8 +399,9 @@ channel below chance, exercising the guard against spurious certification.
 MGMT, absent from this clinical source, is instead scored on the full-power
 $n\!=\!577$ BraTS cohort (${\sim}52\%$ methylated), where the VASARI channel
 is propagated from the annotated seed. There every condition sits at chance
-($\mathrm{B2}\!=\!0.56$, $\mathrm{B3}\!=\!0.53$, $\mathrm{PI}\!=\!0.53$,
-$\mathrm{FC}\!=\!0.55$) and the verdict is Inconclusive---the regime-(iii)
+(\cref{tab:glioma_domainb}: $\mathrm{B2}\!=\!0.56$, $\mathrm{B3}\!=\!0.53$,
+$\mathrm{PI}\!=\!0.53$, $\mathrm{FC}\!=\!0.55$) and the verdict is
+Inconclusive---the regime-(iii)
 untranslatability the field has documented for a decade, now issued as a
 diagnostic output. Because VASARI here is propagated rather than
 expert-scored (seed $n\!=\!63$, held-out feature $\auroc\!\lesssim\!0.6$),
