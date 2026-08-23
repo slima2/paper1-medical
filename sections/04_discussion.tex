@@ -337,13 +337,9 @@ features, a classifier trained on the TCIA-annotated seed and propagated
 to BraTS, occupying the position ANORAK growth patterns hold in
 LUAD---feed the same four conditions: B2 encoder only, B3 ontology only,
 PI concat fusion and FC 2-additive fuzzy Choquet over $\mathbf{P}$. The
-regime predictions are IDH in regime~(i), 1p/19q in
-regime~(ii), and MGMT in regime~(iii). A pilot on the TCGA-LGG subset
-(\cref{tab:glioma_domainb}) confirms the first two at the complementarity
-level; MGMT, scored at full power on the $n\!=\!577$ BraTS cohort, is
-Inconclusive in every condition, so the instrument declines to certify the
-field's best-documented untranslatable target. What remains open is only the
-stronger non-additive form (FC beating the additive PI) on 1p/19q.}
+predicted regimes are IDH in regime~(i), 1p/19q in regime~(ii), and MGMT in
+regime~(iii); the measured outcomes are in \cref{tab:glioma_domainb} and
+developed in the text.}
 \label{fig:pipeline_glioma}
 \end{figure}
 
@@ -373,11 +369,17 @@ untranslatability and has to exclude the two weaker states that produce the
 same stalled AUROC: a data floor, which the $n\!=\!577$ balanced BraTS
 cohort (${\sim}52\%$ methylated) excludes outright, and a subpopulation
 effect of the kind KRAS exhibits here.
-Scored at full power the unconstrained encoder itself stays at chance
-(\cref{tab:glioma_domainb}), so the verdict is Inconclusive and the framework
-reports the field's decade of negative results as a diagnostic finding rather
-than a defeat.
-If that strict verdict holds, the remedy is a different source
+Scored at full power every condition sits at chance
+(\cref{tab:glioma_domainb}: $\mathrm{B2}\!=\!0.56$, $\mathrm{B3}\!=\!0.53$,
+$\mathrm{PI}\!=\!0.53$, $\mathrm{FC}\!=\!0.55$) and the verdict is
+Inconclusive, so the framework reports the field's decade of negative results
+as a diagnostic finding rather than a defeat.
+Because the VASARI channel here is \emph{propagated} from the $63$-subject
+seed rather than expert-scored (held-out feature $\auroc\!\lesssim\!0.6$), we
+rest the claim on the unconstrained encoder remaining at chance, not on the
+strict empty-atom versus data-floor separation that real VASARI licenses for
+KEAP1/RBM10 in LUAD.
+If that verdict holds, the remedy is a different source
 modality---perfusion or diffusion sequences, or methylation-array
 fusion---rather than a further architecture on structural MRI.
 
@@ -396,17 +398,6 @@ complementarity case: neither channel alone is informative
 it ($\mathrm{PI}\!=\!0.74$, $+0.14$ over the encoder). A patient-sex control,
 absent from the VASARI vocabulary, is correctly Inconclusive with the VASARI
 channel below chance, exercising the guard against spurious certification.
-MGMT, absent from this clinical source, is instead scored on the full-power
-$n\!=\!577$ BraTS cohort (${\sim}52\%$ methylated), where the VASARI channel
-is propagated from the annotated seed. There every condition sits at chance
-(\cref{tab:glioma_domainb}: $\mathrm{B2}\!=\!0.56$, $\mathrm{B3}\!=\!0.53$,
-$\mathrm{PI}\!=\!0.53$, $\mathrm{FC}\!=\!0.55$) and the verdict is
-Inconclusive---the regime-(iii)
-untranslatability the field has documented for a decade, now issued as a
-diagnostic output. Because VASARI here is propagated rather than
-expert-scored (seed $n\!=\!63$, held-out feature $\auroc\!\lesssim\!0.6$),
-we rest the claim on the encoder remaining at chance at full power, not on
-the strict empty-atom versus data-floor separation.
 One limit is genuinely deferred: the \emph{non-additive} form of the 1p/19q
 complementarity---the $\mathrm{FC}\!>\!\mathrm{PI}$ signature that KRAS shows
 in LUAD---is not resolved at $n\!\sim\!63$, where the learned Choquet pair
