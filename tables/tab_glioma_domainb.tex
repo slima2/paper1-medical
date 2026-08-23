@@ -28,43 +28,25 @@ MGMT\textsuperscript{$\dagger$} & $0.562{\pm}0.065$ & $0.525{\pm}0.025$ &
 \bottomrule
 \end{tabular}
 \begin{flushleft}\footnotesize
-Mean test $\auroc\pm$SD over five patient-disjoint folds of the TCGA-LGG
-cohort carrying co-registered preoperative MRI, real VASARI scores and a
-molecular call (up to $n=63$ subjects; IDH resolved on four folds, one
-test fold being single-class). Source channel $\mathbf{P}$: the $\sim$26
-neuroradiologist-scored VASARI features (min--max rescaled); encoder
-channel $\mathbf{E}$: a 2.5D CNN with \abmil{} over axial slices of the
-four co-registered sequences. Conditions match the LUAD protocol:
-$\mathrm{B2}$ encoder only, $\mathrm{B3}$ VASARI only, $\mathrm{PI}$ concat
-fusion, $\mathrm{FC}$ encoder $+$ 2-additive Choquet over the VASARI
-features. The regime is read from the decomposition, not the top estimate.
-\textbf{IDH} is encoder-saturated (regime~i): $\mathrm{B2}$ alone already
-reaches $0.856$ and the fusion arms add nothing beyond a fold's SD.
-\textbf{1p/19q} is a complementarity case (regime~ii): neither channel
-alone is informative ($\mathrm{B2}\!=\!0.60$, $\mathrm{B3}\!=\!0.50$) yet
-their fusion recovers the target ($\mathrm{PI}\!=\!0.74$, $+0.14$ over the
-encoder). The \emph{non-additive} form of that complementarity---the
-predicted $\mathrm{FC}\!>\!\mathrm{PI}$ signature seen for KRAS in
-LUAD---is \emph{not} resolved at this sample size: the learned Choquet
-pair interactions shrink to $\lvert I_{jk}\rvert\!\lesssim\!0.005$ and
-$\mathrm{FC}$ trails $\mathrm{PI}$, so the interaction read is deferred to
-a larger 1p/19q-labelled cohort. The
-\textbf{sex} control confirms the guard against spurious certification:
-VASARI carries no sex signal ($\mathrm{B3}\!=\!0.30$, below chance) and the
-verdict is correctly Inconclusive.
+Mean test $\auroc\pm$SD over five patient-disjoint folds.
+IDH, 1p/19q and the sex control are on the TCGA-LGG cohort
+(up to $n=63$ subjects with co-registered preoperative MRI, real
+neuroradiologist VASARI scores and a molecular call; IDH resolved on
+four folds, one test fold single-class);
+MGMT\textsuperscript{$\dagger$} is on the full BraTS~2021 cohort.
+Source channel $\mathbf{P}$: the $\sim$26 VASARI features (min--max
+rescaled); encoder channel $\mathbf{E}$: a 2.5D CNN with \abmil{} over
+axial slices of the four co-registered sequences. Conditions match the
+LUAD protocol: $\mathrm{B2}$ encoder only, $\mathrm{B3}$ VASARI only,
+$\mathrm{PI}$ concat fusion, $\mathrm{FC}$ encoder $+$ 2-additive Choquet
+over the VASARI features. The \emph{Regime} column is read from the
+contrast across conditions, not the top estimate; the per-target reading,
+the deferred non-additive test on 1p/19q and the MGMT propagation caveat
+are developed in the text.
 \par\smallskip
-\textsuperscript{$\dagger$}\textbf{MGMT} is scored on a separate,
-full-power cohort: the $n\!=\!577$ BraTS~2021 subjects carrying a binary
-MGMT-methylation call (${\sim}52\%$ methylated, so both classes clear the
-estimation floor by an order of magnitude), with the VASARI channel
-\emph{propagated} from the annotated seed rather than expert-scored. Every
-condition sits at chance and the verdict is Inconclusive: the same
-instrument that certifies IDH and recovers 1p/19q correctly declines to
-certify MGMT, reproducing a decade of documented untranslatability
-(\cref{tab:crossdomain_protocol}) as a diagnostic output rather than a
-defeat. Because VASARI here is \emph{propagated} (seed $n\!=\!63$, held-out
-feature $\auroc\!\lesssim\!0.6$) rather than expert-scored, the strict
-empty-atom versus data-floor separation available for KEAP1/RBM10 in LUAD
-is not asserted; the encoder at chance at full power
-($\mathrm{B2}\!=\!0.56$) is the load-bearing evidence.
+\textsuperscript{$\dagger$}MGMT is scored on the full BraTS~2021 cohort
+($n\!=\!577$, ${\sim}52\%$ methylated, both classes far above the
+estimation floor), with the VASARI channel \emph{propagated} from the
+annotated seed rather than expert-scored---not the TCGA-LGG cohort used
+for the other rows.
 \end{flushleft}
