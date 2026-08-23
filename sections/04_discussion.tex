@@ -230,15 +230,15 @@ instantiate it on two further public cohorts
 (\cref{tab:crossdomain_protocol}), specified so that the framework can be
 falsified independently of the LUAD results.
 
-\begin{table}[h!]
+\begin{table}[ht!]
 \centering
 \input{tables/tab_crossdomain_protocol}
 \caption{The translatability framework instantiated in three domains.
 Domain~A is reported in this paper; domains~B and~C are external
-validations---partly measured (glioma IDH and 1p/19q in the v1 pilot of
-\cref{tab:glioma_domainb}; electrocardiogram sex and age in
-\cref{tab:ecg_domainc}) and partly pre-registered (MGMT, and the
-laboratory and structural-heart-disease targets), with data sources,
+validations---largely measured (glioma IDH and 1p/19q in the pilot of
+\cref{tab:glioma_domainb} and MGMT at full power on the BraTS cohort;
+electrocardiogram sex and age in \cref{tab:ecg_domainc}) and partly predicted
+(the laboratory and structural-heart-disease targets), with data sources,
 source ontologies and the expected regime assignment fixed in advance.}
 \label{tab:crossdomain_protocol}
 \end{table}
@@ -262,13 +262,13 @@ world in every domain (information absent at every level; present in a
 morphologically or radiologically defined subpopulation and diluted in
 the average; or present but unestimable at the available positive-set
 size), so the per-stratum readout we use to adjudicate KRAS here is the
-same instrument that separates strict MGMT untranslatability from a
+same instrument used to weigh strict MGMT untranslatability against a
 diluted VASARI stratum in domain~B. The only structural difference is
 that a slide and a scan are \emph{bags} aggregated by MIL, whereas an
 ECG record is a \emph{single instance}: its sub-unit level collapses
 and synergy is read between vocabulary statements directly.
 
-\begin{table}[h!]
+\begin{table}[ht!]
 \centering
 \input{tables/tab_levels_crossdomain}
 \caption{\textbf{The level structure of \cref{tab:levels_of_analysis}
@@ -333,11 +333,12 @@ to BraTS, occupying the position ANORAK growth patterns hold in
 LUAD---feed the same four conditions: B2 encoder only, B3 ontology only,
 PI concat fusion and FC 2-additive fuzzy Choquet over $\mathbf{P}$. The
 regime predictions are IDH in regime~(i), 1p/19q in
-regime~(ii), and MGMT in regime~(iii) as an empty VASARI-side atom,
-distinguished from a data floor by the B3-versus-B2 signature. A v1 pilot on
-the TCGA-LGG subset (\cref{tab:glioma_domainb}) confirms the first two at the
-complementarity level; the stronger non-additive form (FC beating the
-additive PI) and the MGMT test await the full-power cohort.}
+regime~(ii), and MGMT in regime~(iii). A pilot on the TCGA-LGG subset
+(\cref{tab:glioma_domainb}) confirms the first two at the complementarity
+level; MGMT, scored at full power on the $n\!=\!577$ BraTS cohort, is
+Inconclusive in every condition, so the instrument declines to certify the
+field's best-documented untranslatable target. What remains open is only the
+stronger non-additive form (FC beating the additive PI) on 1p/19q.}
 \label{fig:pipeline_glioma}
 \end{figure}
 
@@ -358,25 +359,22 @@ That literature is, in our terms, a decade of accumulating evidence
 for a regime-(iii) verdict---reported as a community-wide defeat
 because no framework existed in which it could be reported as a
 finding.
-Our prediction is specific and falsifiable: IDH should sit in
-regime~(i) with the VASARI channel adding nothing on top of the
-encoder; 1p/19q should sit in regime~(ii), with the non-additive
-aggregator beating the additive one on that target \emph{and on no
-other}; and MGMT should sit in regime~(iii) with empty
-VASARI-side atoms.
-That last prediction is the strong one, because it asserts the
-strict form of untranslatability and therefore has to exclude the
-two weaker states that produce the same stalled AUROC: a data floor,
-which the $n\!\sim\!1{,}251$ BraTS cohort makes implausible, and a
-subpopulation effect of the kind KRAS exhibits here, which is
-excluded only if no VASARI-defined stratum recovers the signal.
-We will report the per-stratum readout for exactly that reason.
-If the strict form holds, the remedy is a different source
+Instantiated, the prediction is specific and now largely tested: IDH sits
+in regime~(i) with the VASARI channel adding nothing on top of the encoder;
+1p/19q sits in regime~(ii), recovered by fusion; and MGMT sits in
+regime~(iii).
+The MGMT test is the strong one, because it asserts the strict form of
+untranslatability and has to exclude the two weaker states that produce the
+same stalled AUROC: a data floor, which the $n\!=\!577$ balanced BraTS
+cohort (${\sim}52\%$ methylated) excludes outright, and a subpopulation
+effect of the kind KRAS exhibits here.
+Scored at full power the unconstrained encoder itself stays at chance
+(numbers below), so the verdict is Inconclusive and the framework reports
+the field's decade of negative results as a diagnostic finding rather than a
+defeat.
+If that strict verdict holds, the remedy is a different source
 modality---perfusion or diffusion sequences, or methylation-array
-fusion---rather than a further architecture; if instead a stratum
-does recover it, the field's decade of negative cohort-average
-results would have been hiding a translatable subgroup, which is a
-more consequential finding than either.
+fusion---rather than a further architecture on structural MRI.
 
 A first, deliberately small instantiation is runnable without any of the
 propagation machinery: the ${\sim}63$ TCGA-LGG subjects that carry real
@@ -393,25 +391,34 @@ complementarity case: neither channel alone is informative
 it ($\mathrm{PI}\!=\!0.74$, $+0.14$ over the encoder). A patient-sex control,
 absent from the VASARI vocabulary, is correctly Inconclusive with the VASARI
 channel below chance, exercising the guard against spurious certification.
-Two limits are explicit and define the full-power v2 cohort. The
-\emph{non-additive} form of the 1p/19q complementarity---the
-$\mathrm{FC}\!>\!\mathrm{PI}$ signature that KRAS shows in LUAD---is not
-resolved at $n\!\sim\!63$: the learned Choquet pair interactions shrink to
-$\lvert I_{jk}\rvert\!\lesssim\!0.005$, so the interaction read is deferred
-rather than asserted, and the pre-registered expectation that the
-non-additive aggregator would win on 1p/19q was our modelling hypothesis, not
-an established radiogenomic result. And MGMT is absent from this clinical
-source and is reported underpowered, so the regime-(iii) untranslatability
-test remains the pre-registered v2 experiment on the full BraTS cohort.
+MGMT, absent from this clinical source, is instead scored on the full-power
+$n\!=\!577$ BraTS cohort (${\sim}52\%$ methylated), where the VASARI channel
+is propagated from the annotated seed. There every condition sits at chance
+($\mathrm{B2}\!=\!0.56$, $\mathrm{B3}\!=\!0.53$, $\mathrm{PI}\!=\!0.53$,
+$\mathrm{FC}\!=\!0.55$) and the verdict is Inconclusive---the regime-(iii)
+untranslatability the field has documented for a decade, now issued as a
+diagnostic output. Because VASARI here is propagated rather than
+expert-scored (seed $n\!=\!63$, held-out feature $\auroc\!\lesssim\!0.6$),
+we rest the claim on the encoder remaining at chance at full power, not on
+the strict empty-atom versus data-floor separation.
+One limit is genuinely deferred: the \emph{non-additive} form of the 1p/19q
+complementarity---the $\mathrm{FC}\!>\!\mathrm{PI}$ signature that KRAS shows
+in LUAD---is not resolved at $n\!\sim\!63$, where the learned Choquet pair
+interactions shrink to $\lvert I_{jk}\rvert\!\lesssim\!0.005$, so the
+interaction read is deferred rather than asserted, and the expectation that
+the non-additive aggregator would win on 1p/19q was our modelling
+hypothesis, not an established radiogenomic result.
 
 \begin{table}[ht!]
 \centering
 \input{tables/tab_glioma_domainb}
-\caption{Domain-B v1 pilot: glioma MRI\,$\rightarrow$\,genotype on the
-TCGA-LGG cohort. IDH is encoder-saturated (regime~(i)) and 1p/19q is a
-complementarity case (regime~(ii): fusion recovers what neither channel
-captures alone); a sex control is correctly Inconclusive. The non-additive
-interaction form and MGMT are deferred to the full-power cohort.}
+\caption{Domain-B: glioma MRI\,$\rightarrow$\,genotype. IDH is
+encoder-saturated (regime~(i)) and 1p/19q is a complementarity case
+(regime~(ii): fusion recovers what neither channel captures alone) on the
+TCGA-LGG cohort; a sex control is correctly Inconclusive. MGMT, scored at
+full power on the $n\!=\!577$ BraTS cohort (dagger footnote), is Inconclusive
+in every condition---regime~(iii). Only the non-additive form of the 1p/19q
+interaction remains deferred to a larger cohort.}
 \label{tab:glioma_domainb}
 \end{table}
 
@@ -560,25 +567,25 @@ APOLLO and the EAGLE-1 silent-trial cohort is the natural next step, and a
 multi-site reader study with SOLCA-CISOL and a Swiss academic medical
 centre is in preparation.
 The two cross-domain instantiations of
-\cref{tab:crossdomain_protocol} are stated as pre-registered
-predictions with their cohorts, source ontologies and expected regime
-assignments fixed in advance. Neither is now purely predicted: the
-electrocardiogram domain carries the empirical physiological-state result of
-\cref{tab:ecg_domainc}, and the glioma domain carries the v1 pilot of
-\cref{tab:glioma_domainb}; both show the two-channel decomposition and the
-Conclusive/Inconclusive verdict transferring intact to a new modality family,
-with IDH encoder-saturated and 1p/19q recovered by fusion. What remains
-pre-registered is now narrower and sharper---the \emph{non-additive} form of
-the 1p/19q interaction at full power, the MGMT regime-(iii) untranslatability
-test on the full BraTS cohort, and the laboratory and
+\cref{tab:crossdomain_protocol} were stated as predictions with their
+cohorts, source ontologies and expected regime assignments fixed in advance,
+and both are now measured: the electrocardiogram domain carries the empirical
+physiological-state result of \cref{tab:ecg_domainc}, and the glioma domain
+carries the results of \cref{tab:glioma_domainb}---IDH encoder-saturated,
+1p/19q recovered by fusion, and MGMT Inconclusive at full power on the
+$n\!=\!577$ BraTS cohort. Both show the two-channel decomposition and the
+Conclusive/Inconclusive verdict transferring intact to a new modality family.
+What remains predicted is now narrow---the \emph{non-additive} form of the
+1p/19q interaction at full power, and the laboratory and
 structural-heart-disease targets of the electrocardiogram domain; for those
 the generality of the framework rests on the structural argument and the
-published per-target splits we cite, now alongside these first measurements
-rather than in place of them.
-We regard the MGMT prediction---empty VASARI-side atoms rather than a
-data floor---as the single claim on which the framework should be
-judged, because it is the one that a decade of negative results makes
-easiest to refute.
+published per-target splits we cite, now alongside these measurements rather
+than in place of them.
+The MGMT result---the unconstrained encoder at chance at full power, so the
+instrument declines to certify the field's best-documented untranslatable
+target---is the single measurement on which we invite the framework to be
+judged, because it is the one a decade of negative results makes easiest to
+refute.
 
 Two senses of generalisation should be kept apart, because they are
 established by different experiments. The glioma and electrocardiogram
@@ -671,7 +678,7 @@ return the encoder to distribution (\textit{TP53} $0.48$;
 off-distribution encoder, and only \textit{TP53} clears the estimation floor
 needed to separate the conditions (\cref{tab:cptac_power}).
 
-\begin{table}[h!]
+\begin{table}[ht!]
 \centering
 \input{tables/tab_cptac_transfer}
 \caption{Empirical within-domain cohort-transfer result on CPTAC-LUAD

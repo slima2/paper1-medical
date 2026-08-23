@@ -1,7 +1,8 @@
 % Table tab:crossdomain_protocol — the framework instantiated in three domains.
 % Column 1 = framework element; columns 2-4 = its realisation per domain.
 % Domain A (LUAD) is reported in this paper; B and C are external validations,
-% partly measured (glioma v1 pilot, ECG sex/age) and partly pre-registered.
+% largely measured (glioma IDH/1p19q pilot + MGMT at full power, ECG sex/age)
+% and partly predicted (ECG lab/structural-heart targets).
 \footnotesize
 \setlength{\tabcolsep}{4pt}
 \renewcommand{\arraystretch}{1.15}
@@ -55,15 +56,16 @@ Regime (ii) synergy
   & Candidate pairs, e.g.\ LVH$\times$strain \\
 Regime (iii) out-of-ontology
   & STK11, KEAP1 (RBM10: estimation floor)
-  & \textbf{MGMT} (at chance, $\auroc\!\approx\!0.50$--$0.56$ across
-    architectures)\cite{kim2022mgmtvalidation,robinet2023mgmt,saeed2023mgmt}
+  & \textbf{MGMT} (full BraTS cohort $n\!=\!577$: every condition at chance,
+    $\auroc\!\approx\!0.53$--$0.56$, Inconclusive; matches the published
+    $0.50$--$0.56$)\cite{kim2022mgmtvalidation,robinet2023mgmt,saeed2023mgmt}
   & Troponin~I ($\auroc<0.55$); 16 of 108
     targets\cite{xiao2025anyecglab} \\
 \midrule
 Falsification test
   & Non-additive aggregator wins on regime-(ii) targets only
-  & Same, on 1p/19q but not IDH or MGMT (v1 underpowered;
-    deferred to the full cohort)
+  & Same, on 1p/19q but not IDH or MGMT (MGMT at chance in all
+    conditions; the non-additive read on 1p/19q awaits a larger cohort)
   & Same, on the borderline band but not the recoverable one \\
 Access
   & GDC, public
@@ -77,10 +79,13 @@ unconstrained learned encoder of the same modality; every row above
 is an instance of the same decomposition, not an analogy.
 Domain~B is chosen because MGMT is the best-documented
 population-level translation failure in the field and is currently
-reported as a defeat rather than as a result; whether that failure is
-untranslatability in the strict sense or a diluted subpopulation
-effect (\cref{tab:levels_of_analysis}) is the question the
-pre-registration is designed to settle.
+reported as a defeat rather than as a result; scored here at full power
+($n\!=\!577$) it is Inconclusive in every condition
+(\cref{tab:glioma_domainb}), so the framework issues that decade-old
+failure as a diagnostic verdict. The strict separation of
+untranslatability from a diluted subpopulation effect
+(\cref{tab:levels_of_analysis}) is limited by the propagated---rather than
+expert-scored---VASARI channel and rests on the encoder remaining at chance.
 Domain~C is chosen because its source ontology is
 already graded and ontology-mapped, and because $108$ simultaneous
 targets test whether the taxonomy scales beyond six.

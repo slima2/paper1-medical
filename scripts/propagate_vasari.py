@@ -155,17 +155,29 @@ def main():
     manifest = pd.read_parquet(glioma_root / "derived" / "manifest.parquet")
     path_of = dict(zip(manifest["subject_id"], manifest["slices_path"]))
 
-    # map seed TCGA ids -> BraTS subject_id -> slice path
+    # map seed TCGA ids -> slice path. Two routes, identity first:
+    #   1) identity: the BraTS-TCGA-LGG/GBM NIfTI are named by TCGA id, so a seed
+    #      subject usually already has a prepared slice tensor under its own id
+    #      -> no crosswalk needed (this is the path the MGMT v2 run uses).
+    #   2) crosswalk: fall back to the BraTS<->TCIA XLSX for seed subjects whose
+    #      imaging is only present under a BraTS2021_XXXXX folder.
     xwalk = load_crosswalk(glioma_root)
     tcga_to_brats = dict(zip(xwalk["tcga_id"], xwalk["subject_id"])) if len(xwalk) else {}
     seed_rows = []
+    n_identity = n_xwalk = 0
     for tcga_id, row in seed_df.iterrows():
-        brats = tcga_to_brats.get(str(tcga_id).upper())
+        sid = str(tcga_id).upper()
+        if sid in path_of:
+            seed_rows.append((path_of[sid], row.values)); n_identity += 1
+            continue
+        brats = tcga_to_brats.get(sid)
         if brats and brats in path_of:
-            seed_rows.append((path_of[brats], row.values))
+            seed_rows.append((path_of[brats], row.values)); n_xwalk += 1
+    print(f"seed mapped to imaging: {n_identity} by identity, {n_xwalk} via crosswalk")
     if len(seed_rows) < 20:
         sys.exit(f"only {len(seed_rows)} seed cases have prepared slices; "
-                 "check the crosswalk and prepare_glioma_slices.py coverage")
+                 "check prepare_glioma_slices.py coverage (and the crosswalk if "
+                 "the seed imaging is under BraTS2021_* folders)")
     seed_paths = [r[0] for r in seed_rows]
     seed_Y = np.stack([r[1] for r in seed_rows]).astype(np.float32)
     print(f"trainable seed with imaging: {len(seed_paths)} cases")

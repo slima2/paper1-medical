@@ -94,10 +94,10 @@ def fig_concept():
                  arrowstyle="-|>", mutation_scale=22, lw=2.2, color=C_TRN))
     ax.add_patch(FancyArrowPatch((59.4, 53), (68.6, 53),
                  arrowstyle="-|>", mutation_scale=22, lw=2.2, color=C_TRN))
-    ax.text(64, 57.5, "per-gene AUROC", ha="center", va="center",
-            fontsize=8.8, color="#4d4d4d", fontweight="bold")
+    ax.text(64, 58.8, "per-gene\nAUROC", ha="center", va="center",
+            fontsize=7.2, color="#4d4d4d", fontweight="bold", linespacing=0.95)
     ax.text(64, 48.5, "= faithfulness", ha="center", va="center",
-            fontsize=8.4, color="#4d4d4d", style="italic")
+            fontsize=6.9, color="#4d4d4d", style="italic")
 
     # ---- TARGET DOMAIN ----
     _rbox(ax, 69, 16, 29, 74, "#fdf2f0", "#b0b0b0", lw=1.8, rad=0.03)
@@ -115,14 +115,14 @@ def fig_concept():
         ("RBM10", "AUROC 0.661", C_OOO, "out-of-ontology"),
     ]
     for i, (g, a, c, note) in enumerate(genes):
-        yy = 71.5 - i * 8.7
-        _rbox(ax, 72, yy - 3.2, 23, 6.4, "white", c, lw=1.8, rad=0.06)
-        ax.add_patch(plt.Rectangle((72, yy - 3.2), 1.6, 6.4, color=c, zorder=3))
-        ax.text(76, yy + 0.7, g, ha="left", va="center", fontsize=10.5,
+        yy = 72.5 - i * 9.4
+        _rbox(ax, 72, yy - 3.9, 23, 7.8, "white", c, lw=1.8, rad=0.05)
+        ax.add_patch(plt.Rectangle((72, yy - 3.9), 1.6, 7.8, color=c, zorder=3))
+        ax.text(76, yy + 1.5, g, ha="left", va="center", fontsize=10.5,
                 fontweight="bold", color=INK)
-        ax.text(76, yy - 2.0, note, ha="left", va="center", fontsize=7.8,
+        ax.text(76, yy - 1.9, note, ha="left", va="center", fontsize=7.8,
                 style="italic", color=c)
-        ax.text(94, yy, a, ha="right", va="center", fontsize=9.0, color=INK)
+        ax.text(94, yy + 1.5, a, ha="right", va="center", fontsize=9.0, color=INK)
 
     # regime legend
     leg = [("encoder saturation", C_SAT),
