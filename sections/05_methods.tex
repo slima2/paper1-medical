@@ -183,6 +183,10 @@ where $\Ired$ is the information available \emph{redundantly} from
 either channel, $\Iuni{\mathbf{P}}$ and $\Iuni{\mathbf{E}}$ the
 information available from one channel only, and $\Isyn$ the
 information available only from their \emph{joint} state.
+Since the decomposition is not unique, we adopt the
+Bertschinger~et~al.\ definition of these atoms\cite{bertschinger2014unique}
+as the reference decomposition against which our model-side signatures are
+read.
 \Cref{eq:pid} makes the three regimes mutually exclusive
 predictions rather than post-hoc descriptions: regime~(i) is
 $\Ired$-dominated (so any fusion of $\mathbf{P}$ into $\mathbf{E}$
@@ -226,7 +230,8 @@ above---the sign of the learned Choquet interaction $I_{jk}$ for
 $\Isyn$ (L4), the SHAP embedding/pattern split for $\Ired$ versus
 $\Iuni{\mathbf{E}}$ (L3), and the single-channel ablations for the
 unique atoms (L5)---together with the contrast among the four training
-conditions B2/B3/PI/FC. The regime is therefore assigned from the
+conditions B2/B3/PI/FC (\cref{tab:atom_operationalization}). The regime is
+therefore assigned from the
 \emph{direction} of these signatures, never from a point estimate of an
 atom or from the magnitude of any \auroc{}: regime~(ii) is declared
 when fusion adds to the encoder
@@ -248,31 +253,51 @@ recalibrating any per-cohort threshold; a taxonomy read off absolute
 \auroc{} would instead be a property of the cohort it was fitted on and would
 not travel.
 
+\begin{table}[ht!]
+\centering
+\input{tables/tab_atom_operationalization}
+\caption{\textbf{How each atom of \cref{eq:pid} is read from the model.}
+Every atom is mapped to the model-side signature that evidences it, the
+directional decision rule on the four training conditions, the
+interpretability level(s) that expose it, and the regime it drives. The
+signatures are read---not numerically estimated---against the Bertschinger
+reference decomposition\cite{bertschinger2014unique}.}
+\label{tab:atom_operationalization}
+\end{table}
+
 \paragraph{Scope and corrections.}
-Because both channels are computed from the same slide, every case
-is modality-complete and the inverse-probability-weighting
-correction for missingness-induced bias in information-gain
-estimates\cite{choi2025icym2i} is not required here.
-It \emph{is} required for the multimodal extension proposed in the
-Discussion, where the additional channels (RNA-seq,
-micro-environment quantification) are available for a
-non-randomly-selected subset of TCGA-LUAD, and we specify it as
-part of that protocol rather than applying it retrospectively.
-Similarly, the per-slide impact of a channel is reported here by
-the plug-in L5 ablation; the latent-variable estimator of
-instance-level modality impact\cite{madaan2026primo} is the
-principled replacement and is adopted in the external-validation
-protocol.
-Finally, any numerical estimate of the atoms of \cref{eq:pid} would
-inherit the prevalence-dependent variance of the two single-channel
-models whose logits it would rest on, which across B2 and B3 spans
-$\pm 0.031$ to $\pm 0.081$ AUROC per fold
-(\cref{tab:mutation_luad_resultssec})---of the same order as the
-between-atom differences it would have to resolve.
-This is why we report the decomposition per gene as a
-\emph{structural} claim evidenced by its three model-side
-signatures (\cref{tab:pid_regimes}) and do not attempt point
-estimates of individual atoms.
+Three methodological refinements from the recent literature could in
+principle bear on our decomposition; we state for each whether it is
+needed here.
+The first concerns missing channels. When the two sources are not both
+observed on every case, an information estimate is biased and must be
+reweighted by the inverse probability that a channel was
+observed.\cite{choi2025icym2i} That correction is unnecessary here
+because the pattern channel $\mathbf{P}$ and the embedding channel
+$\mathbf{E}$ are both computed from the \emph{same} H\&E slide, so every
+case carries both. It becomes mandatory only for the multimodal
+extension proposed in the Discussion, where the additional channels
+(RNA-seq, micro-environment quantification) exist for a
+non-randomly-selected subset of TCGA-LUAD; we therefore specify it as
+part of that future protocol rather than applying it retrospectively.
+The second concerns how we measure a channel's per-slide contribution.
+We use the plug-in L5 ablation---zeroing a channel and reading the drop
+in \auroc{}---whereas the principled replacement is a latent-variable
+estimator of instance-level modality impact,\cite{madaan2026primo} which
+we adopt in the external-validation protocol.
+The third is the reason we never quote a numerical value for an
+individual atom of \cref{eq:pid}. Any such estimate would have to be
+built from the outputs of the two single-channel models
+(B2, encoder only; B3, pattern only), and those models are themselves
+noisy: their per-fold \auroc{} varies by $\pm 0.031$ to $\pm 0.081$
+across folds (\cref{tab:mutation_luad_resultssec}). Because the
+differences between the atoms we would be trying to separate are no
+larger than that fold-to-fold noise, a point estimate of any single atom
+would be dominated by sampling error. We therefore report the
+decomposition per gene as a \emph{structural} claim---which atoms are
+present, and with what sign---evidenced by its three model-side
+signatures (\cref{tab:pid_regimes}), and do not attempt point estimates
+of individual atoms.
 
 % =====================================================================
 \subsection*{Cross-validation and statistical analysis}

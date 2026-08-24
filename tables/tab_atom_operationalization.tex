@@ -1,0 +1,49 @@
+% Table tab:atom_operationalization — how each atom of Eq. (eq:pid) is read
+% from the model, not estimated numerically. Maps the four PID atoms to the
+% model-side signature, the directional decision rule, the interpretability
+% level(s) that expose it, and the regime it drives. All rules are on the
+% four training conditions B2/B3/PI/FC and the sign of the Choquet index.
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabularx}{\linewidth}{@{}c X X c c@{}}
+\toprule
+\textbf{Atom} & \textbf{Model-side signature (how it is read)} &
+  \textbf{Decision rule (directional)} & \textbf{Level} & \textbf{Regime} \\
+\midrule
+$\Ired$
+  & Fusion is a no-op on top of the encoder; SHAP places the slide-level
+    contribution on the embedding
+  & $\mathrm{PI}\!\approx\!\mathrm{FC}\!\approx\!\mathrm{B2}$ and
+    $I_{jk}\!\le\!0$
+  & L3 & (i) \\
+$\Iuni{\mathbf{E}}$
+  & Encoder-only far exceeds vocabulary-only; zeroing the embedding costs
+    most of the \auroc{}, zeroing the pattern channel almost none
+  & $\mathrm{B2}\!\gg\!\mathrm{B3}$; asymmetric L5 ablation
+  & L3, L5 & (iii) \\
+$\Iuni{\mathbf{P}}$
+  & Additive concat fusion recovers signal neither channel carries alone
+    (complementary unique information)
+  & $\mathrm{PI}\!>\!\max(\mathrm{B2},\mathrm{B3})$,
+    $\mathrm{FC}\!\approx\!\mathrm{PI}$
+  & conditions, L5 & (ii-a) \\
+$\Isyn$
+  & Only the non-additive aggregator recovers the signal; a supra-additive
+    fuzzy measure on a pattern pair
+  & $\mathrm{FC}\!>\!\mathrm{PI}$ and $\max_{j<k} I_{jk}\!>\!0$
+  & L4 & (ii-b) \\
+\bottomrule
+\end{tabularx}
+\begin{flushleft}\footnotesize
+The four atoms of \cref{eq:pid} and the observable by which each is read.
+$\mathrm{B2}$/$\mathrm{B3}$/$\mathrm{PI}$/$\mathrm{FC}$ are the four training
+conditions (encoder only, vocabulary only, concat fusion, 2-additive
+Choquet); $I_{jk}$ is the learned Choquet pair-interaction index (L4).
+These are \emph{directional} signatures read against the Bertschinger
+reference decomposition\cite{bertschinger2014unique}, not numerical
+estimates of the atoms. The ``unestimable'' sub-state of regime~(iii)
+(e.g.\ \textit{RBM10}) arises when the total $I(\mathbf{P},\mathbf{E};Y)$
+itself sits near the estimation floor, so a non-empty pattern-side atom
+cannot be resolved from noise at the available positive-set size.
+\end{flushleft}
