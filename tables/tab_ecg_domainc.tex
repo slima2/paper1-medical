@@ -26,14 +26,21 @@ the $71$ graded SCP-ECG statements; encoder channel $\mathbf{E}$: a
 Conditions match the LUAD protocol: $\mathrm{B2}$ encoder only,
 $\mathrm{B3}$ statements only, $\mathrm{PI}$ concat fusion, $\mathrm{FC}$
 encoder $+$ 2-additive Choquet over the statements. In both targets the
-fusion conditions match the encoder to within a fold's standard deviation
-while $\mathrm{B3}$ trails far behind---the encoder-saturated signature of
-regime~(i). The regime is assigned by the decomposition structure, not by
-the top point estimate: although $\mathrm{FC}$ is numerically highest on
-Sex it exceeds $\mathrm{B2}$ by only $+0.003$ (below one fold's SD) and
-does not beat the additive $\mathrm{PI}$ ($+0.002$), so no non-additive
-pattern interaction is exploited; on Age the additive $\mathrm{PI}$ in
-fact outscores $\mathrm{FC}$. This is the criterion that separates
-regime~(i) from the synergy of regime~(ii), where $\mathrm{FC}$ beats
-$\mathrm{PI}$ by $+0.019$ on KRAS.
+encoder alone ($\mathrm{B2}$) already reaches the ceiling and the
+statement channel ($\mathrm{B3}$) trails far behind, so fusion cannot add
+to the encoder---the encoder-saturated signature of regime~(i). The
+regime is set by the \emph{direction} of the decomposition
+(\cref{eq:pid}), not by which cell is numerically largest or by the size
+of any margin: regime~(ii) requires the non-additive $\mathrm{FC}$ to
+improve on the additive $\mathrm{PI}$, evidencing an exploited pattern
+interaction (a non-zero Choquet index $I_{jk}$). It does not here---on
+Sex $\mathrm{FC}$ exceeds $\mathrm{PI}$ by only $+0.002$ and on Age the
+additive $\mathrm{PI}$ outscores $\mathrm{FC}$---so the synergy channel is
+empty. The criterion is directional, not magnitude-based: KRAS in LUAD is
+regime~(ii) because $\mathrm{FC}$ recovers what additive $\mathrm{PI}$
+loses ($\mathrm{FC}\!-\!\mathrm{PI}\!=\!+0.019$) with an explicit
+interaction $I(\text{lepidic}\!\times\!\text{solid})\!=\!+0.032$, even
+though that cohort-level gain is itself within a fold's SD---which is
+precisely why KRAS is Inconclusive on the cohort mean yet argumentative
+per slide.
 \end{flushleft}

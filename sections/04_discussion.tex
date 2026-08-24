@@ -35,6 +35,9 @@ embedding-only baseline sit within about $0.02$ AUROC of one another
 on every gene, a gap well inside a single fold's standard deviation
 ($\sim\!0.05$--$0.08$) and therefore not a cohort-mean improvement we
 would defend.
+This is precisely why the regime is read from the \emph{direction} of the
+channel contrasts rather than from their magnitude (Methods): the sign of an
+interaction is stable exactly where a $0.02$ AUROC gap is within-fold noise.
 What pattern-informed MIL does win is the \emph{argument} with the
 pathologist.
 A model that says ``P(KRAS) = 0.965 because the
@@ -372,8 +375,7 @@ effect of the kind KRAS exhibits here.
 Scored at full power every condition sits at chance
 (\cref{tab:glioma_domainb}: $\mathrm{B2}\!=\!0.56$, $\mathrm{B3}\!=\!0.53$,
 $\mathrm{PI}\!=\!0.53$, $\mathrm{FC}\!=\!0.55$) and the verdict is
-Inconclusive, so the framework reports the field's decade of negative results
-as a diagnostic finding rather than a defeat.
+Inconclusive.
 Because the VASARI channel here is \emph{propagated} from the $63$-subject
 seed rather than expert-scored (held-out feature $\auroc\!\lesssim\!0.6$), we
 rest the claim on the unconstrained encoder remaining at chance, not on the
@@ -392,15 +394,17 @@ four-condition protocol five-fold patient-disjoint on this cohort
 level the sample size supports. IDH is Conclusive and encoder-saturated
 (regime~(i)): the encoder alone reaches $\auroc\!=\!0.86$ and the fusion arms
 add nothing beyond a fold's standard deviation, matching the radiogenomic
-expectation. 1p/19q is Conclusive and sits in regime~(ii) as a
-complementarity case: neither channel alone is informative
-($\mathrm{B2}\!=\!0.60$, $\mathrm{B3}\!=\!0.50$) while their fusion recovers
-it ($\mathrm{PI}\!=\!0.74$, $+0.14$ over the encoder). A patient-sex control,
+expectation. 1p/19q is Conclusive and sits in regime~(ii) in its additive
+sub-form (ii-a): neither channel alone is informative
+($\mathrm{B2}\!=\!0.60$, $\mathrm{B3}\!=\!0.50$) while their concat fusion
+recovers it ($\mathrm{PI}\!=\!0.74$, $+0.14$ over the encoder), the
+signature of complementary unique atoms rather than of a synergistic one.
+A patient-sex control,
 absent from the VASARI vocabulary, is correctly Inconclusive with the VASARI
 channel below chance, exercising the guard against spurious certification.
-One limit is genuinely deferred: the \emph{non-additive} form of the 1p/19q
-complementarity---the $\mathrm{FC}\!>\!\mathrm{PI}$ signature that KRAS shows
-in LUAD---is not resolved at $n\!\sim\!63$, where the learned Choquet pair
+One limit is genuinely deferred: the \emph{non-additive} sub-form (ii-b) of
+the 1p/19q complementarity---the $\mathrm{FC}\!>\!\mathrm{PI}$ signature that
+KRAS shows in LUAD---is not resolved at $n\!\sim\!63$, where the learned Choquet pair
 interactions shrink to $\lvert I_{jk}\rvert\!\lesssim\!0.005$, so the
 interaction read is deferred rather than asserted, and the expectation that
 the non-additive aggregator would win on 1p/19q was our modelling
@@ -410,9 +414,9 @@ hypothesis, not an established radiogenomic result.
 \centering
 \input{tables/tab_glioma_domainb}
 \caption{Domain-B: glioma MRI\,$\rightarrow$\,genotype. IDH is
-encoder-saturated (regime~(i)) and 1p/19q is a complementarity case
-(regime~(ii): fusion recovers what neither channel captures alone) on the
-TCGA-LGG cohort; a sex control is correctly Inconclusive. MGMT, scored at
+encoder-saturated (regime~(i)) and 1p/19q is an additive complementarity case
+(regime~(ii-a): concat fusion recovers what neither channel captures alone) on
+the TCGA-LGG cohort; a sex control is correctly Inconclusive. MGMT, scored at
 full power on the $n\!=\!577$ BraTS cohort (dagger footnote), is Inconclusive
 in every condition---regime~(iii). Only the non-additive form of the 1p/19q
 interaction remains deferred to a larger cohort.}
@@ -651,9 +655,8 @@ already near the floor are roughly preserved, a uniform regression toward
 chance---does not by itself separate this residual technical reading from
 genuine cohort-relativity, but both
 carry the same consequence for the claim at issue: read off-the-shelf,
-the TCGA verdicts are not portable, and no assignment in this paper is
-licensed as near-intrinsic. Establishing near-intrinsic assignment would
-require multi-cohort validation with stain harmonisation and explicit
+the TCGA verdicts are not portable. Establishing a near-intrinsic assignment
+would require multi-cohort validation with stain harmonisation and explicit
 domain adaptation; we treat that as a precondition for any translatability
 claim at the level of an individual gene, as distinct from the structural
 portability of the framework that the glioma and electrocardiogram
@@ -707,23 +710,21 @@ tumour-stroma ratio\cite{zhang2015tsr}) is the principled next
 step for STK11 and KEAP1, and multimodal fusion with RNA-seq is the
 principled next step for KEAP1 and RBM10.
 
-The information decomposition itself is bounded rather than measured.
-\Cref{eq:pid} is estimated on scalar sufficient statistics of the
-two channels rather than on the channels themselves, because a
-$512$-dimensional source is not tractable at $n=687$; the
-discretisation into quantile bins and the choice of the
-Bertschinger~et~al.\ construction\cite{bertschinger2014unique}
-are both estimator choices that other definitions of redundancy
-would not share, and at the prevalences available here the atoms are
-too noisy to quote individually, which is why we report the
-decomposition through its three model-side signatures.
-A larger cohort, and the inverse-probability-weighting correction
-required once the additional channels are observed on a
-non-random subset,\cite{choi2025icym2i} are prerequisites for
-turning the structural claim into a measured one; the
-instance-level latent-variable estimator of modality
-impact\cite{madaan2026primo} is the principled replacement for the
-plug-in L5 ablation at the per-slide level.
+The information decomposition is used as a structural lens, not a
+measured quantity. We do not estimate the atoms of \cref{eq:pid}
+numerically: a $512$-dimensional source is intractable at $n=687$, and
+at the prevalences available here any low-dimensional surrogate would be
+too noisy to quote atoms individually. We therefore report the
+decomposition through its three model-side signatures---the sign of the
+Choquet interaction, the SHAP embedding/pattern split and the
+single-channel ablations---rather than as point estimates.
+A larger cohort is the prerequisite for turning this structural claim
+into a measured one; the inverse-probability-weighting correction
+required once additional channels are observed on a non-random
+subset\cite{choi2025icym2i} and the instance-level latent-variable
+estimator of modality impact\cite{madaan2026primo} (the principled
+replacement for the plug-in L5 ablation at the per-slide level) belong
+to that measured extension.
 Finally, the explanation layer has not been validated against
 readers.
 Its two constraints are enforced by construction, but whether they

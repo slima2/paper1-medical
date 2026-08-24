@@ -1,0 +1,83 @@
+@page {
+  size: A4;
+  margin: 22mm 20mm 22mm 20mm;
+}
+
+html {
+  font-size: 11pt;
+}
+
+body {
+  font-family: "Georgia", "Times New Roman", serif;
+  color: #1a1a1a;
+  line-height: 1.5;
+  max-width: 100%;
+  margin: 0;
+  text-align: justify;
+  hyphens: auto;
+}
+
+h1 {
+  font-family: "Helvetica Neue", "Arial", sans-serif;
+  font-size: 15pt;
+  font-weight: 700;
+  color: #0b0b0b;
+  margin: 0 0 0.2em 0;
+  line-height: 1.25;
+  text-align: left;
+}
+
+h2 {
+  font-family: "Helvetica Neue", "Arial", sans-serif;
+  font-size: 11.5pt;
+  font-weight: 700;
+  color: #14456b;
+  margin: 1.3em 0 0.4em 0;
+  padding-bottom: 0.15em;
+  border-bottom: 0.6pt solid #c9d4dd;
+  text-align: left;
+}
+
+p {
+  margin: 0 0 0.75em 0;
+}
+
+strong {
+  color: #0b0b0b;
+}
+
+em {
+  color: #333;
+}
+
+a {
+  color: #14456b;
+  text-decoration: none;
+  word-break: break-word;
+}
+
+ul {
+  margin: 0.3em 0 0.9em 0;
+  padding-left: 1.4em;
+}
+
+li {
+  margin: 0.15em 0;
+  text-align: left;
+}
+
+hr {
+  border: none;
+  border-top: 0.6pt solid #d0d0d0;
+  margin: 1.2em 0;
+}
+
+/* Signature block: keep tight and left aligned */
+p:last-of-type {
+  text-align: left;
+}
+
+/* Avoid awkward page breaks right after a heading */
+h1, h2 {
+  break-after: avoid;
+}

@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>cover_letter_npj_digital_medicine</title>
+  <style>
+
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+
+ul.task-list[class]{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+font-size: inherit;
+width: 0.8em;
+margin: 0 0.8em 0.2em -1.6em;
+vertical-align: middle;
+}
+.display.math{display: block; text-align: center; margin: 0.5rem auto;}
+</style>
+  <style type="text/css">@page {
+size: A4;
+margin: 22mm 20mm 22mm 20mm;
+}
+html {
+font-size: 11pt;
+}
+body {
+font-family: "Georgia", "Times New Roman", serif;
+color: #1a1a1a;
+line-height: 1.5;
+max-width: 100%;
+margin: 0;
+text-align: justify;
+hyphens: auto;
+}
+h1 {
+font-family: "Helvetica Neue", "Arial", sans-serif;
+font-size: 15pt;
+font-weight: 700;
+color: #0b0b0b;
+margin: 0 0 0.2em 0;
+line-height: 1.25;
+text-align: left;
+}
+h2 {
+font-family: "Helvetica Neue", "Arial", sans-serif;
+font-size: 11.5pt;
+font-weight: 700;
+color: #14456b;
+margin: 1.3em 0 0.4em 0;
+padding-bottom: 0.15em;
+border-bottom: 0.6pt solid #c9d4dd;
+text-align: left;
+}
+p {
+margin: 0 0 0.75em 0;
+}
+strong {
+color: #0b0b0b;
+}
+em {
+color: #333;
+}
+a {
+color: #14456b;
+text-decoration: none;
+word-break: break-word;
+}
+ul {
+margin: 0.3em 0 0.9em 0;
+padding-left: 1.4em;
+}
+li {
+margin: 0.15em 0;
+text-align: left;
+}
+hr {
+border: none;
+border-top: 0.6pt solid #d0d0d0;
+margin: 1.2em 0;
+}
+
+p:last-of-type {
+text-align: left;
+}
+
+h1, h2 {
+break-after: avoid;
+}
+</style>
+</head>
+<body>
+<h1 id="cover-letter-npj-digital-medicine">Cover letter — npj Digital
+Medicine</h1>
+<p><strong>To:</strong> Editor-in-Chief, <em>npj Digital Medicine</em>
+<strong>Re:</strong> Submission of original Article — <em>A three-regime
+translatability framework for cross-domain medical prediction with an
+instantiation in lung adenocarcinoma.</em></p>
+<p>Dear Editor,</p>
+<p>We submit this manuscript for consideration as an Article. It
+addresses a reporting problem that cuts across digital medicine rather
+than a question confined to one disease: a large family of clinical AI
+systems predicts, from an accessible source modality, a target that
+modality does not directly measure — histology onto genotype, MRI onto
+molecular markers, the electrocardiogram onto physiological and
+laboratory state — and every one of them is currently reported as a
+single cohort-average AUROC. That number hides which targets are
+actually reachable from the source and why the others are not, and it is
+the reason a decade of negative results on targets such as MGMT-promoter
+methylation has accumulated as community-wide defeat rather than as a
+finding.</p>
+<h2 id="the-contribution">The contribution</h2>
+<p>We propose that such systems be reported by <strong>per-target
+translatability</strong> instead. The framework has three parts.</p>
+<p>First, a <strong>three-regime taxonomy</strong> — encoder saturation,
+inter-pattern co-occurrence, out-of-ontology — that is <em>derived</em>
+rather than descriptive. The regimes are the redundant, synergistic and
+unique atoms of a partial information decomposition of an expert-defined
+source ontology against a learned encoder, which is what makes them
+portable to any domain rather than a relabelling of one cohort’s AUROC
+table.</p>
+<p>Second, a <strong>level-explicit Conclusive/Inconclusive
+verdict</strong>. We are deliberate that this is a population-level
+statement and cannot be read as a per-case one. A gene can be
+Inconclusive across a cohort for three distinct reasons — information
+absent at every level, information real but confined to a
+morphologically defined subpopulation and therefore diluted in the
+average, or information present but unestimable at the available
+prevalence — and only the first is untranslatability. The manuscript
+states, for every quantity reported, whether it was estimated at the
+population, patient, slide or tile level and what a claim at that level
+does and does not license.</p>
+<p>Third, a <strong>six-level per-slide explanation stack
+(LCHAI)</strong> wrapped in a knowledge-graph-grounded
+anti-hallucination language layer, in which the levels are the per-case
+instruments of the same decomposition. The fuzzy linguistic labels
+constrain the vocabulary the language agent may use, an NCIt + MONDO
+knowledge graph constrains the entity set it may assert, and a
+literature layer constrains its citations.</p>
+<h2 id="what-the-instantiation-shows">What the instantiation shows</h2>
+<p>On the public TCGA-LUAD cohort (687 slides, 668 patients, 5-fold
+patient-stratified cross-validation) the six driver genes partition
+cleanly: <em>TP53</em> and <em>EGFR</em> saturate the encoder,
+<em>KRAS</em> is synergistic with a lepidic × solid Choquet interaction
+of +0.032 matching the invasive-mucinous phenotype, and <em>STK11</em>,
+<em>KEAP1</em> and <em>RBM10</em> fall outside the six-pattern
+ontology.</p>
+<p>We want to be explicit that we did not optimise for cohort-mean AUROC
+and do not outperform the foundation-scale published competition; at
+this cohort size we would not expect to. The result we are asking
+reviewers to weigh is the framework, and <em>KRAS</em> is the case that
+demonstrates why it matters: the gene averages 0.609 and is Inconclusive
+as a cohort, yet slide TCGA-55-7815 carries P = 0.965 with that same
+interaction localised in the tissue. Under current reporting practice
+that slide is invisible. Under ours it is the point.</p>
+<h2 id="fit-with-npj-digital-medicine">Fit with <em>npj Digital
+Medicine</em></h2>
+<p>We chose this journal over the oncology titles deliberately. The
+contribution is a reporting and evaluation standard for clinical AI, and
+its natural readership is the digital-medicine community that builds and
+deploys cross-modality predictors, not the LUAD biology community. The
+lung adenocarcinoma work is the instantiation, not the thesis.</p>
+<p>Consistent with that claim, the manuscript instantiates the framework
+on two further fully public modalities and reports the results in the
+main text. In <strong>glioma MRI → genotype</strong>, a standardised
+radiology-feature vocabulary supplies the source ontology: on the
+TCGA-LGG cohort <em>IDH</em> is Conclusive and encoder-saturated (AUROC
+0.86) and <em>1p/19q</em> is a complementarity case that neither channel
+captures alone but their fusion recovers (0.74), while <em>MGMT</em> —
+the best-documented untranslatable target in medical machine learning —
+scored at full power on the balanced BraTS cohort (n = 577, ~52%
+methylated), is Inconclusive in every condition (0.53–0.56): the same
+instrument that certifies IDH and recovers 1p/19q correctly declines to
+certify MGMT, issuing a decade of documented failure as a diagnostic
+verdict rather than a defeat. In the <strong>electrocardiogram →
+physiological state</strong>, the 71 graded, SNOMED-CT-mapped SCP-ECG
+statements of PTB-XL supply the source vocabulary: patient sex (AUROC
+0.90) and age (0.84) carry the identical four-condition protocol intact,
+both encoder-saturated, confirming the machinery transfers across a
+modality family rather than only in principle. We also stress-test the
+framework <em>within</em> pathology through an off-the-shelf cohort
+transfer to CPTAC-LUAD: the frozen predictor collapses (<em>TP53</em>
+0.72 → 0.53, and 0.48 after stain normalisation) and — this is the point
+— the verdict correctly turns Inconclusive, so the diagnostic reports
+its own limits under distribution shift instead of asserting a spurious
+call. The acquisition and preparation scripts for every instantiation
+are released with the manuscript.</p>
+<p>The live system is publicly accessible at
+<strong>https://lchai.gptfy.biz</strong> (anonymous read-only
+credentials available on request to the editor or reviewers) and the
+source code is at <strong>https://github.com/slima2/lchai</strong>. We
+would welcome the opportunity for reviewers to interrogate the
+deployment directly rather than only the manuscript.</p>
+<h2 id="compliance">Compliance</h2>
+<ul>
+<li>The manuscript is formatted to the <em>npj Digital Medicine</em>
+Article content type: title of 14 words free of punctuation, a 150-word
+unsubheaded abstract, no subheadings in the Introduction, subheadings in
+Results and Methods, and a Discussion written as continuous prose with
+no limitations or conclusions sections.</li>
+<li>Data availability, Code availability, Acknowledgements (including
+funding), Author contributions and Competing interests statements are
+provided. Three of the four authors are affiliated with GPTfy Medical,
+which developed and hosts the LCHAI system reported here; this is
+declared in full in the Competing interests statement.</li>
+<li>The reference list currently stands at 76 entries against the
+journal’s 60-reference guideline. We are glad to reduce it on request;
+the excess is concentrated in the cross-domain instantiations, where we
+cite the primary evidence for the MGMT and laboratory-indicator
+literature that our predictions must be judged against.</li>
+<li>TCGA-LUAD is publicly available under the NIH GDC policy; no further
+IRB approval is required for the retrospective analysis reported here.
+No new human-subject data were collected and no patient-identifiable
+information was accessed.</li>
+<li>All authors consented to the submission and approved the final
+manuscript. The manuscript is not under consideration elsewhere and no
+prior version is in press.</li>
+<li>LLM use during manuscript preparation is documented in the Methods
+section.</li>
+</ul>
+<h2 id="suggested-reviewers">Suggested reviewers</h2>
+<p>We have no professional conflicts with any of the following:</p>
+<ul>
+<li><strong>Jakob N. Kather</strong> (TU Dresden) — mutation prediction
+from H&amp;E across cancer types</li>
+<li><strong>Faisal Mahmood</strong> (BWH / Harvard) — interpretable
+multiple-instance learning on histopathology</li>
+<li><strong>Nils Strodthoff</strong> (Oldenburg) — PTB-XL and ECG
+representation learning</li>
+<li><strong>Olivier Gevaert</strong> (Stanford) — multimodal
+genotype–phenotype integration and radiogenomics</li>
+<li><strong>Spyridon Bakas</strong> (Indiana) — BraTS and the glioma
+radiogenomic benchmarks</li>
+</ul>
+<p>Thank you for considering our manuscript.</p>
+<p>Sincerely,</p>
+<p><strong>Servio F. Lima Reina</strong> (corresponding) GPTfy Medical,
+Guayaquil, Ecuador slima@gptfy.biz</p>
+<p>On behalf of: Servio R. Lima Idrobo MD, Doménica N. López García MD,
+Luis Terán.</p>
+</body>
+</html>

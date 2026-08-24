@@ -186,8 +186,16 @@ information available only from their \emph{joint} state.
 \Cref{eq:pid} makes the three regimes mutually exclusive
 predictions rather than post-hoc descriptions: regime~(i) is
 $\Ired$-dominated (so any fusion of $\mathbf{P}$ into $\mathbf{E}$
-is a no-op), regime~(ii) requires $\Isyn>0$ (so only a non-additive
-aggregator can realise it), and regime~(iii) requires
+is a no-op); regime~(ii)---inter-pattern co-occurrence---is the
+regime in which the pattern channel carries information the encoder
+does not, and it admits two sub-forms: \emph{additive
+complementarity} (ii-a), $\Iuni{\mathbf{P}}>0$ with
+$\Isyn\!\approx\!0$, in which concat fusion already recovers the
+signal ($\mathrm{PI}\!>\!\max(\mathrm{B2},\mathrm{B3})$ while
+$\mathrm{FC}\!\approx\!\mathrm{PI}$), and \emph{non-additive synergy}
+(ii-b), $\Isyn>0$, which only a non-additive aggregator can realise
+($\mathrm{FC}\!>\!\mathrm{PI}$ with $\max_{j<k} I_{jk}>0$); and
+regime~(iii) requires
 $\Iuni{\mathbf{P}}\!\approx\!\Isyn\!\approx\!0$ with
 $I(\mathbf{P},\mathbf{E};Y)$ itself near the estimation floor.
 
@@ -210,29 +218,35 @@ $\Iuni{\mathbf{E}}$, L4 reads out $\Isyn$ through the $I_{jk}$, and
 the L5 channel ablation is the plug-in estimator of the unique atom
 of the ablated channel.
 
-\paragraph{Estimator.}
-Direct estimation of \cref{eq:pid} on a $512$-d source is
-intractable at $n=687$.
-We therefore replace each channel by a task-relevant scalar
-summary---the held-out logit of the corresponding single-channel
-model, B3 for $\mathbf{P}$ and B2 for $\mathbf{E}$---pool the
-out-of-fold logits across the five folds, and discretise each into
-$Q=4$ quantile bins, yielding a $4\times4\times2$ joint
-contingency table.
-Because each logit is a deterministic function of its channel, the
-data-processing inequality\cite{cover2006elements} makes every atom
-computed on this table a \emph{lower} bound on the corresponding
-atom of the full channels, so the decomposition can establish that
-a pattern-side atom is present but cannot prove that one is absent;
-the out-of-ontology verdict is correspondingly reported against the
-estimation floor rather than as an exact zero.
-On this table the bivariate atoms are obtained by the
-Bertschinger~et~al.\ construction\cite{bertschinger2014unique},
-which defines the unique atoms as a minimum over the polytope of
-distributions preserving the two source--target marginals and
-recovers $\Ired$ and $\Isyn$ by subtraction from
-\cref{eq:pid}; confidence intervals are obtained by $1{,}000$
-patient-level bootstrap resamples.
+\paragraph{Reading the atoms from the model-side signature.}
+We do not estimate the atoms of \cref{eq:pid} numerically; a direct
+estimate on the $512$-d channel is intractable at $n=687$. Instead each
+atom's \emph{presence} is read from the model-side signatures introduced
+above---the sign of the learned Choquet interaction $I_{jk}$ for
+$\Isyn$ (L4), the SHAP embedding/pattern split for $\Ired$ versus
+$\Iuni{\mathbf{E}}$ (L3), and the single-channel ablations for the
+unique atoms (L5)---together with the contrast among the four training
+conditions B2/B3/PI/FC. The regime is therefore assigned from the
+\emph{direction} of these signatures, never from a point estimate of an
+atom or from the magnitude of any \auroc{}: regime~(ii) is declared
+when fusion adds to the encoder
+($\mathrm{PI}\!>\!\max(\mathrm{B2},\mathrm{B3})$)---its non-additive
+sub-form (ii-b) additionally requiring $\mathrm{FC}\!>\!\mathrm{PI}$
+with $\max_{j<k} I_{jk}>0$, and its additive sub-form (ii-a) holding
+when $\mathrm{FC}\!\approx\!\mathrm{PI}$; regime~(i) when fusion does
+not add to the encoder and $I_{jk}\!\le\!0$; and regime~(iii) when the
+pattern channel is uninformative under every condition, with the total
+signal near the estimation floor. This keeps the regime axis orthogonal
+to the Conclusive/Inconclusive verdict (\cref{eq:conclusive_verdict}),
+the sole magnitude test---so KRAS is regime~(ii) via
+$I(\text{lepidic}\!\times\!\text{solid})\!=\!+0.032$ and
+$\mathrm{FC}\!>\!\mathrm{PI}$ yet Inconclusive at a cohort mean of
+$0.61$ (\cref{tab:pid_regimes}).
+Because the assignment turns on the \emph{sign} of a contrast rather than
+on an absolute \auroc{}, it transfers across cohorts and modalities without
+recalibrating any per-cohort threshold; a taxonomy read off absolute
+\auroc{} would instead be a property of the cohort it was fitted on and would
+not travel.
 
 \paragraph{Scope and corrections.}
 Because both channels are computed from the same slide, every case
@@ -249,15 +263,15 @@ the plug-in L5 ablation; the latent-variable estimator of
 instance-level modality impact\cite{madaan2026primo} is the
 principled replacement and is adopted in the external-validation
 protocol.
-Finally, the atoms of \cref{eq:pid} inherit the prevalence-dependent
-variance of the two single-channel models whose logits they are
-computed from, which across B2 and B3 spans $\pm 0.031$ to
-$\pm 0.081$ AUROC per fold (\cref{tab:mutation_luad_resultssec})
-and is therefore of the same order as the between-atom differences
-the decomposition would have to resolve.
-We consequently report the decomposition per gene as a
+Finally, any numerical estimate of the atoms of \cref{eq:pid} would
+inherit the prevalence-dependent variance of the two single-channel
+models whose logits it would rest on, which across B2 and B3 spans
+$\pm 0.031$ to $\pm 0.081$ AUROC per fold
+(\cref{tab:mutation_luad_resultssec})---of the same order as the
+between-atom differences it would have to resolve.
+This is why we report the decomposition per gene as a
 \emph{structural} claim evidenced by its three model-side
-signatures (\cref{tab:pid_regimes}) and do not interpret point
+signatures (\cref{tab:pid_regimes}) and do not attempt point
 estimates of individual atoms.
 
 % =====================================================================

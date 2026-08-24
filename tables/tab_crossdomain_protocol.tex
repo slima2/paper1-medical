@@ -50,9 +50,9 @@ Regime (i) saturation
   & IDH ($\auroc\!\approx\!0.88$\cite{chang2018radiogenomics};
     v1 pilot $0.90$)
   & NT-proBNP ($\auroc\!\approx\!0.78$)\cite{xiao2025anyecglab} \\
-Regime (ii) synergy
-  & KRAS (lepidic$\times$solid)
-  & 1p/19q (v1 pilot $0.74$ by fusion)
+Regime (ii) co-occurrence
+  & KRAS (lepidic$\times$solid; non-additive ii-b)
+  & 1p/19q (additive ii-a, $0.74$ by concat fusion; non-additive deferred)
   & Candidate pairs, e.g.\ LVH$\times$strain \\
 Regime (iii) out-of-ontology
   & STK11, KEAP1 (RBM10: estimation floor)
@@ -63,9 +63,10 @@ Regime (iii) out-of-ontology
     targets\cite{xiao2025anyecglab} \\
 \midrule
 Falsification test
-  & Non-additive aggregator wins on regime-(ii) targets only
-  & Same, on 1p/19q but not IDH or MGMT (MGMT at chance in all
-    conditions; the non-additive read on 1p/19q awaits a larger cohort)
+  & Non-additive aggregator wins on regime-(ii-b) targets only
+  & Additive fusion recovers 1p/19q but not IDH or MGMT (MGMT at chance
+    in all conditions); the non-additive ii-b read on 1p/19q awaits a
+    larger cohort
   & Same, on the borderline band but not the recoverable one \\
 Access
   & GDC, public
