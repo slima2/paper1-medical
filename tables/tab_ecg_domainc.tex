@@ -31,13 +31,20 @@ statement channel ($\mathrm{B3}$) trails far behind, so fusion cannot add
 to the encoder---the encoder-saturated signature of regime~(i). The
 regime is set by the \emph{direction} of the decomposition
 (\cref{eq:pid}), not by which cell is numerically largest or by the size
-of any margin: regime~(ii) requires the non-additive $\mathrm{FC}$ to
-improve on the additive $\mathrm{PI}$, evidencing an exploited pattern
-interaction (a non-zero Choquet index $I_{jk}$). It does not here---on
-Sex $\mathrm{FC}$ exceeds $\mathrm{PI}$ by only $+0.002$ and on Age the
-additive $\mathrm{PI}$ outscores $\mathrm{FC}$---so the synergy channel is
-empty. The criterion is directional, not magnitude-based: KRAS in LUAD is
-regime~(ii) because $\mathrm{FC}$ recovers what additive $\mathrm{PI}$
+of any margin, and regime~(ii) is excluded here in \emph{both} of its
+sub-forms (\cref{tab:atom_operationalization}). The additive sub-form
+(ii-a) would require concat fusion to exceed the better single channel,
+but $\mathrm{PI}$ improves on $\mathrm{B2}$ by only $+0.001$ on Sex and
+$+0.005$ on Age; the non-additive sub-form (ii-b) would require
+$\mathrm{FC}$ to improve on $\mathrm{PI}$, evidencing an exploited
+pattern interaction (a non-zero Choquet index $I_{jk}$), but
+$\mathrm{FC}$ exceeds $\mathrm{PI}$ by only $+0.002$ on Sex and loses to
+it on Age. Both pattern-side atoms are therefore empty, and at
+$n\!=\!21{,}799$ that is a measured negative rather than a deferral:
+unlike the $n\!\sim\!63$ glioma cohort, a near-zero interaction here sits
+well clear of the estimation floor. The criterion remains directional,
+not magnitude-based: KRAS in LUAD is
+regime~(ii-b) because $\mathrm{FC}$ recovers what additive $\mathrm{PI}$
 loses ($\mathrm{FC}\!-\!\mathrm{PI}\!=\!+0.019$) with an explicit
 interaction $I(\text{lepidic}\!\times\!\text{solid})\!=\!+0.032$, even
 though that cohort-level gain is itself within a fold's SD---which is
