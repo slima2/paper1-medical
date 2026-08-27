@@ -86,7 +86,7 @@ per-gene biology, three distinct regimes appear
 On TP53 and EGFR the embedding-only baseline B2 reaches
 $\auroc = 0.718 \pm 0.053$ and $0.701 \pm 0.049$ respectively;
 adding the 6-d pattern channel (\piabmil{}, A or \fcmil{}) changes
-the AUROC by $\leq 0.02$.
+the AUROC by $\leq 0.02$ (\cref{tab:mutation_luad_resultssec}).
 This is the predicted regime when the \ctranspath{} foundation
 encoder already represents the discriminative morphology---TP53's
 high-grade nuclear pleomorphism\cite{ahn2022tp53highgrade,mendoza2024tp53nuclear}
@@ -101,7 +101,8 @@ matters, and the isolating comparison is between the two aggregators
 that receive \emph{the same} two channels.
 Fusing the pattern channel additively \emph{hurts}: \piabmil{}
 concat fusion falls to $\auroc = 0.590 \pm 0.071$, below the
-embedding-only B2 at $0.607 \pm 0.078$.
+embedding-only B2 at $0.607 \pm 0.078$
+(\cref{tab:mutation_luad_resultssec}).
 The 2-additive Choquet head recovers it to $0.609 \pm 0.059$,
 ${+}0.019$ over additive fusion, and exposes an explicit positive
 interaction index
@@ -190,7 +191,8 @@ first two are out-of-ontology in the strict sense.
 \emph{Label-space mismatch} (STK11).
 The B2 embedding-only ceiling reaches
 $\auroc = 0.684 \pm 0.042$ and \piabmil{} reaches
-$\auroc = 0.695 \pm 0.023$, the best per-gene result for STK11.
+$\auroc = 0.695 \pm 0.023$, the best per-gene result for STK11
+(\cref{tab:mutation_luad_resultssec}).
 However, STK11's predictive signal is principally an
 \emph{immune-cold tumour microenvironment}---reduced lymphocytic
 infiltration, increased neutrophilic
@@ -203,7 +205,7 @@ its categorical structure.
 
 \emph{No morphological projection} (KEAP1).
 \piabmil{} reaches $\auroc = 0.610 \pm 0.071$, the best for KEAP1,
-and \fcmil{} delivers $0.589$.
+and \fcmil{} delivers $0.589$ (\cref{tab:mutation_luad_resultssec}).
 KEAP1's mutation acts through the NRF2-mediated oxidative-stress
 axis,\cite{li2011keap1papillary} a biochemical state that produces
 no consistent morphological projection at the H\&E level---the
@@ -211,7 +213,8 @@ slide is asked a question (\emph{is this cell's antioxidant axis
 deranged?}) that the staining method does not answer.
 
 \emph{Collapse-to-prior} (RBM10).
-\fcmil{} reaches $\auroc = 0.661 \pm 0.063$, the best for RBM10.
+\fcmil{} reaches $\auroc = 0.661 \pm 0.063$, the best for RBM10
+(\cref{tab:mutation_luad_resultssec}).
 With only $5.4\%$ prevalence ($n_+ = 37$ slides on the full
 cohort), the discriminative signal struggles to overcome the
 class prior; the model collapses much of its probability mass
@@ -280,13 +283,14 @@ For KEAP1 the pattern side is genuinely empty: the L3 split
 assigns $87\%$ of the slide-level contribution to the embedding and
 $13\%$ to the pattern channel, the L5 ablation costs $-44.7$\,pp of
 fold-level \auroc{} when the embedding is zeroed against $-0.5$\,pp
-when the pattern is zeroed, and the pattern-only B3 ($0.588$) sits
-below the
-embedding-only B2 ($0.597$).
+when the pattern is zeroed (\cref{tab:pid_regimes}), and the
+pattern-only B3 ($0.588$) sits below the
+embedding-only B2 ($0.597$; \cref{tab:mutation_luad_resultssec}).
 For RBM10 the opposite holds, and it is the only gene in the cohort
 for which it holds: the pattern-only B3 reaches $0.653$ and
 \emph{exceeds} the embedding-only B2 at $0.642$, and the
-non-additive aggregator adds a further ${+}0.021$.
+non-additive aggregator adds a further ${+}0.021$
+(\cref{tab:mutation_luad_resultssec}).
 The pattern-side atoms for RBM10 are therefore not empty---they are
 unestimable, at $n_+ = 37$ and a per-fold SD of $\pm 0.081$ on B3,
 roughly four times the ${+}0.021$ non-additive gain it would have
