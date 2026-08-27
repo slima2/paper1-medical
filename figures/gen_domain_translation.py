@@ -151,21 +151,30 @@ def fig_concept():
 def fig_spectrum():
     fig, ax = plt.subplots(figsize=(11.2, 6.6))
 
-    # (label, representative AUROC/accuracy, training n, category)
+    # (label, reported AUROC, training n, category, label offset)
     #   category: 'analogue' or one of the three LUAD regimes.
+    # Every analogue is the AUROC as published, not accuracy: Chang et al. report
+    # IDH 0.91 / 1p19q 0.88 / MGMT 0.81 AUC alongside the 94/92/83% accuracies, and
+    # the accuracies are what an earlier draft of this figure plotted. MGMT is shown
+    # at the externally validated 0.562 (Kim et al., models trained on the n=585
+    # BraTS-2021 cohort), because the 0.81 development-cohort value is exactly the
+    # non-replicating result the Discussion is about.
     pts = [
         ("Virtual staining\n(autofluorescence->H&E)", 0.99, 700, "analogue", (-12, 20)),
         ("ECG -> LV function\n(EF<=35%)",             0.93, 44959, "analogue", (-10, 16)),
-        ("Radiogenomics\nglioma IDH",                 0.94, 260, "analogue", (-6, 12)),
-        ("Radiogenomics\nglioma MGMT",                0.83, 260, "analogue", (10, 8)),
-        ("Pathomics -> MSI\n(GI cancer)",             0.81, 4000, "analogue", (-20, 12)),
+        ("Radiogenomics\nglioma IDH",                 0.91, 259, "analogue", (-6, 14)),
+        ("Pathomics -> MSI\n(GI cancer)",             0.81, 315, "analogue", (-20, 14)),
         ("Retinal -> MACE\n(cardiovascular)",         0.70, 284335, "analogue", (12, 0)),
+        ("Radiogenomics glioma MGMT\n(external validation)",
+                                                      0.562, 585, "analogue", (2, 62)),
         ("TP53",  0.718, 687, "sat", (14, 16)),
         ("EGFR",  0.701, 687, "sat", (14, -18)),
         ("STK11", 0.695, 687, "ooo", (2, 34)),
         ("RBM10", 0.661, 687, "ooo", (6, -26)),
+        # KRAS (0.609) and KEAP1 (0.610) coincide; draw KEAP1 last so the triangle
+        # is not buried under the diamond.
+        ("KRAS",  0.609, 687, "coo", (-6, -34)),
         ("KEAP1", 0.610, 687, "ooo", (20, 30)),
-        ("KRAS",  0.609, 687, "coo", (-46, -24)),
     ]
     cat_color = {"analogue": "#6b6b6b", "sat": C_SAT, "coo": C_COO, "ooo": C_OOO}
     cat_marker = {"analogue": "o", "sat": "s", "coo": "D", "ooo": "^"}
@@ -189,8 +198,8 @@ def fig_spectrum():
     ax.set_yscale("log")
     ax.set_xlim(0.55, 1.02)
     ax.set_ylim(150, 700000)
-    ax.set_xlabel("Translational faithfulness  (representative reported AUROC / accuracy)",
-                  fontsize=11)
+    ax.set_xlabel("Translational faithfulness  (reported AUROC; virtual staining: "
+                  "pathologist concordance)", fontsize=11)
     ax.set_ylabel("Training cohort size  (slides / patients, log scale)", fontsize=11)
 
     # conclusive threshold
@@ -200,7 +209,7 @@ def fig_spectrum():
 
     # shade the low-faithfulness / low-data corner
     ax.axvspan(0.55, 0.72, ymin=0, ymax=0.42, color="#d62728", alpha=0.06, zorder=0)
-    ax.text(0.562, 3200, "low-faithfulness,\nlow-data corner\n(this work)",
+    ax.text(0.558, 6000, "low-faithfulness,\nlow-data corner",
             fontsize=8.8, color=C_OOO, ha="left", va="center", style="italic")
 
     # legend
