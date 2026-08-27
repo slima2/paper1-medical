@@ -79,13 +79,17 @@ and so surfaces signal not previously thought to be morphologically
 encoded\cite{poplin2018retinal}, to pathomics-to-genomics on the
 very H\&E substrate we use\cite{kather2019msi,kather2020pancancer}.
 Radiogenomics is the most instructive of them, because it already
-exhibits the phenomenon we formalise: on one TCIA cohort IDH and
-1p/19q are recovered at $\auroc=0.91$ and $0.88$ while MGMT-promoter
-methylation trails at $0.81$\cite{chang2018radiogenomics}, and that
-residual is not merely smaller but fails to survive external
-validation, where the BraTS-2021 winning models fall to
-$0.56$\cite{kim2022mgmtvalidation}---a \emph{per-marker} split
-of the same kind as our per-gene regimes.
+exhibits the phenomenon we formalise: on one TCIA cohort ($n\!=\!259$)
+IDH and 1p/19q are recovered at $\auroc=0.91$ and $0.88$ while
+MGMT-promoter methylation trails at
+$0.81$\cite{chang2018radiogenomics}. Those are five-fold
+cross-validated means \emph{within} a single cohort---the same design,
+and the same optimism, as our own LUAD figures---and the MGMT value
+does not survive the move out of it, where the BraTS-2021 winning
+models fall to $0.56$\cite{kim2022mgmtvalidation}. That
+internal-to-external gap is the one our CPTAC test measures directly
+(\cref{tab:cptac_transfer}), and the per-marker split it leaves behind
+is of the same kind as our per-gene regimes.
 
 \begin{figure}[ht!]
   \centering
@@ -107,7 +111,7 @@ directly measure; the horizontal axis is the
   discrimination. Glioma MGMT is plotted at its \emph{externally
   validated} value ($0.56$ for models trained on the $585$-case
   BraTS-2021 cohort\cite{kim2022mgmtvalidation}) rather than the
-  $0.81$ first reported on a development
+  $0.81$ five-fold cross-validated within a single development
   cohort\cite{chang2018radiogenomics}, and on that value it falls into
   the same corner as the out-of-ontology LUAD genes---a regime-(iii)
   case in a second modality. The six
