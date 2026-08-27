@@ -109,8 +109,8 @@ directly measure; the horizontal axis is the
 Against this backdrop our LUAD map sits at the
 \emph{low-faithfulness, low-data} corner
 (\cref{fig:fidelity_spectrum}; per-gene
-$\auroc\in[0.6,0.72]$; positive sets down to $n_+\!=\!37$ for
-RBM10).
+$\auroc\in[0.6,0.72]$ in \cref{tab:mutation_luad_resultssec};
+positive sets down to $n_+\!=\!37$ for RBM10).
 The three-regime taxonomy is the diagnostic that explains
 \emph{why} a given gene lands there---encoder saturation, a missing
 non-additive grammar, or genuine out-of-ontology
@@ -196,7 +196,8 @@ error---and a consequential one, because it discards exactly the cases
 where the morphology \emph{does} speak.
 KRAS is our counterexample and it is unambiguous
 (\cref{fig:kras_lepidic_solid_proxy}): a gene that is Inconclusive as
-a population ($\auroc = 0.609$) yet carries confident,
+a population ($\auroc = 0.609$, \cref{tab:mutation_luad_resultssec})
+yet carries confident,
 tissue-localised per-slide calls wherever the IMA-associated
 lepidic$\times$solid morphology is present.
 Nothing about those slides is untranslatable.
@@ -454,9 +455,9 @@ knowledge-graph layer already
 built.\cite{strodthoff2023ptbxlplus}
 Two properties make this domain more favourable than histology.
 First, the source vocabulary is already \emph{graded}: each
-diagnostic statement carries a $0$--$100$ likelihood extracted from
-the cardiologist's report, so the fuzzy membership our L6 layer must
-learn in LUAD is here supplied as data.
+diagnostic statement carries a likelihood score on a $0$--$100$ scale,
+extracted from the cardiologist's report, so the fuzzy membership our
+L6 layer must learn in LUAD is here supplied as data.
 Second, the target set is an order of magnitude larger: a recent
 foundation-model study reports $33$ of $108$ laboratory indicators
 above $\auroc=0.65$, $59$ in a borderline band the authors describe
@@ -487,10 +488,11 @@ or a foundation-scale cohort; both are reachable from public archives, which
 is the point.
 
 The electrocardiogram domain, however, need not remain purely
-pre-registered for its most immediately available target. Patient sex and age are recorded
+pre-registered. Two of the ${\sim}10^{2}$ targets it affords are available
+immediately: patient sex and age are recorded
 for every PTB-XL case and are not derivable from the SCP-ECG statements
 (which are diagnostic, form and rhythm terms), so they furnish a clean,
-leakage-free target on which the framework can be run now, with the same
+leakage-free pair on which the framework can be run now, with the same
 two channels: the $71$ graded SCP-ECG statements as the source
 vocabulary $\mathbf{P}$ and a compact 1D convolutional encoder of the raw
 twelve-lead signal as $\mathbf{E}$ (\cref{fig:ecg_ptbxl}). This is the
@@ -517,7 +519,8 @@ $\binom{71}{2}$ statement pairs, exactly the read-out that surfaces the
 $I(\text{lepidic}\!\times\!\text{solid})\!=\!+0.032$ for KRAS in LUAD.
 For sex and age no statement pair reaches an interaction that lets
 $\mathrm{FC}$ improve on the additive $\mathrm{PI}$
-($\mathrm{FC}-\mathrm{PI}\!=\!+0.002$ and $-0.002$ respectively), so the
+($\mathrm{FC}-\mathrm{PI}\!=\!+0.002$ and $-0.002$ respectively;
+\cref{tab:ecg_domainc}), so the
 synergy channel is empty and both targets remain in regime~(i)---the
 negative result the model-side signature is designed to report.
 The run does not exhibit an Inconclusive electrocardiogram target---sex
@@ -636,8 +639,10 @@ adaptation, and slide scores mean-pooled to the patient exactly as
 pre-registered (\cref{tab:cptac_power,tab:cptac_transfer}).
 
 The result is a clean negative. In the genotyped-with-imaging subset only
-\textit{TP53} clears the $n_+\!=\!37$ estimation floor ($n_+\!=\!55$); its
-CPTAC AUROC is $0.53$ ($95\%$ CI $0.42$--$0.64$), an interval that
+\textit{TP53} clears the $n_+\!=\!37$ estimation floor ($n_+\!=\!55$;
+\cref{tab:cptac_power}); its
+CPTAC AUROC is $0.53$ ($95\%$ CI $0.42$--$0.64$;
+\cref{tab:cptac_transfer}), an interval that
 excludes the TCGA point estimate ($0.717$) and moves the verdict from
 Conclusive to Inconclusive. The collapse is not an artefact of
 patient-level pooling: a slide-level read-out ($n\!=\!498$), a max, a
