@@ -32,9 +32,10 @@ The pattern-informed channel does not win the cohort-mean
 benchmark---across the upper tier of
 \cref{tab:mutation_luad_resultssec} the fusion arms and the
 embedding-only baseline sit within about $0.02$ AUROC of one another
-on every gene, a gap well inside a single fold's standard deviation
-($\sim\!0.05$--$0.08$) and therefore not a cohort-mean improvement we
-would defend.
+on every gene, a gap well inside the corresponding per-fold standard
+deviation, which runs from $0.023$ to $0.082$ across that tier
+(\cref{tab:mutation_luad_resultssec}), and therefore not a cohort-mean
+improvement we would defend.
 This is precisely why the regime is read from the \emph{direction} of the
 channel contrasts rather than from their magnitude (Methods): the sign of an
 interaction is stable exactly where a $0.02$ AUROC gap is within-fold noise.
@@ -415,7 +416,8 @@ add nothing beyond a fold's standard deviation, matching the radiogenomic
 expectation. 1p/19q is Conclusive and sits in regime~(ii) in its additive
 sub-form (ii-a): neither channel alone is informative
 ($\mathrm{B2}\!=\!0.60$, $\mathrm{B3}\!=\!0.50$) while their concat fusion
-recovers it ($\mathrm{PI}\!=\!0.74$, $+0.14$ over the encoder), the
+recovers it ($\mathrm{PI}\!=\!0.74$, $+0.14$ over the encoder;
+\cref{tab:glioma_domainb}), the
 signature of complementary unique atoms rather than of a synergistic one.
 A patient-sex control,
 absent from the VASARI vocabulary, is correctly Inconclusive with the VASARI
@@ -532,7 +534,8 @@ different modality family with a natively graded source vocabulary.
 The two-pattern synergy analysis was run for these targets as well: the
 2-additive Choquet head emits a pairwise interaction index over all
 $\binom{71}{2}$ statement pairs, exactly the read-out that surfaces the
-$I(\text{lepidic}\!\times\!\text{solid})\!=\!+0.032$ for KRAS in LUAD.
+$I(\text{lepidic}\!\times\!\text{solid})\!=\!+0.032$ for KRAS in LUAD
+(\cref{tab:pid_regimes}).
 For sex and age no statement pair reaches an interaction that lets
 $\mathrm{FC}$ improve on the additive $\mathrm{PI}$
 ($\mathrm{FC}-\mathrm{PI}\!=\!+0.002$ and $-0.002$ respectively;

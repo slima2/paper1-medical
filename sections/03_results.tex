@@ -199,7 +199,8 @@ infiltration, increased neutrophilic
 density\cite{skoulidis2018stk11pd1,pineda2025stk11morphology}---that
 the 6-pattern ANORAK ontology, designed for tumour-cell growth
 patterns, does not encode.
-The marginal $+0.011$ AUROC gain of pattern fusion is real but
+The marginal $+0.011$ AUROC gain of pattern fusion over B2
+(\cref{tab:mutation_luad_resultssec}) is real but
 small because the signal is in the wrong label space, not in
 its categorical structure.
 
@@ -356,7 +357,8 @@ splitting the slide-level prediction into the contribution of
 the $512$-d \ctranspath{} embedding and the $6$-d pattern channel;
 \textbf{L4}~Choquet--Shapley values (intrinsic contribution of
 each pattern) and pairwise interaction indices (\emph{e.g.} the
-$+0.032$ KRAS lepidic$\,\times\,$solid above);
+$+0.032$ KRAS lepidic$\,\times\,$solid of
+\cref{tab:pid_regimes});
 \textbf{L5}~channel ablation, recomputing the prediction with each
 input channel zeroed in turn, read out per slide as
 $\Delta P(\mathrm{mut})$ and per gene as the fold-level
