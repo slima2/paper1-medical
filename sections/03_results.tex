@@ -322,12 +322,21 @@ modality that is in fact informative on the cases that matter.
 
 We report this decomposition as a structural claim evidenced by its
 three model-side signatures rather than as a table of numeric atoms.
-At the per-fold SDs available here the atoms inherit a sampling
-variance of the same order as the differences they would have to
-resolve, and quoting point estimates under those conditions would
+A numeric atom would have to be built from the per-fold outputs of the
+single-channel models B2 and B3, and those outputs move by $\pm 0.031$
+to $\pm 0.081$ from fold to fold
+(\cref{tab:mutation_luad_resultssec}), so any estimate derived from
+them inherits at least that much sampling noise---while the quantity it
+would have to resolve, whether a pattern-side atom is ${\sim}{+}0.02$
+or zero, is several times smaller, as the RBM10 case above makes
+explicit. Quoting a point estimate at that noise-to-signal ratio would
 reproduce exactly the false precision that the
-Conclusive/Inconclusive verdict exists to prevent; the estimator and
-this bound are specified in Methods.
+Conclusive/Inconclusive verdict exists to prevent.
+What does survive the noise is the \emph{sign} of each contrast: which
+condition beats which, and whether $I_{jk}$ is positive. That is what
+the three signatures read and what the regime assignment turns on.
+Methods states this bound and the signatures we use in place of point
+estimates.
 
 % =====================================================================
 \subsection*{Six-level interpretability and dual anti-hallucination}
