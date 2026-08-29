@@ -66,6 +66,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+from PIL import Image
 
 # Reuse the slide enumeration, DICOM handling and stain normalisation that the
 # transfer run already validated on this cohort, so the two runs see identical
@@ -78,6 +79,23 @@ from run_cptac_inference import (  # noqa: E402
     patient_of,
     resolve_root,
 )
+
+def slide_mpp(src: Path) -> float | None:
+    """Microns per pixel at level 0, read straight from the source slide.
+
+    Taken from the DICOM/SVS rather than the converted TIFF: the conversion
+    rewrites resolution as px/cm and a rounding there would silently change the
+    field-of-view correction.
+    """
+    try:
+        import openslide
+        s = openslide.OpenSlide(str(src))
+        mpp = s.properties.get("openslide.mpp-x")
+        s.close()
+        return float(mpp) if mpp else None
+    except Exception:
+        return None
+
 
 EMB_DIM = 512   # CTransPath
 PAT_DIM = 6     # ANORAK growth patterns (lepidic, acinar, papillary,
@@ -209,6 +227,16 @@ def main() -> None:
                     help="print the tile-pass output structure for one slide and exit")
     ap.add_argument("--emb-key", default=None, help="pin the embedding field path")
     ap.add_argument("--pat-key", default=None, help="pin the pattern field path")
+    ap.add_argument("--match-mag", action="store_true",
+                    help="rescale each tile so it covers the same physical field "
+                         "as the TCGA tiles the model was fitted on. Both pipelines "
+                         "tile at level 0 with a fixed 224px window, so a tile "
+                         "spans tile_size*mpp microns: 56 on TCGA (83%% of it 40x, "
+                         "mpp~0.25) against 111 on CPTAC (99%% of it 20x, "
+                         "mpp~0.49). Without this the encoder sees four times the "
+                         "tissue area per tile at transfer time")
+    ap.add_argument("--target-mpp", type=float, default=0.25,
+                    help="microns per pixel to match (default: TCGA's 40x mode)")
     ap.add_argument("--stain-normalize", action="store_true")
     ap.add_argument("--stain-target", default=None)
     ap.add_argument("--stain-method", default="reinhard",
@@ -219,6 +247,8 @@ def main() -> None:
     wsi_dir = Path(args.wsi_dir) if args.wsi_dir else root / "wsi"
     cache_dir = root / "wsi_tiff"
     tag = f"_stain_{args.stain_method}" if args.stain_normalize else ""
+    if args.match_mag:
+        tag += f"_mag{args.target_mpp:g}"
     out_dir = Path(args.out_dir) if args.out_dir else root / f"features{tag}"
     out_dir.mkdir(parents=True, exist_ok=True)
 
@@ -253,9 +283,39 @@ def main() -> None:
     # untouched so the rest of the pipeline behaves exactly as in production.
     captured: dict = {}
 
+    # Field-of-view matching. The hook receives tiles already cut at 224px from
+    # level 0, so the correction is a centre crop to the pixel count that spans
+    # --target-mpp microns, upsampled back to the encoder's input size. Cropping
+    # keeps the tile grid and the runtime intact; splitting each tile into
+    # quadrants would preserve all the tissue but quadruple the forward passes.
+    scale_ctx: dict = {"mpp": None, "logged": False}
+
+    def _plan_crop(tile_px: int) -> int | None:
+        """Pixels of a source tile that span --target-mpp * tile_px microns."""
+        mpp = scale_ctx["mpp"]
+        if not args.match_mag or not mpp or mpp <= args.target_mpp:
+            return None
+        crop = int(round(tile_px * args.target_mpp / mpp))
+        return crop if 16 <= crop < tile_px else None
+
     orig_tile = roi._real_tile_inference
 
     def patched(tiles, config):
+        crop = _plan_crop(tiles[0][2].size[0]) if tiles else None
+        if crop:
+            rescaled = []
+            for (x, y, im) in tiles:
+                w, h = im.size
+                off_x, off_y = (w - crop) // 2, (h - crop) // 2
+                im = im.crop((off_x, off_y, off_x + crop, off_y + crop))
+                rescaled.append((x, y, im.resize((w, h), Image.LANCZOS)))
+            tiles = rescaled
+            if not scale_ctx["logged"]:
+                print(f"[match-mag] mpp {scale_ctx['mpp']:.3f} -> centre {crop}px "
+                      f"upsampled to {tiles[0][2].size[0]}px "
+                      f"({crop * scale_ctx['mpp']:.0f} um field, "
+                      f"target {tiles[0][2].size[0] * args.target_mpp:.0f} um)")
+                scale_ctx["logged"] = True
         if normalize_batch is not None:
             normed = normalize_batch([im for (_x, _y, im) in tiles])
             tiles = [(x, y, normed[i]) for i, (x, y, _im) in enumerate(tiles)]
@@ -319,6 +379,11 @@ def main() -> None:
                 wsi = item["src"]
 
             captured.clear()
+            scale_ctx["mpp"] = slide_mpp(item["src"]) if args.match_mag else None
+            if args.match_mag and scale_ctx["mpp"] is None:
+                print(f"[{i}/{total}] {pid}: SKIP (no mpp metadata; cannot match "
+                      f"field of view)")
+                continue
             cfg = InferenceConfig(
                 image_uri=str(wsi),
                 image_format=wsi.suffix.lower().lstrip("."),
