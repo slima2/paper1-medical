@@ -208,3 +208,44 @@ read, because it is the load-bearing assumption behind the whole
   TCGA. If ANORAK itself degrades on CPTAC stain/scanner characteristics, a
   weak B3 is a channel artefact rather than an empty atom. Compare the raw and
   Reinhard arms before reading anything into a low B3.
+
+---
+
+## 9. Measured: the cohorts differ in scanner magnification
+
+Found while the first extraction was running, and it bears on how the frozen
+transfer result can be read. Both pipelines tile at level 0 through a fixed
+224px window — CPTAC via LCHAI's `roi_inference` (`level: int = 0`), TCGA via
+`SLIMA_PARALELL_inferencing_..._ctranspath_v2.py`
+(`read_region((x, y), 0, ...)`, annotated *"Tile size at level 0 — MUST be 224
+to match CTransPath training"*). Neither selects a level from the slide's
+microns-per-pixel, so a tile spans `224 × mpp` microns, and that span follows
+the scanner.
+
+Read from the slide headers (`openslide.mpp-x`):
+
+| cohort | n | 40x (mpp<0.35) | 20x (0.35–0.75) | unknown |
+|---|---|---|---|---|
+| TCGA-LUAD, the 687 slides with embeddings | 687 | 525 (76.4%) | 155 (22.6%) | 7 (1.0%) |
+| CPTAC-LUAD series | 498 | 7 (1.4%) | 491 (98.6%) | 0 |
+
+A 40x tile carries ~56 µm of tissue, a 20x tile ~111 µm: four times the area.
+The proportions are close to inverted between fitting and transfer.
+
+Two things follow, and they pull in opposite directions. Magnification is a
+confound on reading the frozen-transfer collapse as untranslatability, since
+stain normalisation corrects colour and leaves field of view untouched. But
+TCGA is itself mixed, and its 22.6% of 20x slides means the encoder was fitted
+on both fields rather than on 40x alone — so scale cannot be assumed to explain
+the collapse either. Hence the `MATCHMAG=1` arm: it centre-crops each CPTAC tile
+to the pixel count spanning `--target-mpp` microns and upsamples it back, which
+equalises the field of view and turns the question into a measurement. It is a
+test of the scale hypothesis, not a reconstruction of a 40x acquisition — the
+crop samples a quarter of each tile's tissue, and the upsampling interpolates
+detail the scanner never recorded.
+
+The comment in the TCGA tiler is worth recording separately: pinning 224px at
+level 0 was intended to match CTransPath's 20x pretraining, and achieves it only
+on the 20x slides. On the 76.4% at 40x the tiles are half the intended linear
+scale. This does not disturb the published TCGA AUROCs, which were
+cross-validated over exactly that mixture, but it belongs in limitations.
