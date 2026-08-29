@@ -44,6 +44,9 @@
 #   LCHAI_MODELS=... the models dir, if it is not $LCHAI/models
 
 set -uo pipefail
+# Extraction runs for hours under nohup, where python block-buffers stdout and
+# the per-slide progress only lands in the log in multi-kilobyte bursts.
+export PYTHONUNBUFFERED=1
 log(){ echo "[cptac-tp53] $(date '+%F %T') $*"; }
 die(){ log "FATAL $*"; exit 1; }
 
