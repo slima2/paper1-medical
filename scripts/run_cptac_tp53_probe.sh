@@ -40,6 +40,8 @@
 #   INFER_DIR=...    dir holding run_cptac_inference.py, if it is not alongside
 #                    this script (the extractor imports it)
 #   SEARCH_ROOT=...  where to hunt for it automatically (default $HOME)
+#   LCHAI_APP=...    the inference app dir, if it is not one of the layouts
+#   LCHAI_MODELS=... the models dir, if it is not $LCHAI/models
 
 set -uo pipefail
 log(){ echo "[cptac-tp53] $(date '+%F %T') $*"; }
@@ -48,7 +50,7 @@ die(){ log "FATAL $*"; exit 1; }
 # ---- environment --------------------------------------------------------
 VENV="${VENV:-/home/rapids/cptac_venv}"
 export DATA_ROOT="${DATA_ROOT:-/home/rapids/notebooks/slima/data/translatability}"
-LCHAI="${LCHAI:-/home/rapids/notebooks/slima/lchai/oncology-xai}"
+LCHAI="${LCHAI:-/home/rapids/notebooks/slima/paper1_nature}"
 SMOKE="${SMOKE:-0}"
 SMOKE_SLIDES="${SMOKE_SLIDES:-12}"
 STAIN="${STAIN:-0}"
@@ -96,14 +98,25 @@ done
 log "python   = $(which python)"
 log "DATA_ROOT= $DATA_ROOT"
 log "LCHAI    = $LCHAI"
+log "app      = ${LCHAI_APP:-<autodetect>}"
 log "mode     = $([ "$SMOKE" = 1 ] && echo "SMOKE ($SMOKE_SLIDES slides, plumbing only)" || echo full)$([ "$STAIN" = 1 ] && echo " + reinhard stain" || echo "")"
 
 # ---- prerequisites ------------------------------------------------------
-APP="$LCHAI/apps/inference-service"
-MODELS="$LCHAI/models"
+# The app directory is named differently depending on how LCHAI was deployed:
+# apps/inference-service in the upstream checkout, lchai_app in the flattened
+# copy on the DGX. Accept either rather than pinning one layout.
+APP="${LCHAI_APP:-}"
+if [ -z "$APP" ]; then
+  for d in "$LCHAI/apps/inference-service" "$LCHAI/lchai_app" "$LCHAI/inference-service"; do
+    [ -d "$d" ] && { APP="$d"; break; }
+  done
+fi
+MODELS="${LCHAI_MODELS:-$LCHAI/models}"
 WSI="$DATA_ROOT/luad_cptac/wsi"
-[ -d "$APP" ]    || die "missing LCHAI app dir: $APP"
-[ -d "$MODELS" ] || die "missing LCHAI models dir: $MODELS"
+[ -n "$APP" ] && [ -d "$APP" ] || die \
+"no LCHAI app dir under $LCHAI (tried apps/inference-service, lchai_app, inference-service).
+  Set LCHAI=/path/to/lchai/root or LCHAI_APP=/path/to/the/app/dir directly."
+[ -d "$MODELS" ] || die "missing LCHAI models dir: $MODELS (set LCHAI_MODELS=...)"
 [ -d "$WSI" ]    || die "missing WSI dir: $WSI (is DATA_ROOT right?)"
 for f in "$MODELS/backbones/ctranspath.pth" \
          "$MODELS/backbones/best_fuzzyarcloss_v2.pth" \
