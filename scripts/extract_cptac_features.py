@@ -245,10 +245,14 @@ def main() -> None:
 
     root = resolve_root(args.data_root)
     wsi_dir = Path(args.wsi_dir) if args.wsi_dir else root / "wsi"
-    cache_dir = root / "wsi_tiff"
     tag = f"_stain_{args.stain_method}" if args.stain_normalize else ""
     if args.match_mag:
         tag += f"_mag{args.target_mpp:g}"
+    # Per-arm scratch for the DICOM->TIFF conversions. Each slide's TIFF is
+    # deleted once its tiles are read, so two arms sharing this directory can
+    # have one delete a file the other is still reading. Cheap to separate:
+    # only a slide or two exists at a time.
+    cache_dir = root / f"wsi_tiff{tag}"
     out_dir = Path(args.out_dir) if args.out_dir else root / f"features{tag}"
     out_dir.mkdir(parents=True, exist_ok=True)
 
