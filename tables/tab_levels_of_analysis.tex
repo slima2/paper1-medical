@@ -52,13 +52,21 @@ Tile
 The three-regime taxonomy and the Conclusive/Inconclusive verdict are
 defined at the population level only.
 The consequence that matters clinically is that an Inconclusive
-verdict is compatible with three distinct states of the world, which
+verdict is compatible with four distinct states of the world, which
 the cohort mean cannot separate: information absent at every level
 (strict untranslatability, the KEAP1 candidate); information present
 in a morphologically defined \emph{subpopulation} and therefore
 diluted in the cohort average (KRAS, where the cohort mean is $0.609$
 yet TCGA-55-7815 carries $P=0.965$ with a coherent
-lepidic$\times$solid Choquet readout); and information present but
-unestimable at the available positive-set size (RBM10, $n_+=37$).
+lepidic$\times$solid Choquet readout); information present but
+unestimable at the available positive-set size (RBM10, $n_+=37$); and a
+\emph{heterogeneous target}, in which the gene-level label unions
+variants with different morphological correlates whose signals partly
+cancel in the mixture. The last is the same dilution mechanism as the
+second, relocated from the cases to the label definition, and it is
+untested here: splitting \textit{EGFR} by variant
+(exon-19 deletion, L858R, exon-20 insertion) leaves every subset far
+below the estimation floor, so we flag it as a confound on regime~(iii)
+rather than resolving it.
 Only the first is untranslatability.
 \end{flushleft}
