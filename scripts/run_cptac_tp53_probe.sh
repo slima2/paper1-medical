@@ -186,7 +186,7 @@ if [ "$SMOKE" != 1 ]; then
     || die "trainer full"
 fi
 
-OUT="$DATA_ROOT/luad_cptac/derived/domainA_v2"
+OUT="$DATA_ROOT/luad_cptac/derived/domainA_v2${FEATURES#*/luad_cptac/features}"
 log "DONE. results in $OUT"
 log "  regimes.json           <- B2 vs TCGA 0.718 is the number to read first"
 log "  contrast_bootstrap.csv <- p_sign_agrees_with_tcga per contrast"

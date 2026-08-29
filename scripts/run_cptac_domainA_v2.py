@@ -578,7 +578,12 @@ def main() -> None:
               f"[{'agree' if cptac_regime == ref.get('regime') else 'DIFFER'}], "
               f"P(regime reproduces)={boot.get('_p_regime_matches_tcga')}")
 
-    out_dir = root / "derived" / "domainA_v2"
+    # Carry the feature arm into the output path. The native, Reinhard and
+    # field-of-view-matched arms are meant to be compared against each other, so
+    # a fixed output directory would have each run silently overwrite the last.
+    arm = features_dir.name
+    arm = arm[len("features"):] if arm.startswith("features") else f"_{arm}"
+    out_dir = root / "derived" / f"domainA_v2{arm}"
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / "results.json").write_text(json.dumps(results, indent=2))
     (out_dir / "regimes.json").write_text(json.dumps(regimes, indent=2))
