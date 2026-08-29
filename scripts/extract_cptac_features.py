@@ -200,6 +200,10 @@ def main() -> None:
                     help="must match the TCGA protocol (200)")
     ap.add_argument("--max-tiles-wsi", type=int, default=20000)
     ap.add_argument("--limit", type=int, default=None)
+    ap.add_argument("--only-labeled", action="store_true",
+                    help="skip slides whose patient has no row in labels.parquet; "
+                         "those slides can never enter a bag, so extracting them "
+                         "is pure cost")
     ap.add_argument("--keep-tiff", action="store_true")
     ap.add_argument("--inspect", action="store_true",
                     help="print the tile-pass output structure for one slide and exit")
@@ -263,6 +267,19 @@ def main() -> None:
     roi._real_tile_inference = patched
 
     items = list_slides(wsi_dir)
+    if args.only_labeled:
+        labels_path = root / "labels.parquet"
+        if not labels_path.exists():
+            sys.exit(f"--only-labeled needs {labels_path}\n"
+                     f"run: python fetch_cptac_labels.py")
+        genotyped = set(pd.read_parquet(labels_path).index.astype(str))
+        before = len(items)
+        items = [it for it in items if patient_of(it["src"]) in genotyped]
+        print(f"--only-labeled: {len(items)}/{before} slides "
+              f"({len(genotyped)} genotyped patients)")
+        if not items:
+            sys.exit("no slide matched a genotyped patient; check the patient-id "
+                     "convention in labels.parquet against patient_of()")
     if args.limit:
         items = items[: args.limit]
 
