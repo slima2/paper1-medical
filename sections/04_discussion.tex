@@ -83,14 +83,23 @@ Radiogenomics is the most instructive of them, because it already
 exhibits the phenomenon we formalise: on one TCIA cohort ($n\!=\!259$)
 IDH and 1p/19q are recovered at $\auroc=0.91$ and $0.88$ while
 MGMT-promoter methylation trails at
-$0.81$\cite{chang2018radiogenomics}. Those are five-fold
-cross-validated means \emph{within} a single cohort---the same design,
-and the same optimism, as our own LUAD figures---and the MGMT value
-does not survive the move out of it, where the BraTS-2021 winning
-models fall to $0.56$\cite{kim2022mgmtvalidation}. That
-internal-to-external gap is the one our CPTAC test measures directly
-(\cref{tab:cptac_transfer}), and the per-marker split it leaves behind
-is of the same kind as our per-gene regimes.
+$0.81$\cite{chang2018radiogenomics}. That per-marker split---same
+cohort, same architecture, three different outcomes---is of the same
+kind as our per-gene regimes. The MGMT figure itself does not hold up,
+and the manner of its failure matters. It is a five-fold
+cross-validated mean on a single dataset with no external cohort, and
+what it fails to survive is not only the move between
+cohorts\cite{kim2022mgmtvalidation}: it does not reproduce
+\emph{within} one either. On five patient-disjoint folds of the larger,
+balanced BraTS-2021 cohort---the same internal design---the
+unconstrained encoder sits at $0.562$ (\cref{tab:glioma_domainb}), and
+the BraTS-2021 challenge was itself won at only
+$\auroc\!\approx\!0.62$ on its own validation
+split\cite{baid2021brats}. Our two cross-domain tests therefore measure
+two different things, and we keep them apart: CPTAC is a transfer
+failure, where the one well-powered gene is Conclusive in-cohort and
+collapses under distribution shift (\cref{tab:cptac_transfer}); MGMT is
+an absent signal, already visible without leaving the cohort at all.
 
 \begin{figure}[ht!]
   \centering
@@ -109,11 +118,13 @@ directly measure; the horizontal axis is the
   retinal-to-cardiovascular mapping\cite{poplin2018retinal}. Every
   point is a published AUROC on the cohort size shown, except virtual
   staining, which is scored by pathologist concordance rather than by
-  discrimination. Glioma MGMT is plotted at its \emph{externally
-  validated} value ($0.56$ for models trained on the $585$-case
-  BraTS-2021 cohort\cite{kim2022mgmtvalidation}) rather than the
-  $0.81$ five-fold cross-validated within a single development
-  cohort\cite{chang2018radiogenomics}, and on that value it falls into
+  discrimination. Glioma MGMT is plotted at $0.56$ rather than at the
+  $0.81$ cross-validated within a single development
+  cohort\cite{chang2018radiogenomics}: that lower value is what
+  external validation\cite{kim2022mgmtvalidation} and our own
+  patient-disjoint cross-validation on BraTS-2021
+  (\cref{tab:glioma_domainb}) independently return, so it is not an
+  artefact of leaving the development cohort. On it, MGMT falls into
   the same corner as the out-of-ontology LUAD genes---a regime-(iii)
   case in a second modality. The six
   LUAD genes of this work occupy the \emph{low-faithfulness,
@@ -368,9 +379,9 @@ developed in the text.}
 What makes this domain worth the effort is the target, not the
 method.
 MGMT promoter methylation has resisted prediction from preoperative
-MRI for a decade: the BraTS 2021 radiogenomic challenge was won at
-$\auroc\!\approx\!0.62$ on its own validation split, but subsequent
-CNN, ViT and Swin variants evaluated externally collapse to chance
+MRI for a decade. Beyond the BraTS 2021 challenge result already
+noted, CNN, ViT and Swin variants evaluated externally collapse to
+chance
 ($\auroc\!\approx\!0.50$--$0.56$),\cite{baid2021brats,saeed2023mgmt} a systematic
 re-evaluation concluded that the algorithms developed to date are
 ``not suitable for clinical application'',\cite{robinet2023mgmt} and
