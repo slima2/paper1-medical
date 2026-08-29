@@ -57,6 +57,8 @@ LCHAI="${LCHAI:-/home/rapids/notebooks/slima/paper1_nature}"
 SMOKE="${SMOKE:-0}"
 SMOKE_SLIDES="${SMOKE_SLIDES:-12}"
 STAIN="${STAIN:-0}"
+MATCHMAG="${MATCHMAG:-0}"
+TARGET_MPP="${TARGET_MPP:-0.25}"
 SCRIPTS="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 [ -f "$VENV/bin/activate" ] || die "venv not found at $VENV (set VENV=...)"
@@ -102,7 +104,7 @@ log "python   = $(which python)"
 log "DATA_ROOT= $DATA_ROOT"
 log "LCHAI    = $LCHAI"
 log "app      = ${LCHAI_APP:-<autodetect>}"
-log "mode     = $([ "$SMOKE" = 1 ] && echo "SMOKE ($SMOKE_SLIDES slides, plumbing only)" || echo full)$([ "$STAIN" = 1 ] && echo " + reinhard stain" || echo "")"
+log "mode     = $([ "$SMOKE" = 1 ] && echo "SMOKE ($SMOKE_SLIDES slides, plumbing only)" || echo full)$([ "$STAIN" = 1 ] && echo " + reinhard stain" || echo "")$([ "$MATCHMAG" = 1 ] && echo " + field-of-view matched to mpp $TARGET_MPP" || echo "")"
 
 # ---- prerequisites ------------------------------------------------------
 # The app directory is named differently depending on how LCHAI was deployed:
@@ -142,6 +144,17 @@ if [ "$STAIN" = 1 ]; then
   FEATURES="$DATA_ROOT/luad_cptac/features_stain_reinhard"
 fi
 
+# ---- field-of-view arm ---------------------------------------------------
+# TCGA-LUAD is 83% 40x and CPTAC-LUAD 99% 20x, and both pipelines tile at
+# level 0 with a fixed 224px window, so a CPTAC tile carries four times the
+# tissue area of the tiles the model was fitted on. This arm rescales each tile
+# to the same physical field before the encoder sees it.
+MAG_ARGS=()
+if [ "$MATCHMAG" = 1 ]; then
+  MAG_ARGS=(--match-mag --target-mpp "$TARGET_MPP")
+  FEATURES="${FEATURES}_mag${TARGET_MPP}"
+fi
+
 COMMON=(--lchai-app-dir "$APP" --models-dir "$MODELS" --wsi-dir "$WSI" --device cuda)
 
 # ---- 1. resolve the tile-pass contract on one slide ---------------------
@@ -150,7 +163,7 @@ COMMON=(--lchai-app-dir "$APP" --models-dir "$MODELS" --wsi-dir "$WSI" --device 
 # actually received; if it cannot resolve them it dies here rather than after
 # hours of extraction.
 log "1/3 inspect: resolving the E/P channels on one slide"
-python extract_cptac_features.py --inspect --limit 1 "${COMMON[@]}" "${STAIN_ARGS[@]}" \
+python extract_cptac_features.py --inspect --limit 1 "${COMMON[@]}" "${STAIN_ARGS[@]}" "${MAG_ARGS[@]}" \
   || die "channel resolution failed -- read the structure dump above and pin the fields with --emb-key/--pat-key"
 
 # ---- 2. extract the two channels for the cohort -------------------------
@@ -161,7 +174,7 @@ python extract_cptac_features.py --inspect --limit 1 "${COMMON[@]}" "${STAIN_ARG
 EXTRA=(--only-labeled)
 if [ "$SMOKE" = 1 ]; then EXTRA+=(--limit "$SMOKE_SLIDES"); fi
 log "2/3 extracting features -> $FEATURES"
-python extract_cptac_features.py "${COMMON[@]}" "${STAIN_ARGS[@]}" "${EXTRA[@]}" \
+python extract_cptac_features.py "${COMMON[@]}" "${STAIN_ARGS[@]}" "${MAG_ARGS[@]}" "${EXTRA[@]}" \
   || die "feature extraction"
 
 # ---- 3. the four conditions, TP53 only ----------------------------------
