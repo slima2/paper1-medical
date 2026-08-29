@@ -37,6 +37,9 @@
 #
 # OVERRIDES
 #   VENV=... DATA_ROOT=... LCHAI=... SMOKE=1 SMOKE_SLIDES=12 STAIN=1
+#   INFER_DIR=...    dir holding run_cptac_inference.py, if it is not alongside
+#                    this script (the extractor imports it)
+#   SEARCH_ROOT=...  where to hunt for it automatically (default $HOME)
 
 set -uo pipefail
 log(){ echo "[cptac-tp53] $(date '+%F %T') $*"; }
@@ -54,10 +57,41 @@ SCRIPTS="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 [ -f "$VENV/bin/activate" ] || die "venv not found at $VENV (set VENV=...)"
 source "$VENV/bin/activate"
 
-# extract_cptac_features.py imports run_cptac_inference.py, so both must be
-# importable from the working directory.
+# extract_cptac_features.py imports run_cptac_inference.py (it reuses the slide
+# enumeration, DICOM handling and stain normalisation already validated on this
+# cohort). The two do not have to live in the same directory, but the importing
+# one has to be on PYTHONPATH. Resolve it here rather than demanding a layout.
 cd "$SCRIPTS" || die "cannot cd to $SCRIPTS"
-[ -f run_cptac_inference.py ] || die "run_cptac_inference.py not next to this script"
+if [ ! -f run_cptac_inference.py ]; then
+  CAND="${INFER_DIR:-}"
+  if [ -z "$CAND" ]; then
+    # Look in the usual places before giving up: a sibling checkout, then a
+    # bounded search under the user's notebook tree.
+    for d in "$SCRIPTS/../scripts" "$SCRIPTS/.." "$HOME/paper1-medical/scripts"; do
+      [ -f "$d/run_cptac_inference.py" ] && { CAND="$(cd "$d" && pwd)"; break; }
+    done
+  fi
+  if [ -z "$CAND" ]; then
+    CAND="$(dirname "$(find "${SEARCH_ROOT:-$HOME}" -name run_cptac_inference.py \
+             -not -path '*/.git/*' -print -quit 2>/dev/null)" 2>/dev/null)"
+  fi
+  [ -n "$CAND" ] && [ -f "$CAND/run_cptac_inference.py" ] || die \
+"run_cptac_inference.py not found.
+  Searched: $SCRIPTS, \$INFER_DIR, sibling dirs, and under \${SEARCH_ROOT:-\$HOME}.
+  Fix with either:
+    INFER_DIR=/path/to/dir/holding/run_cptac_inference.py bash $(basename "$0")
+  or put the whole scripts/ dir together:
+    git clone https://github.com/slima2/paper1-medical.git && cd paper1-medical/scripts"
+  export PYTHONPATH="$CAND${PYTHONPATH:+:$PYTHONPATH}"
+  log "run_cptac_inference.py resolved at $CAND (added to PYTHONPATH)"
+fi
+
+for f in extract_cptac_features.py run_cptac_domainA_v2.py; do
+  [ -f "$SCRIPTS/$f" ] || die \
+"$f is missing from $SCRIPTS.
+  This pipeline needs the three CPTAC scripts together. Get them with:
+    git clone https://github.com/slima2/paper1-medical.git && cd paper1-medical/scripts"
+done
 
 log "python   = $(which python)"
 log "DATA_ROOT= $DATA_ROOT"
