@@ -152,8 +152,11 @@ python extract_cptac_features.py --inspect --limit 1 "${COMMON[@]}" "${STAIN_ARG
 
 # ---- 2. extract the two channels for the cohort -------------------------
 # Resumable: relaunching continues from the manifest.
-EXTRA=()
-if [ "$SMOKE" = 1 ]; then EXTRA=(--limit "$SMOKE_SLIDES"); fi
+# Roughly half the 498 series belong to patients cBioPortal has no genotype
+# for. Those slides cannot enter a bag, so tiling them is several hours of GPU
+# spent on rows the trainer will drop.
+EXTRA=(--only-labeled)
+if [ "$SMOKE" = 1 ]; then EXTRA+=(--limit "$SMOKE_SLIDES"); fi
 log "2/3 extracting features -> $FEATURES"
 python extract_cptac_features.py "${COMMON[@]}" "${STAIN_ARGS[@]}" "${EXTRA[@]}" \
   || die "feature extraction"
