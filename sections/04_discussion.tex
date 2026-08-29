@@ -167,6 +167,20 @@ checked, and the check reported in Results---that the non-additive
 aggregator wins on exactly the genes with a recoverable synergistic
 atom and loses elsewhere---is the kind of evidence a leaderboard
 comparison cannot produce.
+The objection this has to answer is that the regimes only restate what
+is already known: that KEAP1 acts through a biochemical axis, that
+STK11 acts through the immune micro-environment. Recovering those is
+\emph{calibration}---an instrument earns trust by returning the known
+answer where the answer is known---and we present it as such. The
+predictive content lies where prior knowledge does not reach, and two
+instances are on the record here. The additive sub-form (ii-a) was an
+empty cell of \cref{eq:pid} in LUAD, predicted by the decomposition
+before anything occupied it, and it is populated by 1p/19q in a
+different modality (\cref{tab:glioma_domainb}). And KEAP1 and RBM10,
+separated by $0.05$ AUROC (\cref{tab:mutation_luad_resultssec}) and
+indistinguishable on any leaderboard, carry opposite atom structures and
+therefore opposite next experiments. What the framework predicts is not
+the mutation but which remedy will move it.
 
 The specific bridge we draw is between the $2$-additive Choquet
 interaction index and the synergistic atom.
@@ -193,7 +207,12 @@ atom means no aggregator change will help and the encoder is the
 binding constraint; a synergistic atom means the aggregator's
 hypothesis space is the binding constraint; an empty pattern-side
 atom means the \emph{source vocabulary} is the binding constraint
-and only a new channel will move it.
+and only a new channel will move it; and a pattern-side atom that is
+non-empty but unestimable means the \emph{cohort} is the binding
+constraint, so more positives of the same kind are exactly what is
+needed. The last two matter most in practice because they are
+indistinguishable on a leaderboard and call for opposite investments:
+KEAP1 will not yield to more slides at any number, RBM10 plausibly will.
 
 The translation frame does more than organise the results; it
 suggests a different stance on interpretability itself.
@@ -248,9 +267,21 @@ target language, and here is the missing vocabulary'' is more useful
 to the next experiment---NRF2 immunostaining, TIL quantification,
 RNA-seq---than a fluent but ungrounded paraphrase, and it is the
 decomposition that makes the statement specific enough to act on:
-the three states an Inconclusive verdict can hide
-(\cref{tab:pid_regimes}) share a mediocre AUROC while calling for
+the four states an Inconclusive verdict can hide
+(\cref{tab:levels_of_analysis}) share a mediocre AUROC while calling for
 different experiments.
+The operational rule that follows is deliberately restrictive. An
+Inconclusive gene licenses no diagnostic use by the reporting
+pathologist---not a hedged call, not a ranked shortlist---until the
+deficit the decomposition names has been repaired. What the regime adds
+is \emph{which} repair counts: an empty pattern-side atom is not repaired
+by more slides at any number, only by a new source channel; an
+unestimable one is repaired by more positives of the same kind; a diluted
+subpopulation is not repaired at the cohort level at all, but by moving
+the unit of deployment to the slide, where KRAS is already
+well-calibrated; and a heterogeneous target is repaired by refining the
+label rather than the model. Reporting the verdict without the regime
+would leave the clinician with a prohibition and no route out of it.
 We therefore position the Conclusive/Inconclusive verdict as a
 population-level translatability flag rather than as a per-case
 confidence threshold or as a verdict on the modality, and we argue
@@ -295,7 +326,7 @@ the non-additive sub-form of regime~(ii) is falsifiable at both levels
 in each domain---between
 growth patterns on a slide, between VASARI features on a scan, and
 between SCP-ECG statements on a record. Second, an Inconclusive
-population verdict is compatible with the same three states of the
+population verdict is compatible with the same states of the
 world in every domain (information absent at every level; present in a
 morphologically or radiologically defined subpopulation and diluted in
 the average; or present but unestimable at the available positive-set

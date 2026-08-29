@@ -207,11 +207,14 @@ establishes what actually travels. Across \emph{modalities}, the same
 decomposition and Conclusive/Inconclusive verdict transfer intact from
 histology to glioma MRI and to the electrocardiogram (a glioma pilot with a
 full-power MGMT test and a full ECG run, both below). Across \emph{cohorts within a modality}, we
-deliberately ask whether a regime assignment is intrinsic to a gene by
-applying the frozen TCGA-LUAD pipeline off-the-shelf to CPTAC-LUAD; it is
-not---under genuine distribution shift the model weights do not transfer and
-the one well-powered gene collapses to chance, yet the framework's own
-verdict correctly turns Inconclusive rather than overclaiming. The first
+apply the frozen TCGA-LUAD pipeline off-the-shelf to CPTAC-LUAD: under
+genuine distribution shift the model weights do not transfer and the one
+well-powered gene collapses to chance, yet the framework's own verdict
+correctly turns Inconclusive rather than overclaiming. That is a test of the
+\emph{predictor}, not of the regime assignment---re-reading a regime on a
+second cohort would require retraining all four conditions there, which the
+$106$ genotyped CPTAC patients cannot support---so whether an assignment is
+intrinsic to a gene remains open, and we mark it as open. The first
 axis shows the method travels; the second shows that what travels is the
 \emph{diagnostic}, not a frozen predictor, and that the diagnostic reports
 its own limits rather than hiding them---the same
@@ -293,7 +296,7 @@ that establish and operationalise it:
     slide or tile level and what a claim at that level licenses
     (\cref{tab:levels_of_analysis}).
     This matters because an Inconclusive verdict is a statement about
-    an average, and only one of the three states of the world
+    an average, and only one of the four states of the world
     compatible with it is untranslatability.
     The verdict is the operational artefact that surfaces Regime~(i)
     Conclusive (TP53, EGFR) versus Regimes~(ii)--(iii) Inconclusive

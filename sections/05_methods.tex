@@ -248,10 +248,15 @@ $I(\text{lepidic}\!\times\!\text{solid})\!=\!+0.032$ and
 $\mathrm{FC}\!>\!\mathrm{PI}$ yet Inconclusive at a cohort mean of
 $0.61$ (\cref{tab:pid_regimes}).
 Because the assignment turns on the \emph{sign} of a contrast rather than
-on an absolute \auroc{}, it transfers across cohorts and modalities without
-recalibrating any per-cohort threshold; a taxonomy read off absolute
-\auroc{} would instead be a property of the cohort it was fitted on and would
-not travel.
+on an absolute \auroc{}, the \emph{procedure} carries over to a new cohort or
+modality with no per-cohort threshold to recalibrate---which is what lets the
+same read-out run unchanged on glioma MRI and on the electrocardiogram,
+whereas a taxonomy read off absolute \auroc{} would be a property of the
+cohort it was fitted on. It does not follow that a given assignment is
+cohort-invariant: the contrasts are themselves computed from
+cohort-dependent \auroc{}s, so a change of case mix can in principle move a
+gene between regimes. What we claim travels is the instrument, not its
+per-gene reading, and only the former is tested here.
 
 \begin{table}[ht!]
 \centering
