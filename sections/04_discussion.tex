@@ -392,16 +392,12 @@ definition, oedema, ependymal contact, grey-level
 heterogeneity---published with per-subject scores and reported
 inter-observer agreement for the TCGA glioma
 collections.\cite{gutman2013vasari,vasari_tcia}
-The transfer of our pipeline is one-to-one: a VASARI-feature
-classifier trained on the TCIA-annotated seed ($n=178$ LGG and $n=75$
-GBM carry expert scores, of which $63$ LGG also carry the co-registered
-preoperative MRI and molecular call the protocol needs) and propagated
-to the $\sim$1{,}251 BraTS 2021
-subjects\cite{baid2021brats} occupies the position that
-\fuzzyarc{}\,V2 trained on Zenodo-ANORAK and propagated to TCGA-LUAD
-occupies here in the LUAD two-channel architecture
-(\cref{fig:two_channels}), with the same 2-additive Choquet aggregator
-over the feature vector (\cref{fig:pipeline_glioma}).
+The transfer of our pipeline is one-to-one: a VASARI-feature classifier
+propagated to the BraTS 2021 subjects\cite{baid2021brats} occupies the
+position ANORAK growth patterns hold in LUAD, feeding the same four
+conditions through the same 2-additive Choquet aggregator
+(\cref{fig:two_channels,fig:pipeline_glioma}; seed sizes and propagation
+in Supplementary Note~1).
 
 \begin{figure}[ht!]
   \centering
@@ -459,10 +455,6 @@ That literature is, in our terms, a decade of accumulating evidence
 for a regime-(iii) verdict---reported as a community-wide defeat
 because no framework existed in which it could be reported as a
 finding.
-Instantiated, the prediction is specific and now largely tested: IDH sits
-in regime~(i) with the VASARI channel adding nothing on top of the encoder;
-1p/19q sits in regime~(ii), recovered by fusion; and MGMT sits in
-regime~(iii).
 The MGMT test is the strong one, because it asserts the strict form of
 untranslatability and has to exclude the two weaker states that produce the
 same stalled AUROC: a data floor, which the $n\!=\!577$ balanced BraTS
@@ -472,40 +464,29 @@ Scored at full power every condition sits at chance
 (\cref{tab:glioma_domainb}: $\mathrm{B2}\!=\!0.56$, $\mathrm{B3}\!=\!0.53$,
 $\mathrm{PI}\!=\!0.53$, $\mathrm{FC}\!=\!0.55$) and the verdict is
 Inconclusive.
-Because the VASARI channel here is \emph{propagated} from the $63$-subject
-seed rather than expert-scored (held-out feature $\auroc\!\lesssim\!0.6$), we
-rest the claim on the unconstrained encoder remaining at chance, not on the
-strict empty-atom versus data-floor separation that real VASARI licenses for
-KEAP1/RBM10 in LUAD.
+Because the VASARI channel on BraTS is propagated rather than expert-scored,
+the claim rests on the unconstrained encoder remaining at chance rather than
+on the strict empty-atom separation real VASARI licenses in LUAD
+(Supplementary Note~1).
 If that verdict holds, the remedy is a different source
 modality---perfusion or diffusion sequences, or methylation-array
 fusion---rather than a further architecture on structural MRI.
 
-A first, deliberately small instantiation is runnable without any of the
-propagation machinery: the ${\sim}63$ TCGA-LGG subjects that carry real
-neuroradiologist VASARI scores, co-registered preoperative MRI from
-BraTS-TCGA-LGG (\cref{fig:glioma_example}) and a matched molecular call. Running the identical
-four-condition protocol five-fold patient-disjoint on this cohort
-(\cref{tab:glioma_domainb}) reproduces the predicted regime structure at the
-level the sample size supports. IDH is Conclusive and encoder-saturated
-(regime~(i)): the encoder alone reaches $\auroc\!=\!0.86$ and the fusion arms
-add nothing beyond a fold's standard deviation, matching the radiogenomic
-expectation. 1p/19q is Conclusive and sits in regime~(ii) in its additive
-sub-form (ii-a): neither channel alone is informative
-($\mathrm{B2}\!=\!0.60$, $\mathrm{B3}\!=\!0.50$) while their concat fusion
-recovers it ($\mathrm{PI}\!=\!0.74$, $+0.14$ over the encoder;
-\cref{tab:glioma_domainb}), the
-signature of complementary unique atoms rather than of a synergistic one.
-A patient-sex control,
-absent from the VASARI vocabulary, is correctly Inconclusive with the VASARI
-channel below chance, exercising the guard against spurious certification.
-One limit is genuinely deferred: the \emph{non-additive} sub-form (ii-b) of
-the 1p/19q complementarity---the $\mathrm{FC}\!>\!\mathrm{PI}$ signature that
-KRAS shows in LUAD---is not resolved at $n\!\sim\!63$, where the learned Choquet pair
-interactions shrink to $\lvert I_{jk}\rvert\!\lesssim\!0.005$, so the
-interaction read is deferred rather than asserted, and the expectation that
-the non-additive aggregator would win on 1p/19q was our modelling
-hypothesis, not an established radiogenomic result.
+A second, smaller instantiation runs without any of the propagation
+machinery, on the ${\sim}63$ TCGA-LGG subjects that carry real
+neuroradiologist VASARI scores, co-registered preoperative MRI and a matched
+molecular call (\cref{fig:glioma_example}). Under the identical
+four-condition protocol it reproduces the predicted regime structure at the
+level the sample size supports (\cref{tab:glioma_domainb}): IDH Conclusive
+and encoder-saturated (regime~(i)), 1p/19q Conclusive and recovered by
+fusion---neither channel alone informative, their concatenation gaining
+$+0.14$ over the encoder---and a patient-sex control, absent from the VASARI
+vocabulary, correctly Inconclusive, exercising the guard against spurious
+certification. One limit is genuinely deferred: the \emph{non-additive}
+sub-form (ii-b) of the 1p/19q complementarity is not resolved at
+$n\!\sim\!63$, where the learned Choquet pair interactions shrink to
+$\lvert I_{jk}\rvert\!\lesssim\!0.005$. Supplementary Note~1 gives the
+per-condition values and the propagation caveat.
 
 That 1p/19q landed in the additive rather than the synergistic sub-form is
 worth stating plainly, because it is the sharpest evidence available here that
@@ -519,10 +500,7 @@ regimes been a relabelling of one cohort's AUROC table, a second domain would
 have produced a case fitting none of them; because they are read off
 \cref{eq:pid}, it produced one for which the decomposition already had a cell,
 and the taxonomy absorbs it by naming a sub-form rather than by adding a
-category. The transfer therefore did not weaken the regime-(ii) claim on
-1p/19q---which stands on
-$\mathrm{PI}\!>\!\max(\mathrm{B2},\mathrm{B3})$---but declined the stronger
-sub-claim at a sample size that cannot support it.
+category.
 
 \begin{table}[ht!]
 \centering
@@ -542,96 +520,55 @@ physiological state, tests whether the taxonomy survives a change of
 modality family. Whether it also scales past six targets is a question
 the laboratory-target literature surveyed below poses and this run
 does not settle.
-PTB-XL supplies $21{,}799$ records annotated by cardiologists with
-$71$ SCP-ECG statements organised into diagnostic, form and rhythm
-categories with a proposed
-hierarchy\cite{wagner2020ptbxl}---the direct counterpart of the
-ANORAK six---and PTB-XL$+$ supplies the SNOMED-CT mapping with
-upward propagation through the ontology tree, which is our
-knowledge-graph layer already
-built.\cite{strodthoff2023ptbxlplus}
-Two properties make this domain more favourable than histology.
-First, the source vocabulary is already \emph{graded}: each
-diagnostic statement carries a likelihood score on a $0$--$100$ scale,
-extracted from the cardiologist's report, so the fuzzy membership our
-L6 layer must learn in LUAD is here supplied as data.
-Second, the target set is an order of magnitude larger: a recent
-foundation-model study reports $33$ of $108$ laboratory indicators
-above $\auroc=0.65$, $59$ in a borderline band the authors describe
-as information that ``may exist in the signal but is difficult to
-extract'', and $16$ below $\auroc=0.55$\cite{xiao2025anyecglab}---an
-empirical three-way partition published without a framework to
-interpret it.
-The sharpest single case is the contrast reported by
-AnyECG-Lab\cite{xiao2025anyecglab} (not run here) between NT-proBNP
-($\auroc\!\approx\!0.78$) and troponin~I ($\auroc<0.55$): two cardiac markers,
-one with a projection onto the electrical signal and one a purely
-biochemical state, mirroring our EGFR-versus-KEAP1 contrast
-in a different organ system.
-Structural heart disease labels from
-EchoNext\cite{hughes2026echonext} and the paired
-ECG/chest-radiograph/laboratory records of
-MIMIC-IV-ECG\cite{gow2023mimicivecg} extend the same protocol to a
-multimodal setting in which the missingness correction of
-\citet{choi2025icym2i} becomes mandatory rather than optional.
+PTB-XL supplies $21{,}799$ records annotated by cardiologists with $71$
+SCP-ECG statements---the direct counterpart of the ANORAK six---and PTB-XL$+$
+supplies the SNOMED-CT mapping that is our knowledge-graph layer already
+built.\cite{wagner2020ptbxl,strodthoff2023ptbxlplus}
+Two properties make this domain more favourable than histology. The source
+vocabulary is already \emph{graded}: each diagnostic statement carries a
+$0$--$100$ likelihood score extracted from the cardiologist's report, so the
+fuzzy membership our L6 layer must learn in LUAD is here supplied as data.
+And the target set is an order of magnitude larger: a foundation-model study
+reports an empirical three-way partition of $108$ laboratory
+indicators---$33$ above $\auroc\!=\!0.65$, $59$ borderline, $16$ below
+$0.55$---published without a framework to interpret
+it,\cite{xiao2025anyecglab} its sharpest case the contrast between NT-proBNP
+($\auroc\!\approx\!0.78$) and troponin~I ($<\!0.55$), which mirrors our
+EGFR-versus-KEAP1 contrast in a different organ system. Whether the regimes
+remain distinguishable at $10^{2}$ targets rather than $6$ is the further
+question those targets pose, and it is not one this paper answers
+(Supplementary Note~1).
 
-Between them the two domains buy complementary evidence: the glioma
-instantiation tests the framework against the hardest available negative
-case (MGMT), while the electrocardiogram instantiation tests whether the
-three regimes survive a change of modality family and whether a natively
-graded source vocabulary strengthens or weakens the fuzzy explanation
-layer. Whether they remain distinguishable at $10^2$ targets rather than
-$6$ is the further question the laboratory targets pose, and it is not
-one this paper answers. Neither requires new data collection, proprietary access
-or a foundation-scale cohort; both are reachable from public archives, which
-is the point.
-
-The electrocardiogram domain, however, need not remain purely
-pre-registered. Two of the ${\sim}10^{2}$ targets it affords are available
-immediately: patient sex and age are recorded
-for every PTB-XL case and are not derivable from the SCP-ECG statements
-(which are diagnostic, form and rhythm terms), so they furnish a clean,
-leakage-free pair on which the framework can be run now, with the same
-two channels: the $71$ graded SCP-ECG statements as the source
-vocabulary $\mathbf{P}$ and a compact 1D convolutional encoder of the raw
-twelve-lead signal as $\mathbf{E}$ (\cref{fig:ecg_ptbxl}). This is the
-electrocardiographic
-counterpart of the retinal$\rightarrow$systemic mapping we cite---
-recovering a physiological state from a modality not designed to report
-it\cite{poplin2018retinal,attia2019ecg}.
-
-Running the identical four-condition protocol used for LUAD, five-fold
-patient-disjoint on the PTB-XL folds
-(\cref{tab:ecg_domainc,fig:pipeline_ecg}), reproduces
-the machinery end to end. Both targets are Conclusive---sex at
-$\auroc\!=\!0.90$ and age$\,\geq\!65$ at $0.84$ under the best
-aggregator---and both sit in regime~(i): the fusion conditions match the
-encoder to within a fold's standard deviation ($\Delta\auroc\!<\!0.01$)
-while the source vocabulary alone is far weaker ($0.62$ and $0.73$), so
-the raw signal saturates the target and the statement channel adds
-essentially nothing on top. This is the same encoder-saturated signature
-\textit{EGFR} and \textit{TP53} show in LUAD, now recovered in a
-different modality family with a natively graded source vocabulary.
-The two-pattern synergy analysis was run for these targets as well: the
+What is measured here is narrower. Patient sex and age are recorded for
+every PTB-XL case and are not derivable from the SCP-ECG statements, so they
+furnish a clean, leakage-free pair, run under the identical four-condition
+protocol with the $71$ graded statements as $\mathbf{P}$ and a compact 1D
+convolutional encoder of the raw twelve-lead signal as $\mathbf{E}$
+(\cref{fig:ecg_ptbxl,fig:pipeline_ecg}). This is the electrocardiographic
+counterpart of the retinal$\,\rightarrow\,$systemic mapping we
+cite\cite{poplin2018retinal,attia2019ecg}. Both targets are Conclusive and
+both sit in regime~(i): the fusion conditions match the encoder to within a
+fold's standard deviation while the source vocabulary alone is far weaker
+(\cref{tab:ecg_domainc}), the same encoder-saturated signature \textit{EGFR}
+and \textit{TP53} show in LUAD. The synergy read-out was run as well---the
 2-additive Choquet head emits a pairwise interaction index over all
-$\binom{71}{2}$ statement pairs, exactly the read-out that surfaces the
-$I(\text{lepidic}\!\times\!\text{solid})\!=\!+0.032$ for KRAS in LUAD
-(\cref{tab:pid_regimes}).
-For sex and age no statement pair reaches an interaction that lets
-$\mathrm{FC}$ improve on the additive $\mathrm{PI}$
-($\mathrm{FC}-\mathrm{PI}\!=\!+0.002$ and $-0.002$ respectively;
-\cref{tab:ecg_domainc}), so the
-synergy channel is empty and both targets remain in regime~(i)---the
-negative result the model-side signature is designed to report.
-The run does not exhibit an Inconclusive electrocardiogram target---sex
-and age are, as expected, strongly written into the electrical
-signal---so the untranslatable end of the spectrum stays anchored by
-LUAD and by the pre-registered laboratory targets, whose partition into
-translatable, borderline and untranslatable bands the literature already
-reports.\cite{xiao2025anyecglab} What the PTB-XL run establishes is
-narrower but real: the two-channel decomposition, the four-condition
-protocol and the Conclusive verdict transfer intact across a modality
-family, not merely in principle.
+$\binom{71}{2}$ statement pairs, the read-out that surfaces
+$I(\text{lepidic}\!\times\!\text{solid})\!=\!+0.032$ for KRAS
+(\cref{tab:pid_regimes})---and no statement pair reaches an interaction that
+lets $\mathrm{FC}$ improve on the additive $\mathrm{PI}$
+(\cref{tab:ecg_domainc}), so the synergy channel is empty: the negative
+result the model-side signature is designed to report. The run exhibits no
+Inconclusive electrocardiogram target, so the untranslatable end of the
+spectrum stays anchored by LUAD and by the laboratory targets the literature
+already partitions.\cite{xiao2025anyecglab}
+
+Between them the two domains buy complementary evidence: glioma tests the
+framework against the hardest available negative case, while the
+electrocardiogram tests whether the machinery survives a change of modality
+family and whether a natively graded source vocabulary strengthens or
+weakens the fuzzy explanation layer. Neither required new data collection,
+proprietary access or a foundation-scale cohort; both are reachable from
+public archives, which is the point.
 
 \begin{figure}[ht!]
 \centering

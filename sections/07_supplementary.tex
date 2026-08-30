@@ -13,6 +13,59 @@
 \section*{Supplementary Information}
 
 % ----------------------------------------------------------------------
+% Supplementary notes
+% ----------------------------------------------------------------------
+
+\subsection*{Supplementary Note 1: extended protocol for domains B and C}
+
+\paragraph{Glioma seed and propagation.}
+The VASARI-feature classifier is trained on the TCIA-annotated seed---$178$
+LGG and $75$ GBM subjects carry expert scores, of which $63$ LGG also carry
+the co-registered preoperative MRI and molecular call the protocol
+needs---and propagated to the ${\sim}1{,}251$ BraTS 2021
+subjects.\cite{baid2021brats} This occupies the position that \fuzzyarc{}\,V2,
+trained on Zenodo-ANORAK and propagated to TCGA-LUAD, occupies in the LUAD
+two-channel architecture (\cref{fig:two_channels}). Because the VASARI
+channel on BraTS is therefore \emph{propagated} rather than expert-scored
+(held-out feature $\auroc\!\lesssim\!0.6$), the MGMT claim in the main text
+rests on the unconstrained encoder remaining at chance, not on the strict
+empty-atom versus data-floor separation that real VASARI licenses for
+\textit{KEAP1} and \textit{RBM10} in LUAD.
+
+\paragraph{Glioma pilot, per condition.}
+On the $63$-subject expert-scored cohort, five-fold patient-disjoint
+(\cref{tab:glioma_domainb}): IDH reaches $\auroc\!=\!0.86$ on the encoder
+alone with the fusion arms adding nothing beyond a fold's standard deviation,
+the radiogenomic expectation for regime~(i). For 1p/19q neither channel alone
+is informative ($\mathrm{B2}\!=\!0.60$, $\mathrm{B3}\!=\!0.50$) while their
+concatenation recovers it ($\mathrm{PI}\!=\!0.74$), the signature of
+complementary unique atoms rather than of a synergistic one, which places it
+in sub-form (ii-a). The expectation that the non-additive aggregator would
+win on 1p/19q was our modelling hypothesis, not an established radiogenomic
+result; at $n\!\sim\!63$ the learned Choquet pair interactions shrink to
+$\lvert I_{jk}\rvert\!\lesssim\!0.005$, so that read is deferred rather than
+asserted. The transfer therefore did not weaken the regime-(ii) claim---which
+stands on $\mathrm{PI}\!>\!\max(\mathrm{B2},\mathrm{B3})$---but declined the
+stronger sub-claim at a sample size that cannot support it.
+
+\paragraph{Electrocardiogram, measured and remaining targets.}
+The $71$ SCP-ECG statements are organised into diagnostic, form and rhythm
+categories with a proposed hierarchy,\cite{wagner2020ptbxl} and PTB-XL$+$
+adds upward propagation through the SNOMED-CT
+tree.\cite{strodthoff2023ptbxlplus} The measured pair reported in the main
+text is sex ($\auroc\!=\!0.90$) and age$\,\geq\!65$ ($0.84$) under the best
+aggregator, against $0.62$ and $0.73$ for the statement channel alone, with
+$\mathrm{FC}-\mathrm{PI}\!=\!+0.002$ and $-0.002$ respectively
+(\cref{tab:ecg_domainc}). The $59$ borderline laboratory indicators that
+\citet{xiao2025anyecglab} describe as information that ``may exist in the
+signal but is difficult to extract'' are the natural next targets. Beyond
+them, structural heart disease labels from EchoNext\cite{hughes2026echonext}
+and the paired ECG/chest-radiograph/laboratory records of
+MIMIC-IV-ECG\cite{gow2023mimicivecg} extend the same protocol to a
+multimodal setting in which the missingness correction of
+\citet{choi2025icym2i} becomes mandatory rather than optional.
+
+% ----------------------------------------------------------------------
 % Supplementary figures
 % ----------------------------------------------------------------------
 
