@@ -10,16 +10,10 @@ The implicit assumption is that this probability is comparable
 across genes and that improvement on the cohort-mean metric is
 the figure of merit.
 Our results challenge both assumptions.
-The same cohort, same encoder, same MIL backbone yields
-qualitatively different gene-level behaviour: encoder
-saturation on TP53/EGFR (where additional pattern information
-adds nothing), inter-pattern co-occurrence on KRAS (where only
-a non-additive aggregator captures the IMA proxy), and an
-unusable pattern channel on STK11/KEAP1/RBM10---out-of-ontology
-for the first two, whose signal lives in stromal or biochemical
-substrates the 6-pattern ontology does not encode, but merely
-unestimable for RBM10, whose pattern-side atoms are demonstrably
-non-empty at $n_+\!=\!37$.
+The same cohort, same encoder and same MIL backbone yield
+qualitatively different gene-level behaviour, and the six genes
+separate into the three regimes rather than onto a scale
+(\cref{tab:pid_regimes}).
 The Conclusive/Inconclusive flag we report alongside each AUROC
 is therefore not a cosmetic addition---it is a statement that
 the cohort-level metric does \emph{not} translate uniformly into
@@ -137,12 +131,6 @@ positive sets down to $n_+\!=\!37$ for RBM10).
 What the three-regime taxonomy adds is the diagnostic of \emph{why} a
 given gene lands there, and with it a remedy specific to that gene
 rather than to the cohort---a mapping developed below.
-The recurring lesson across all of these tasks is the one our
-Conclusive/Inconclusive verdict operationalises: the value of a
-cross-domain map is set by the physics of the source, not by the
-sophistication of the estimator, and transparent per-target
-reporting of that ceiling is what turns the map into a usable
-clinical tool.
 
 What lifts this from an empirical grouping to a portable claim is
 that the regimes are not a grouping at all.
@@ -173,17 +161,14 @@ indistinguishable on any leaderboard, carry opposite atom structures and
 therefore opposite next experiments. What the framework predicts is not
 the mutation but which remedy will move it.
 
-The specific bridge we draw is between the $2$-additive Choquet
-interaction index and the synergistic atom.
-These are objects of different kinds: $I_{jk}$ is a learnable,
-differentiable, per-slide parameter of an aggregation operator,
-whereas $\Isyn$ is a property of a joint distribution that is
-notoriously hard to estimate in high dimension.
-The correspondence we establish is one of sign and support---a
-supra-additive fuzzy measure on a pattern pair is the aggregator's
-way of paying for joint activation, which is what a positive
-synergistic atom licenses---and it is what makes the atom
-inspectable at the bedside rather than only in a contingency table.
+The bridge between $I_{jk}$ and the synergistic atom joins objects of
+different kinds: a learnable, differentiable, per-slide parameter of an
+aggregation operator on one side, and a property of a joint distribution
+that is notoriously hard to estimate in high dimension on the other. The
+correspondence is one of sign and support---a supra-additive fuzzy measure
+on a pattern pair is the aggregator's way of paying for joint activation,
+which is what a positive synergistic atom licenses---and it is what makes
+the atom inspectable at the bedside rather than only in a contingency table.
 We do not claim that $I_{jk}$ is a consistent estimator of
 $\Isyn$; establishing the conditions under which it is, or bounding
 the gap, is the natural theoretical continuation of this work.
@@ -247,22 +232,16 @@ needed. The last two matter most in practice, because they call for
 opposite investments: KEAP1 will not yield to more slides at any
 number, RBM10 plausibly will.
 
-The translation frame does more than organise the results; it
-suggests a different stance on interpretability itself.
+The translation frame also carries a stance on interpretability itself.
 Mainstream explainable-AI methods for computational pathology are
 \emph{post-hoc and attributive}: a saliency map, an attention
 overlay or a SHAP value indicates \emph{where} in the slide the
 model attended, but not in a vocabulary the pathologist can contest
 line by line.\cite{rudin2019stop,jain2019attention}
-Reading the pipeline as a translator reframes explanation as the
-act of \emph{exhibiting the translation}: the six-level stack (C2)
-is a bilingual dictionary that must express every prediction in the
-source language of growth patterns (L2), expose the non-additive
-\emph{grammar} that couples them (L4 Choquet--Shapley interactions),
-and hand the result to a target-domain lexicon (the NCIt$+$MONDO
-knowledge graph, C4) that forbids invented genotype terms.
-Interpretability becomes contrastive and bilingual rather than a
-heat-coloured monologue.
+Reading the pipeline as a translator instead makes explanation the act of
+\emph{exhibiting the translation}, which is what the six-level stack is
+built to do, and interpretability becomes contrastive and bilingual rather
+than a heat-coloured monologue.
 
 The sharper consequence is that \emph{untranslatability is promoted
 to a first-class, actionable result}---provided it is asserted at the
@@ -602,22 +581,12 @@ Large language models are entering the clinical pathology workflow
 as report-drafters and second readers, but the failure mode is
 the same as in the consumer setting: confident assertions
 unsupported by the underlying evidence.
-The dual anti-hallucination mechanism we built into the LCHAI
-explanation layer is a direct response: the fuzzy linguistic labels
-constrain the \emph{vocabulary} (a 0.59 prediction cannot be
-\emph{high}; it must be \emph{moderate}), the NCIt+MONDO knowledge
-graph constrains the \emph{entity set} (the agent cannot invent
-mutations that do not exist for LUAD), and a DeepSearch literature
-layer constrains the \emph{citations} (every claim must be
-traceable to PubMed or a curated ontology IRI).
-Deactivation-without-deletion of contested assertions completes the
-mechanism by preserving an audit trail rather than silently
-rewriting the record.
-We argue this is the minimum bar for AI-assisted pathology
-reporting and that it should generalise beyond LUAD, while noting
-that the three constraints are architectural guarantees about what
-the agent \emph{can} emit and not measurements of what it does emit
-in the hands of a reader.
+The three constraints of the LCHAI explanation layer---fuzzy labels on the
+vocabulary, the knowledge graph on the entity set, a literature layer on the
+citations---are a direct response, and we argue they are the minimum bar for
+AI-assisted pathology reporting and should generalise beyond LUAD. They are,
+however, architectural guarantees about what the agent \emph{can} emit, not
+measurements of what it does emit in the hands of a reader.
 
 Several constraints bound what the present study establishes.
 All primary numbers reported here are 5-fold patient-stratified CV on
@@ -627,17 +596,11 @@ Harmonised external validation on CPTAC-LUAD with domain adaptation,
 APOLLO and the EAGLE-1 silent-trial cohort is the natural next step, and a
 multi-site reader study with SOLCA-CISOL and a Swiss academic medical
 centre is in preparation.
-The two cross-domain instantiations of
-\cref{tab:crossdomain_protocol} were stated as predictions with their
-cohorts, source ontologies and expected regime assignments fixed in advance,
-and both are now measured
-(\cref{tab:glioma_domainb,tab:ecg_domainc}).
-What remains predicted is narrow---the \emph{non-additive} form of the
-1p/19q interaction at full power, and the laboratory and
-structural-heart-disease targets of the electrocardiogram domain; for those
-the generality of the framework rests on the structural argument and the
-published per-target splits we cite, now alongside these measurements rather
-than in place of them.
+Of the two cross-domain instantiations, what remains predicted rather than
+measured is narrow---the \emph{non-additive} form of the 1p/19q interaction
+at full power, and the laboratory and structural-heart-disease targets of the
+electrocardiogram domain---and for those the generality of the framework
+rests on the structural argument and the published per-target splits we cite.
 The MGMT result---the unconstrained encoder at chance at full power, so the
 instrument declines to certify the field's best-documented untranslatable
 target---is the single measurement on which we invite the framework to be
@@ -658,19 +621,16 @@ threshold---as the KRAS case-mix dilution already shows in-sample.
 Calling an assignment near-intrinsic is therefore licensed only by
 concordance across independent cohorts with overlapping confidence
 intervals, which a single-cohort study cannot supply.
-We therefore ran a within-domain cohort-transfer test on
-CPTAC-LUAD, whose whole-slide images are on The Cancer Imaging Archive
-and whose matched whole-exome/whole-genome calls are on the Genomic
-Data Commons and cBioPortal (\texttt{luad\_cptac\_2020}), and which
-carries all six of our target genes.\cite{gillette2020cptacluad,cptacluad_data}
-CPTAC-LUAD is a genuine distribution shift rather than a resample of
-TCGA---enriched for never-smokers and \textit{EGFR}-mutant,
-demographically more diverse tumours\cite{gillette2020cptacluad}---and
-we processed it off-the-shelf: the frozen TCGA-trained pipeline applied
+We therefore ran a within-domain cohort-transfer test on CPTAC-LUAD, which
+carries all six target genes and is a genuine distribution shift rather than
+a resample of TCGA---enriched for never-smokers and \textit{EGFR}-mutant,
+demographically more diverse
+tumours.\cite{gillette2020cptacluad,cptacluad_data}
+We processed it off-the-shelf: the frozen TCGA-trained pipeline applied
 to the $498$ CPTAC slides from the $106$ genotyped patients with matched
 H\&E, with no stain normalisation, colour calibration or domain
 adaptation, and slide scores mean-pooled to the patient exactly as
-pre-registered (\cref{tab:cptac_power,tab:cptac_transfer}).
+stated in advance (\cref{tab:cptac_power,tab:cptac_transfer}).
 
 The result is a clean negative. In the genotyped-with-imaging subset only
 \textit{TP53} clears the $n_+\!=\!37$ estimation floor ($n_+\!=\!55$;
@@ -690,8 +650,7 @@ one well-powered gene is unambiguous.
 
 Two readings survive this. The first is genuine cohort-relativity: the
 morphology-to-genotype coupling is itself local to TCGA, in which case
-nothing about the gene is recoverable in CPTAC by any means and
-harmonisation would be wasted effort.
+nothing about the gene is recoverable in CPTAC by any means.
 The second is an uncorrected technical domain gap:
 CPTAC reaches the model through a DICOM-to-pyramidal-TIFF conversion on
 different scanners, and TCGA-trained models are known to encode
@@ -710,18 +669,17 @@ site-level batch signatures beyond colour (Macenko stain-matrix
 normalisation remains untested).
 The pattern here---the high-TCGA-AUROC genes fall the most while genes
 already near the floor are roughly preserved, a uniform regression toward
-chance---does not by itself separate the residual technical reading from
-genuine cohort-relativity. Read off-the-shelf, the TCGA verdicts are not
-portable, and that much the frozen test establishes on its own: it measures
-whether the \emph{learned decision function} transfers---the \ctranspath{}
-encoder, the ANORAK pattern head and the selected per-gene aggregator applied
-as one predictor---and it does not.
+chance---does not by itself separate the two. What the frozen test does
+establish on its own is that read off-the-shelf the TCGA verdicts are not
+portable: it measures whether the \emph{learned decision function}
+transfers---the \ctranspath{} encoder, the ANORAK pattern head and the
+selected per-gene aggregator applied as one predictor---and it does not.
 
-What it cannot say is which of the two readings above holds, and they
-prescribe opposite investments: the second would mean the coupling is
-present and only the fitted decision function failed to survive the move,
-which harmonisation can repair. They are separable by experiment, and we
-ran it. Freezing
+Which reading holds it cannot say, and the two prescribe opposite
+investments: cohort-relativity would make harmonisation wasted effort, while
+a technical gap would mean the coupling is present and only the fitted
+decision function failed to survive the move. They are separable by
+experiment, and we ran it. Freezing
 only the \emph{representation}---the \ctranspath{} embeddings and ANORAK
 pattern probabilities recomputed on CPTAC tiles---and re-fitting the four
 conditions with patient-disjoint cross-validation inside CPTAC recovers
@@ -804,14 +762,11 @@ tumour-stroma ratio\cite{zhang2015tsr}) is the principled next
 step for STK11 and KEAP1, and multimodal fusion with RNA-seq is the
 principled next step for KEAP1 and RBM10.
 
-The information decomposition is used as a structural lens, not a
-measured quantity. We do not estimate the atoms of \cref{eq:pid}
-numerically: a $512$-dimensional source is intractable at $n=687$, and
-at the prevalences available here any low-dimensional surrogate would be
-too noisy to quote atoms individually. We therefore report the
-decomposition through its three model-side signatures---the sign of the
-Choquet interaction, the SHAP embedding/pattern split and the
-single-channel ablations---rather than as point estimates.
+The decomposition is used as a structural lens, not a measured quantity,
+and beyond the reliability argument above there is a hard constraint: a
+$512$-dimensional source is intractable at $n=687$, and at the prevalences
+available here any low-dimensional surrogate would be too noisy to quote
+atoms individually.
 A larger cohort is the prerequisite for turning this structural claim
 into a measured one; the inverse-probability-weighting correction
 required once additional channels are observed on a non-random
