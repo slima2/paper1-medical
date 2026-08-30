@@ -742,9 +742,9 @@ Conclusive to Inconclusive. The collapse is not an artefact of
 patient-level pooling: a slide-level read-out ($n\!=\!498$), a max, a
 top-$2$/top-$3$ mean and a single-largest-slide read-out all place
 \textit{TP53} between $0.49$ and $0.57$, and across all six genes and
-five aggregators no CPTAC AUROC exceeds $0.62$. The remaining five
+all six read-outs no CPTAC AUROC exceeds $0.62$. The remaining five
 targets are underpowered---\textit{EGFR}, at $n_+\!=\!36$ in this subset,
-falls just short of the floor the full cohort had cleared---so their
+falls just short of the floor the full genotyped cohort had cleared---so their
 near-chance values are, as stated in advance, claims about power; but the
 one well-powered gene is unambiguous.
 
@@ -761,8 +761,8 @@ stain normalisation only partly removes.\cite{howard2021site}
 We tested the colour component of this directly: re-running the transfer
 with Reinhard stain normalisation of every tile to a representative
 TCGA-LUAD reference does not recover it---\textit{TP53} stays at $0.48$
-at the patient level and at most $0.54$ across the slide, mean, max,
-top-$2$/top-$3$ and largest-slide aggregators, its $95\%$ CI still
+at the patient level and at most $0.54$ across the other five
+read-outs, its $95\%$ CI still
 excluding the TCGA point, and no aggregator recovers the TCGA value for
 any gene (\cref{tab:cptac_transfer})---so a global colour/stain cast is
 not the driver, and any technical account must rest on deeper scanner- or
