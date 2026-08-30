@@ -22,8 +22,19 @@
   {../../SLIMA_Thesis_Research_ver_2026_rev_9/figures/}%
 }
 \usepackage{float}
+\usepackage{placeins}
 \usepackage{subcaption}
 \usepackage[labelfont=bf,font=small]{caption}
+
+% Nine floats in the Discussion overrun LaTeX's defaults, which defer them until
+% they flush past the bibliography and read as supplementary material.
+\setcounter{topnumber}{3}
+\setcounter{bottomnumber}{2}
+\setcounter{totalnumber}{4}
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.7}
+\renewcommand{\textfraction}{0.07}
+\renewcommand{\floatpagefraction}{0.75}
 
 \usepackage{booktabs,multirow,makecell,longtable,tabularx,array}
 \newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
