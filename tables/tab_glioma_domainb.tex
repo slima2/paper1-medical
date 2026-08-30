@@ -34,7 +34,9 @@ IDH, 1p/19q and the sex control are on the TCGA-LGG cohort
 neuroradiologist VASARI scores and a molecular call; IDH resolved on
 four folds, one test fold single-class);
 MGMT\textsuperscript{$\dagger$} is on the full BraTS~2021 cohort.
-Source channel $\mathbf{P}$: the $\sim$26 VASARI features (min--max
+Source channel $\mathbf{P}$: the $26$ VASARI features retained of the
+${\sim}30$ the terminology defines, after dropping those constant or
+unscored across the cohort (min--max
 rescaled); encoder channel $\mathbf{E}$: a 2.5D CNN with \abmil{} over
 axial slices of the four co-registered sequences. Conditions match the
 LUAD protocol: $\mathrm{B2}$ encoder only, $\mathrm{B3}$ VASARI only,

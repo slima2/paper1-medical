@@ -50,8 +50,22 @@ Slides failing any criterion were excluded.
 % =====================================================================
 
 Each WSI was tiled at level~0 into non-overlapping
-$224 \times 224$~px patches at $0.5~\mu\text{m}/\text{px}$
-(approx.\ $20\times$).
+$224 \times 224$~px patches, that is, at each slide's native scanning
+resolution, with no resampling to a common microns-per-pixel.
+The analysable cohort is not uniform in that respect: of the $687$
+slides, $76.4\%$ were scanned at $40\times$
+($\mathrm{mpp}\!<\!0.35$) and $22.6\%$ at $20\times$
+($0.35\!\leq\!\mathrm{mpp}\!<\!0.75$; the remaining $1\%$ carry no
+resolution metadata), so a fixed $224$~px window spans
+about $56~\mu\text{m}$ of tissue on the former and about
+$112~\mu\text{m}$ on the latter, and \ctranspath{}---pretrained at
+$20\times$\cite{wang2022ctranspath}---sees the majority of our tiles at
+twice its training linear scale.
+Training and cross-validation run over this same mixture, so the
+within-cohort estimates reported here are internally consistent; the
+consequence is for transfer to a cohort with a different magnification
+profile, which we measure directly in the field-of-view control of
+\cref{tab:cptac_refit} rather than assume.
 A per-slide Otsu tissue mask discarded blank or background tiles
 ($<10\%$ tissue).
 Per-tile pen-marker, blur and artefact checks were re-applied at
@@ -427,7 +441,7 @@ It does not follow, because the cohort mean is taken over a
 population that may be morphologically heterogeneous with respect to
 the target.
 
-\paragraph{An Inconclusive verdict is compatible with three distinct
+\paragraph{An Inconclusive verdict is compatible with four distinct
 states.}
 Writing $\ell$ for the level at which a claim is made, a gene may
 fail \cref{eq:conclusive_verdict} because
@@ -436,17 +450,25 @@ $\ell$, which is untranslatability in the strict sense;
 \emph{(b)}~those atoms are non-empty on a subpopulation of cases
 defined by source-domain morphology, so the signal is real at the
 slide level but is diluted in an average taken over the whole
-cohort; or
+cohort;
 \emph{(c)}~the atoms are non-empty but unestimable at the available
-positive-set size.
-These have the same cohort-mean signature and opposite remedies---a
-different source modality, a stratified or conditional readout, and
-more slides respectively---so we report which of the three we believe
-holds, with the model-side evidence for it, rather than reporting the
-verdict alone.
+positive-set size; or
+\emph{(d)}~the gene-level label itself unions variants with different
+morphological correlates whose signals partly cancel in the mixture.
+These have the same cohort-mean signature and different remedies---a
+different source modality, a stratified or conditional readout, more
+slides of the same kind, and a refined label respectively---so we
+report which of the four we believe holds, with the model-side
+evidence for it, rather than reporting the verdict alone.
 KRAS is our instance of \emph{(b)} and is discussed in Results; it is
 also the reason the six-level stack is evaluated per slide rather
 than summarised into a cohort statistic.
+State \emph{(d)} is the same dilution mechanism as \emph{(b)} relocated
+from the cases to the label definition, and it is not separable at the
+positive-set sizes available here---splitting \textit{EGFR} by variant
+leaves every subset far below the estimation floor---so we flag it in
+\cref{tab:levels_of_analysis} as an untested confound on regime~(iii)
+rather than adjudicating it.
 
 \paragraph{Consequence for the interpretability stack.}
 Levels L1--L6 are computed at the slide and tile levels and are never
@@ -492,7 +514,7 @@ the trapezoidal membership functions
 \min\!\left(1,\,\frac{x-a}{b-a},\,\frac{d-x}{d-c}\right)\right),
 \label{eq:trap_mf}
 \end{equation}
-The breakpoints are a uniform five-band partition of $[0,1]$
+The breakpoints are a fixed five-band partition of $[0,1]$
 ($\mathrm{VL}\!:\![0,0.10]$, $\mathrm{L}\!:\![0.10,0.30]$,
 $\mathrm{M}\!:\![0.30,0.70]$, $\mathrm{H}\!:\![0.70,0.90]$,
 $\mathrm{VH}\!:\![0.90,1.00]$) with a symmetric overlap of $0.10$

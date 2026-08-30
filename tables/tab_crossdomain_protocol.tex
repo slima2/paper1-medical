@@ -20,7 +20,8 @@ Source modality
 Target domain
   & 6 somatic driver mutations
   & IDH, 1p/19q, MGMT
-  & Laboratory abnormalities; structural heart disease \\
+  & Physiological state (sex, age; measured here). Laboratory
+    abnormalities and structural heart disease remain predicted \\
 \midrule
 Source ontology
   & ANORAK, 6 growth patterns\cite{anorak2024}
@@ -33,8 +34,9 @@ Ontology already graded?
   & \textbf{Yes}: $0$--$100$ likelihood per statement, native to L6 \\
 Vocabulary renderer
   & \fuzzyarc{}\,V2 on Zenodo-ANORAK ($n=637$ tiles)
-  & VASARI-feature classifier on the TCIA-annotated subset
-    ($n=178$ LGG, $75$ GBM)
+  & VASARI-feature classifier on the TCIA-annotated seed
+    ($n=178$ LGG and $75$ GBM scored; $63$ LGG carry the matched MRI
+    and molecular call the protocol needs)
   & Direct: statements are supplied per record \\
 Propagated to
   & 687 TCGA-LUAD slides
@@ -49,25 +51,33 @@ Regime (i) saturation
   & TP53, EGFR
   & IDH ($\auroc\!\approx\!0.88$\cite{chang2018radiogenomics};
     v1 pilot $0.90$)
-  & NT-proBNP ($\auroc\!\approx\!0.78$)\cite{xiao2025anyecglab} \\
+  & \textbf{Sex} ($0.90$) and \textbf{age}$\,\geq\!65$ ($0.84$), both
+    measured (\cref{tab:ecg_domainc}); NT-proBNP
+    ($\auroc\!\approx\!0.78$) as reported by\cite{xiao2025anyecglab},
+    not run here \\
 Regime (ii) co-occurrence
   & KRAS (lepidic$\times$solid; non-additive ii-b)
   & 1p/19q (additive ii-a, $0.74$ by concat fusion; non-additive deferred)
-  & Candidate pairs, e.g.\ LVH$\times$strain \\
+  & Not populated by the two measured targets; candidate pairs for the
+    predicted ones, e.g.\ LVH$\times$strain \\
 Regime (iii) out-of-ontology
   & STK11, KEAP1 (RBM10: estimation floor)
   & \textbf{MGMT} (full BraTS cohort $n\!=\!577$: every condition at chance,
     $\auroc\!\approx\!0.53$--$0.56$, Inconclusive; matches the published
     $0.50$--$0.56$)\cite{kim2022mgmtvalidation,robinet2023mgmt,saeed2023mgmt}
-  & Troponin~I ($\auroc<0.55$); 16 of 108
-    targets\cite{xiao2025anyecglab} \\
+  & Not populated by the two measured targets; troponin~I
+    ($\auroc<0.55$) and $16$ of $108$ targets as reported
+    by\cite{xiao2025anyecglab}, not run here \\
 \midrule
 Falsification test
   & Non-additive aggregator wins on regime-(ii-b) targets only
   & Additive fusion recovers 1p/19q but not IDH or MGMT (MGMT at chance
     in all conditions); the non-additive ii-b read on 1p/19q awaits a
     larger cohort
-  & Same, on the borderline band but not the recoverable one \\
+  & Non-additive aggregator wins only where a statement pair interacts:
+    on sex and age no pair does
+    ($\lvert\mathrm{FC}\!-\!\mathrm{PI}\rvert\!\leq\!0.002$) and both
+    stay in regime~(i) \\
 Access
   & GDC, public
   & TCIA/IDC $+$ BraTS 2021, public
@@ -88,6 +98,11 @@ untranslatability from a diluted subpopulation effect
 (\cref{tab:levels_of_analysis}) is limited by the propagated---rather than
 expert-scored---VASARI channel and rests on the encoder remaining at chance.
 Domain~C is chosen because its source ontology is
-already graded and ontology-mapped, and because $108$ simultaneous
-targets test whether the taxonomy scales beyond six.
+already graded and ontology-mapped. The two targets scored here---sex
+and age---are physiological rather than laboratory ones, and they test
+that the four-condition protocol and the verdict survive a change of
+modality family. The $108$ laboratory indicators the domain also
+affords would test whether the taxonomy scales beyond six targets;
+that question is posed by the literature cited in the regime rows and
+is not settled by this run.
 \end{flushleft}

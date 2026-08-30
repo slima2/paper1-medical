@@ -19,7 +19,8 @@ embedding norm were selected for MIL aggregation.
 
 Across all six conditions ablated against a common
 \ctranspath{}\cite{wang2022ctranspath} encoder backbone
-(B1~\xgb{} on 7-dim pattern fractions; B2 \abmil{}-embeddings; B3
+(B1~\xgb{} on the six slide-level pattern fractions and their
+entropy; B2 \abmil{}-embeddings; B3
 \abmil{}-patterns-only; \piabmil{} concat fusion; A one-hot
 patterns; \fcmil{} 2-additive Choquet),
 the per-gene AUROC under 5-fold patient-stratified cross-validation
@@ -38,7 +39,8 @@ within the upper tier is gene-dependent rather than dominant.
 \input{tables/tab_mutation_luad}
 \caption{Mutation prediction AUROC (mean $\pm$ SD, 5-fold
 patient-stratified CV) on $687$ TCGA-LUAD slides.
-B1~$=$~\xgb{} on 7-dim pattern fractions;
+B1~$=$~\xgb{} on the $7$-d vector of the six slide-level pattern
+fractions and their entropy;
 B2~$=$~\abmil{} on \ctranspath{} embeddings (the ceiling baseline);
 B3~$=$~\abmil{} on pattern probabilities only;
 PI~$=$~\piabmil{} concat fusion (ours);
