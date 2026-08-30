@@ -309,16 +309,15 @@ instantiate it on two further public cohorts
 (\cref{tab:crossdomain_protocol}), specified so that the framework can be
 falsified independently of the LUAD results.
 
-\begin{table}[ht!]
+\begin{table}[p]
 \centering
 \input{tables/tab_crossdomain_protocol}
-\caption{The translatability framework instantiated in three domains.
-Domain~A is reported in this paper; domains~B and~C are external
-validations---largely measured (glioma IDH and 1p/19q in the pilot of
-\cref{tab:glioma_domainb} and MGMT at full power on the BraTS cohort;
-electrocardiogram sex and age in \cref{tab:ecg_domainc}) and partly predicted
-(the laboratory and structural-heart-disease targets), with data sources,
-source ontologies and the expected regime assignment fixed in advance.}
+\caption{\textbf{The translatability framework instantiated in three
+domains.} Domain~A is reported in this paper; domains~B and~C are external
+validations, largely measured
+(\cref{tab:glioma_domainb,tab:ecg_domainc}) and partly predicted, with
+data sources, source ontologies and the expected regime assignment fixed
+in advance.}
 \label{tab:crossdomain_protocol}
 \end{table}
 
@@ -348,18 +347,15 @@ that a slide and a scan are \emph{bags} aggregated by MIL, whereas an
 ECG record is a \emph{single instance}: its sub-unit level collapses
 and synergy is read between vocabulary statements directly.
 
-\begin{table}[ht!]
+\begin{table}[p]
 \centering
 \input{tables/tab_levels_crossdomain}
 \caption{\textbf{The level structure of \cref{tab:levels_of_analysis}
-generalised to the three domains.} The population level hosts the \pid{}
-decomposition and the verdict in every domain; the interpretability
-instruments are per-unit. Only the name of the unit and whether it is a
-bag or a single instance change across domains---which is the precise
-sense in which the framework, not the model weights, transfers.}
+generalised to the three domains.} Only the name of the unit and whether
+it is a bag or a single instance change across domains---which is the
+precise sense in which the framework, not the model weights, transfers.}
 \label{tab:levels_crossdomain}
 \end{table}
-\FloatBarrier
 
 The first instantiation, glioma MRI $\rightarrow$ genotype, is the
 closest structural analogue: an image of a tumour mapped
@@ -492,7 +488,6 @@ full power on the $n\!=\!577$ BraTS cohort (dagger footnote), is Inconclusive
 in every condition---regime~(iii).}
 \label{tab:glioma_domainb}
 \end{table}
-\FloatBarrier
 
 The second instantiation, the electrocardiogram $\rightarrow$
 physiological state, tests whether the taxonomy survives a change of
@@ -573,7 +568,6 @@ PTB-XL. Both targets are Conclusive and encoder-saturated (regime~(i)),
 reproducing the LUAD machinery in a different modality family.}
 \label{tab:ecg_domainc}
 \end{table}
-\FloatBarrier
 
 Deployment imposes one further requirement that is independent of the
 taxonomy.
