@@ -197,6 +197,48 @@ We do not claim that $I_{jk}$ is a consistent estimator of
 $\Isyn$; establishing the conditions under which it is, or bounding
 the gap, is the natural theoretical continuation of this work.
 
+The decomposition itself is not new, and it is worth being precise
+about what is.
+\Cref{eq:pid} has been used for a decade to ask how a neuron integrates
+its inputs, how baroreflex and respiratory pathways jointly drive heart
+rate variability,\cite{krohova2019hrv} and which gene triplets carry
+regulatory information a pairwise measure would
+miss.\cite{chan2017pidc}
+In the modality of our Domain~B it has been used to rank MRI contrast
+pairs and retain only the most informative when training under a compute
+budget.\cite{chopra2026pidmri}
+It was brought to multimodal learning with estimators that scale to
+high-dimensional sources, and applied there to computational pathology:
+in TCGA lower-grade glioma every atom was near zero except the one
+unique to genomics, which the authors read as evidence that histology
+was not the modality carrying the answer.\cite{liang2023quantifying}
+That is the same shape of conclusion as our regime~(iii), and we take it
+as corroboration rather than as competition, because two things differ.
+The first is the axis. Every application above decomposes across
+\emph{different} sources---pathology against genomics, pressure against
+respiration, gene against gene, contrast against
+contrast---whereas the two channels here are two
+readings of one slide, which is what allows the question to be whether a
+clinically legible vocabulary adds anything to an opaque encoder.
+The second is the purpose. Those studies use the decomposition to choose
+a fusion architecture; the recent analysis closest to ours uses a
+related bound to ask whether a translated representation adds
+information to the one it was derived from.\cite{saisan2026ceilings}
+We use it to adjudicate whether the target is reachable from the
+modality at all, and to attach a distinct remedy to each verdict.
+
+This literature also supplies the strongest reason for the choice made
+in Methods not to quote numerical atoms. When the four \pid{} statistics
+were estimated directly across seven modality pairs in four cancer
+cohorts, they agreed with downstream model performance in only one, and
+the authors concluded that the estimators are not yet accurate enough to
+guide a fusion decision.\cite{zhang2025evaluatingpid}
+Reading the atoms as directional signatures from trained contrasts is
+not a concession to intractability, then, but the more defensible
+instrument at these sample sizes: a sign that survives a paired
+bootstrap is a weaker claim than a point estimate, and, on the present
+evidence, a considerably more reliable one.
+
 The practical consequence is a change in how the field should
 decide what to build next.
 Under a cohort-mean metric, the question ``what should we add?''
@@ -715,8 +757,8 @@ falls just short of the floor the full cohort had cleared---so their
 near-chance values are, as stated in advance, claims about power; but the
 one well-powered gene is unambiguous.
 
-Two readings survive this and a single external cohort cannot separate
-them. The first is genuine cohort-relativity: the morphology-to-genotype
+Two readings survive this. The first is genuine cohort-relativity: the
+morphology-to-genotype
 coupling learned on TCGA does not hold in CPTAC, so a regime assignment
 is a property of the (source ontology, learned encoder, cohort) triple
 and not of the gene. The second is an uncorrected technical domain gap:
@@ -737,31 +779,70 @@ site-level batch signatures beyond colour (Macenko stain-matrix
 normalisation remains untested).
 The pattern here---the high-TCGA-AUROC genes fall the most while genes
 already near the floor are roughly preserved, a uniform regression toward
-chance---does not by itself separate this residual technical reading from
-genuine cohort-relativity, but both
-carry the same consequence for the claim at issue: read off-the-shelf,
-the TCGA verdicts are not portable. Establishing a near-intrinsic assignment
-would require multi-cohort validation with stain harmonisation and explicit
-domain adaptation; we treat that as a precondition for any translatability
-claim at the level of an individual gene, as distinct from the structural
-portability of the framework that the glioma and electrocardiogram
-instantiations test separately.
+chance---does not by itself separate the residual technical reading from
+genuine cohort-relativity. Read off-the-shelf, the TCGA verdicts are not
+portable, and that much the frozen test establishes on its own: it measures
+whether the \emph{learned decision function} transfers---the \ctranspath{}
+encoder, the ANORAK pattern head and the selected per-gene aggregator applied
+as one predictor---and it does not.
 
-This frozen-pipeline test measures whether the \emph{learned decision
-function} transfers---the \ctranspath{} encoder, the ANORAK pattern head and
-the selected per-gene aggregator applied as one predictor, read out as a
-single probability per gene---and it does not. It is deliberately not a test
-of whether the \emph{regime assignment} transfers, because a regime is the
-contrast across the four conditions (B2/B3/\piabmil{}/\fcmil{}), not a single
-head, and one number per gene cannot express it. Probing regime transfer
-would instead mean freezing only the \emph{representation} and re-fitting the
-four conditions with CPTAC-internal cross-validation, as the glioma and
-electrocardiogram instantiations do in a new modality---but this is
-infeasible on a single external cohort here: stain normalisation does not
-return the encoder to distribution (\textit{TP53} $0.48$;
-\cref{tab:cptac_transfer}), so any within-CPTAC refit is confounded by an
-off-distribution encoder, and only \textit{TP53} clears the estimation floor
-needed to separate the conditions (\cref{tab:cptac_power}).
+What it cannot say is why, and the distinction prescribes opposite
+investments. Cohort-relativity would mean the coupling itself is local, in
+which case harmonisation is wasted effort; a transported-model failure would
+mean the coupling is present and only the fitted decision function failed to
+survive the move. These are separable by experiment, and we ran it. Freezing
+only the \emph{representation}---the \ctranspath{} embeddings and ANORAK
+pattern probabilities recomputed on CPTAC tiles---and re-fitting the four
+conditions with patient-disjoint cross-validation inside CPTAC recovers
+\textit{TP53} to $0.698$, against the TCGA value of $0.717$; the encoder-only
+condition alone reaches $0.665$ (\cref{tab:cptac_refit}).
+The morphology-to-genotype coupling for \textit{TP53} is therefore present in
+CPTAC at strength comparable to TCGA, and the off-the-shelf collapse to
+$0.53$ is a property of the transported decision function rather than of the
+representation or of the tissue. In the terms of
+\cref{eq:modality_ceiling} this is a method-limited gap and not a modality
+ceiling: $I(W;Y)$ is plainly not the binding constraint in CPTAC, because a
+model fitted on those same slides attains most of what TCGA attains.
+
+Two controls delimit that conclusion. The cohorts differ sharply in scanner
+magnification---TCGA-LUAD is $76.4\%$ $40\times$ and CPTAC-LUAD $98.6\%$
+$20\times$, so identical tiling at level~$0$ presents up to four times the
+tissue area per tile---which makes physical scale the most obvious mechanical
+candidate. Centre-cropping and rescaling every CPTAC tile to the field of view
+of a $40\times$ TCGA tile lowers every condition (encoder-only $0.561$, best
+$0.632$) and widens fold-to-fold spread substantially, so scale mismatch is
+not the mechanism; the crop is itself lossy, so the arm does not argue the
+other way either. And the refit is within-cohort cross-validation, so it
+establishes that CPTAC slides carry the signal, not that one model serves both
+cohorts. Harmonised external validation with explicit domain adaptation
+remains the requirement for that, and remains outstanding.
+
+The regime assignment, by contrast, stays unresolved, and this is where the
+transfer question turns out to need more than either test can give. A regime
+is the contrast across the four conditions (B2/B3/\piabmil{}/\fcmil{}), not a
+single head, so one number per gene cannot express it; the frozen pipeline was
+deliberately never a test of it. But the refit does not adjudicate it either.
+The deciding contrast $\piabmil{}-\mathrm{B2}$ is $+0.032$ with a paired
+bootstrap $95\%$ CI of $-0.041$ to $+0.102$ natively, and $+0.073$
+($-0.038$ to $+0.174$) under field-of-view matching (\cref{tab:cptac_refit}).
+Both span zero, so under the noise-aware rule stated in Methods the
+point-estimate read of (ii-a) is withheld and CPTAC neither confirms nor
+contradicts the TCGA reading of~(i). That the two arms disagree on the point
+estimate and agree on the verdict is the behaviour the rule exists to produce.
+
+This exposes a requirement the estimation floor does not capture. Clearing
+$n_+\!=\!37$ says a model can be \emph{fitted}, and \textit{TP53} clears it
+comfortably at $n_+\!=\!55$; resolving a contrast between two fitted
+conditions is a stricter and different demand, because what must exceed
+sampling error is the \emph{difference} rather than either \auroc{}. Slide
+count does not relieve it, since the $498$ slides are not $498$ independent
+observations---the genotype is a patient-level label and slides from one
+tumour share it. Scaling the observed interval width to the observed effect
+puts the cohort needed to resolve this contrast at roughly five times the
+present one, on the order of $500$ genotyped patients rather than $106$. We
+report that as an approximate design specification for the harmonised
+multi-cohort study called for above, in preference to leaving the limitation
+as a complaint.
 
 \begin{table}[ht!]
 \centering
@@ -773,10 +854,11 @@ from a TCGA AUROC of $0.717$ to $0.53$ ($95\%$ CI $0.42$--$0.64$), and no
 gene under any aggregator exceeds $0.62$. Reinhard stain normalisation to a
 TCGA-LUAD reference does not recover transfer (\textit{TP53} $0.48$), ruling
 out a global colour/stain cast. Read off-the-shelf, the TCGA
-verdicts do not transfer; whether the residual reflects cohort-relativity of
-the assignment or an uncorrected scanner/site domain gap\cite{howard2021site}
-cannot be disentangled with a single external cohort, but either way no
-assignment is licensed as near-intrinsic.}
+verdicts do not transfer. What fails, however, is the transported decision
+function and not the tissue: re-fitting the four conditions inside CPTAC with
+only the representation carried over returns \textit{TP53} to $0.698$
+(\cref{tab:cptac_refit}), so no assignment is licensed as near-intrinsic on
+this evidence, but neither is the coupling itself cohort-local.}
 \label{tab:cptac_transfer}
 \end{table}
 

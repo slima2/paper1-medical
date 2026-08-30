@@ -211,9 +211,13 @@ apply the frozen TCGA-LUAD pipeline off-the-shelf to CPTAC-LUAD: under
 genuine distribution shift the model weights do not transfer and the one
 well-powered gene collapses to chance, yet the framework's own verdict
 correctly turns Inconclusive rather than overclaiming. That is a test of the
-\emph{predictor}, not of the regime assignment---re-reading a regime on a
-second cohort would require retraining all four conditions there, which the
-$106$ genotyped CPTAC patients cannot support---so whether an assignment is
+\emph{predictor}, not of the regime assignment. Re-fitting all four conditions
+inside CPTAC, with only the representation carried over, returns that gene to
+within $0.02$ of its TCGA value, so the morphology-to-genotype coupling is
+present in the second cohort and it is the transported decision function that
+fails. The regime itself nonetheless remains unresolved there, because
+separating two fitted conditions is a stricter demand than fitting either one
+and $106$ patients do not meet it---so whether an assignment is
 intrinsic to a gene remains open, and we mark it as open. The first
 axis shows the method travels; the second shows that what travels is the
 \emph{diagnostic}, not a frozen predictor, and that the diagnostic reports
@@ -303,9 +307,9 @@ that establish and operationalise it:
     (KRAS, STK11, KEAP1, RBM10) at the user-interface level.
     The same verdict is what makes the within-domain cohort transfer
     legible: applied off-the-shelf to CPTAC-LUAD it turns Inconclusive
-    under distribution shift, showing that a regime assignment is a
+    under distribution shift, showing that an off-the-shelf verdict is a
     property of the (source ontology, learned encoder, cohort) triple
-    rather than of the gene, and that the diagnostic detects its own
+    rather than of the gene alone, and that the diagnostic detects its own
     failure to transfer instead of reporting a confident but wrong call.
 
     \item \textbf{C4.\ A dual anti-hallucination LLM explanation

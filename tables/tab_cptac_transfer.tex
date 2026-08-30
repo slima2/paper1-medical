@@ -47,4 +47,11 @@ aggregators, its $95\%$ CI still excluding the TCGA point; no aggregator
 recovers the TCGA value for any gene), so the collapse is not a global
 colour/stain cast either. Macenko stain-matrix normalisation was
 not tested and is left to future work.
+Every value in this table is a \emph{frozen-pipeline} read-out, and measures
+whether the learned decision function survives the move between cohorts. It
+is not a measure of whether CPTAC slides carry the signal: re-fitting the four
+aggregation conditions inside CPTAC, with only the representation carried
+over, returns \textit{TP53} to $0.698$ against the TCGA $0.717$
+(\cref{tab:cptac_refit}), so the collapse tabulated here is a property of the
+transported model rather than of the encoder or of the tissue.
 \end{flushleft}
