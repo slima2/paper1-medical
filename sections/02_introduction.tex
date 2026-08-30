@@ -78,39 +78,29 @@ per-target \emph{translatability} is the reported result and
 untranslatability is a finding rather than a failure.
 We instantiate it in \lchai{}\,v2 (Lung Cancer Histologic Analysis
 with Interpretable AI), a pattern-informed MIL system designed
-against the three problems above, and we probe its generality along
-two axes---two further public modalities and a within-domain cohort
-transfer---developed below.
+against the three problems above.
 
 % --- The conceptual frame: domain translation ---
 Conceptually, we treat H\&E-based mutation prediction as an
 \emph{imperfect translation between two clinical domains}: a
 \emph{source} domain of tissue morphology and a \emph{target}
 domain of somatic driver mutations.
-To make the translation as faithful as the source permits, we first
-render the morphology with the strongest available angular-margin
-tile classifier---\fuzzyarc{}\,V2\cite{limareina2026fuzzyarc},
-which attains the highest macro-F1 and, critically, the highest
-per-class F1 on the ambiguous \emph{cribriform} boundary, the
-hardest growth pattern to call.
 Under this lens the six-pattern ANORAK ontology is the source
 \emph{vocabulary}, the MIL aggregator is the \emph{translator}, and
 the per-gene AUROC measures how much of the mutation ``language''
 is expressible in morphological words
 (\cref{fig:domain_translation}).
-The three-regime taxonomy (below) is then a statement about
-\emph{translational faithfulness at the cohort level}: TP53/EGFR
-translate well on average, KRAS requires a non-additive grammar
-(pattern co-occurrence), and STK11/KEAP1/RBM10 resist translation
-from H\&E alone---bounded here to $\auroc\!\in\![0.61,0.70]$ with
-positive sets as small as $n_+\!=\!37$
-(\cref{tab:mutation_luad_resultssec}).
-The qualifier is load-bearing rather than decorative: these are
-averages over a heterogeneous population, and a gene can average
+The three-regime taxonomy below is then a statement about
+translational faithfulness \emph{at the cohort level}, with the
+genes that resist translation from H\&E alone bounded here to
+$\auroc\!\in\![0.61,0.70]$ and positive sets as small as
+$n_+\!=\!37$ (\cref{tab:mutation_luad_resultssec}).
+That qualifier is load-bearing: a cohort average is taken over a
+morphologically heterogeneous population, so a gene can average
 poorly while remaining translatable on the subpopulation of slides
 that carry the relevant morphology, which is exactly what we observe
 for KRAS.
-This framing is not cosmetic: it connects our per-gene ceiling to a
+The frame also places our per-gene ceiling in a
 broad family of medical cross-domain inference tasks---radiogenomics,
 pathomics-to-genomics, retinal-to-cardiovascular and
 ECG-to-function mapping---where faithfulness is set by the physics
@@ -137,7 +127,7 @@ the three ways that decomposition can be dominated
 is pattern-side information the encoder lacks---unique or
 synergistic---and out-of-ontology is the absence of any pattern-side
 atom at all.
-The correspondence is operational rather than decorative, because
+The correspondence is operational, because
 the $2$-additive Choquet interaction index $I_{jk}$ that
 \fcmil{} learns is the model-side counterpart of the synergistic
 atom carried by the pattern pair $\{j,k\}$, and an additive
@@ -155,9 +145,9 @@ opposite remedies.
   \caption{\textbf{Histology-to-mutation prediction as an imperfect
   domain translation.} A \emph{source} domain of tissue morphology
   (H\&E), whose vocabulary is the six ANORAK growth patterns rendered
-  by the \fuzzyarc{}\,V2 tile classifier\cite{limareina2026fuzzyarc}
-  (macro-F1 $92.3\%$, best per-class F1 on the ambiguous cribriform
-  boundary), is mapped by a MIL \emph{translator} (\piabmil{}/\fcmil{},
+  by the \fuzzyarc{}\,V2 tile
+  classifier\cite{limareina2026fuzzyarc}, is mapped by a MIL
+  \emph{translator} (\piabmil{}/\fcmil{},
   the 2-additive Choquet integral supplying a non-additive grammar)
   onto a \emph{target} domain of somatic driver mutations. The
   per-gene AUROC measures translational faithfulness \emph{averaged
@@ -221,9 +211,8 @@ separating two fitted conditions is a stricter demand than fitting either one
 and $106$ patients do not meet it---so whether an assignment is
 intrinsic to a gene remains open, and we mark it as open. The first
 axis shows the method travels; the second shows that what travels is the
-\emph{diagnostic}, not a frozen predictor, and that the diagnostic reports
-its own limits rather than hiding them---the same
-untranslatability-as-finding stance, now applied to cohort transfer.
+\emph{diagnostic} rather than a frozen predictor, and that it reports
+its own limits rather than hiding them.
 
 Our contributions are the framework itself and the five artefacts
 that establish and operationalise it:
@@ -307,12 +296,9 @@ that establish and operationalise it:
     The verdict is the operational artefact that surfaces Regime~(i)
     Conclusive (TP53, EGFR) versus Regimes~(ii)--(iii) Inconclusive
     (KRAS, STK11, KEAP1, RBM10) at the user-interface level.
-    The same verdict is what makes the within-domain cohort transfer
-    legible: applied off-the-shelf to CPTAC-LUAD it turns Inconclusive
-    under distribution shift, showing that an off-the-shelf verdict is a
-    property of the (source ontology, learned encoder, cohort) triple
-    rather than of the gene alone, and that the diagnostic detects its own
-    failure to transfer instead of reporting a confident but wrong call.
+    It is also what makes the CPTAC transfer above legible: turning
+    Inconclusive under distribution shift is the diagnostic detecting
+    its own failure rather than issuing a confident but wrong call.
 
     \item \textbf{C4.\ A dual anti-hallucination LLM explanation
     layer grounded in NCIt$+$MONDO.}
@@ -334,9 +320,12 @@ that establish and operationalise it:
     TCGA-LUAD cohort that supports the above.}
     Each slide is decomposed into the six expert-defined ANORAK
     growth patterns (lepidic, acinar, papillary, micropapillary,
-    solid, cribriform)\cite{anorak2024} by a fuzzy angular-margin
-    pattern classifier (\fuzzyarc{}\,V2\cite{limareina2026fuzzyarc},
-    macro-F1 $92.31\%\!\pm\!2.04$ on Zenodo-ANORAK).
+    solid, cribriform)\cite{anorak2024} by the strongest available
+    fuzzy angular-margin pattern classifier
+    (\fuzzyarc{}\,V2\cite{limareina2026fuzzyarc}, macro-F1
+    $92.31\%\!\pm\!2.04$ on Zenodo-ANORAK and the best per-class F1 on
+    the ambiguous \emph{cribriform} boundary, the hardest growth
+    pattern to call).
     The 6-d pattern probabilities are propagated to a gated-attention
     MIL aggregator (\piabmil{}) and a 2-additive fuzzy Choquet
     integral (\fcmil{}) that captures the supra-additive
