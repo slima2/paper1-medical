@@ -37,3 +37,7 @@ figures/_ptbxl_cache/
 env.sh
 *.bak
 */README (*).md
+
+# ---- compiled output & local previews ----
+main.pdf
+_preview/
