@@ -25,7 +25,7 @@ The contribution is instead three-fold:
 
 A per-gene Conclusive/Inconclusive flag (mean AUROC ≥ 0.70) gates the explanation pathway and decouples cohort-level signal presence from per-slide morphological confidence.
 
-Although lung adenocarcinoma is the primary instantiation, the framework is portable — it is a decomposition of any expert vocabulary against any learned encoder — and the manuscript validates it beyond LUAD. In glioma MRI → genotype it recovers the same regimes (*IDH* encoder-saturated, AUROC 0.86; *1p/19q* recovered only by channel fusion, 0.74), and an off-the-shelf transfer of the LUAD predictor to the independent CPTAC-LUAD cohort collapses (*TP53* 0.72 → 0.53, and 0.48 after stain normalisation) with the verdict correctly turning Inconclusive — demonstrating that the diagnostic reports its own limits under distribution shift rather than issuing an over-confident call.
+Although lung adenocarcinoma is the primary instantiation, the framework is portable — it is a decomposition of any expert vocabulary against any learned encoder — and the manuscript validates it beyond LUAD. In glioma MRI → genotype it recovers the same regimes (*IDH* encoder-saturated, AUROC 0.86; *1p/19q* recovered only by channel fusion, 0.74), and an off-the-shelf transfer of the LUAD predictor to the independent CPTAC-LUAD cohort collapses (*TP53* 0.72 → 0.53) with the verdict correctly turning Inconclusive — demonstrating that the diagnostic reports its own limits under distribution shift rather than issuing an over-confident call. Re-fitting the four conditions inside CPTAC returns *TP53* to 0.70, locating that failure in the transported decision function rather than in the tissue.
 
 ## Fit with *npj Precision Oncology*
 

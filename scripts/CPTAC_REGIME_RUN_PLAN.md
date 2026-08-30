@@ -14,7 +14,15 @@ conflated:
 | Claim | Experiment that establishes it | Status |
 |---|---|---|
 | The trained **predictor** does not survive the move to CPTAC | `run_cptac_inference.py` + `eval_cptac_transfer.py` | Done (`tab:cptac_transfer`) |
-| A **regime assignment** is/is not intrinsic to a gene | *this run* | Not done |
+| A **regime assignment** is/is not intrinsic to a gene | *this run* | Done, **unresolved** (`tab:cptac_refit`) |
+
+**Result.** The refit answered a different question than it was designed for,
+and answered it decisively. TP53 recovers to 0.698 (B2 alone 0.665) against
+TCGA's 0.717, so the morphology-to-genotype coupling is present in CPTAC and
+the frozen collapse to 0.53 belongs to the transported decision function. The
+regime question itself stays open: PI−B2 is +0.032 with a 95% CI of −0.041 to
++0.102, so the noise-aware rule withholds the (ii-a) point estimate. Resolving
+it needs roughly five times the cohort, on the order of 500 genotyped patients.
 
 `tab_cptac_transfer` has one AUROC column per gene because the frozen run only
 ever produced one number per gene. A regime is read from the sign of contrasts

@@ -169,7 +169,16 @@ The transfer is a clean negative: TP53 collapses from a TCGA AUROC of 0.717 to
 0.53 (95% CI 0.42–0.64), and across all six genes and five aggregators (mean,
 max, top-2, top-3, largest-slide) plus the slide-level read-out, no CPTAC AUROC
 exceeds 0.62 — so it is not a pooling artefact. Read off-the-shelf (no stain
-normalisation / domain adaptation), the TCGA verdicts do not transfer; whether
-this is cohort-relativity of the assignment or an uncorrected scanner/site
-domain gap (Howard et al. 2021, Nat Commun) cannot be disentangled with a single
-external cohort. See `tables/tab_cptac_transfer.tex` and Discussion §CPTAC.
+normalisation / domain adaptation), the TCGA verdicts do not transfer.
+
+**Refit outcome (`run_cptac_domainA_v2.py`).** Carrying over only the
+representation and re-fitting the four conditions with patient-disjoint CV
+inside CPTAC returns TP53 to 0.698 (B2 alone 0.665) against the TCGA 0.717,
+so the coupling is present in CPTAC and the off-the-shelf collapse is a
+property of the transported decision function, not of the encoder or the
+tissue. The field-of-view-matched arm is worse in every condition (B2 0.561,
+best 0.632), so scanner magnification is not the mechanism. The regime stays
+unresolved in both arms: the deciding contrast PI−B2 is +0.032 (95% CI −0.041
+to +0.102) native and +0.073 (−0.038 to +0.174) matched, both spanning zero.
+See `tables/tab_cptac_transfer.tex`, `tables/tab_cptac_refit.tex` and
+Discussion §CPTAC.
