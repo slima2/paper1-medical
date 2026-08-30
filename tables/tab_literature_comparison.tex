@@ -14,8 +14,8 @@
   \textit{STK11} & \textit{KEAP1} & \textit{RBM10} \\
 \midrule
 Coudray~et~al.\cite{coudray2018classification} &
-  2018 & Nat.\ Med.\ & 382 & Inception-v3 e2e &
-  0.733--0.86\textsuperscript{*} & 0.826 & 0.733 & 0.85\textsuperscript{*} & --- & --- \\
+  2018 & Nat.\ Med.\ & 382 & Inception-v3 e2e\textsuperscript{*} &
+  0.760 & 0.826 & 0.733 & 0.856 & 0.675 & --- \\
 Kather~et~al.\cite{kather2020pancancer} &
   2020 & Nat.\ Cancer & 17{,}355 & ShuffleNet+att.\ &
   0.65--0.72$^{\dagger}$ & 0.63--0.68$^{\dagger}$ & 0.60--0.65$^{\dagger}$ & --- & --- & --- \\
@@ -28,7 +28,7 @@ Zhao~et~al.\cite{zhao2025deepgem} (DeepGEM) &
   0.82--0.96\textsuperscript{$\ddagger$} & 0.945\textsuperscript{$\ddagger$} & 0.82--0.96\textsuperscript{$\ddagger$} & --- & --- & --- \\
 Campanella~et~al.\cite{campanella2025eagle} (EAGLE) &
   2025 & Nat.\ Med.\ & 8{,}461 & FM fine-tuning &
-  --- & \textbf{0.890} & --- & --- & --- & --- \\
+  --- & 0.890 & --- & --- & --- & --- \\
 Wang~et~al.\cite{wang2024chief} (CHIEF) &
   2024 & Nature & 60{,}530 & FM, pan-cancer &
   ---\textsuperscript{\S} & $>$\,0.70 & --- & --- & --- & --- \\
@@ -40,9 +40,13 @@ Wang~et~al.\cite{wang2024chief} (CHIEF) &
 \end{tabular}%
 }
 \begin{flushleft}\footnotesize
-\textsuperscript{*}Coudray~et~al.\ report per-gene AUCs as an aggregate
-range (0.733--0.856) over six genes; STK11 is the strongest predictor
-(AUC ${\approx}0.85$, not the range minimum).
+\textsuperscript{*}The whole Coudray row is the per-slide AUC obtained by
+averaging the predicted tile probabilities (their Fig.~3 table), measured on a
+$62$-slide held-out test set. The widely quoted $0.733$--$0.856$ is the range
+over the six genes they call predictable, and its endpoints are \textit{KRAS}
+and \textit{STK11}, not a per-gene value for either \textit{TP53} or any other
+gene. Their intervals are correspondingly wide, e.g.\ \textit{STK11}
+$[0.709,0.964]$ and \textit{KEAP1} $[0.466,0.865]$.
 $^{\dagger}$Kather~et~al.\ report LUAD per-gene AUROCs only in a bar chart
 (Extended Data Fig.~2); the values shown are read from that figure and lie
 within the paper's stated LUAD range of $0.60$--$0.78$ (3-fold CV on TCGA).
@@ -64,6 +68,8 @@ This work reports six driver genes per slide simultaneously, with two
 parallel MIL aggregators (\piabmil{} concatenative attention,
 \fcmil{} 2-additive Choquet); prior work typically reports two to three
 genes.
-``---'' indicates the gene was not reported in the corresponding study;
-most published studies do not report STK11, KEAP1, or RBM10 individually.
+``---'' indicates the gene was not reported in the corresponding study.
+Coudray is the only prior study reporting \textit{STK11} and \textit{KEAP1}
+individually, and both of its values exceed ours on a test set an order of
+magnitude smaller; \textit{RBM10} is reported by none of them.
 \end{flushleft}
