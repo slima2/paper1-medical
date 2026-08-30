@@ -86,16 +86,11 @@ MGMT-promoter methylation trails at
 $0.81$\cite{chang2018radiogenomics}. That per-marker split---same
 cohort, same architecture, three different outcomes---is of the same
 kind as our per-gene regimes. The MGMT figure itself does not hold up,
-and the manner of its failure matters. It is a five-fold
-cross-validated mean on a single dataset with no external cohort, and
-what it fails to survive is not only the move between
-cohorts\cite{kim2022mgmtvalidation}: it does not reproduce
-\emph{within} one either. On five patient-disjoint folds of the larger,
-balanced BraTS-2021 cohort---the same internal design---the
-unconstrained encoder sits at $0.562$ (\cref{tab:glioma_domainb}), and
-the BraTS-2021 challenge was itself won at only
-$\auroc\!\approx\!0.62$ on its own validation
-split\cite{baid2021brats}. Our two cross-domain tests therefore measure
+and the manner of its failure matters: it is a five-fold
+cross-validated mean on a single development cohort with no external
+one, and it reproduces neither across cohorts nor---as our own
+full-power run below shows---within one. Our two cross-domain tests
+therefore measure
 two different things, and we keep them apart: CPTAC is a transfer
 failure, where the one well-powered gene is Conclusive on TCGA and
 collapses under distribution shift (\cref{tab:cptac_transfer}); MGMT is
@@ -139,13 +134,9 @@ Against this backdrop our LUAD map sits at the
 (\cref{fig:fidelity_spectrum}; per-gene
 $\auroc\in[0.6,0.72]$ in \cref{tab:mutation_luad_resultssec};
 positive sets down to $n_+\!=\!37$ for RBM10).
-The three-regime taxonomy is the diagnostic that explains
-\emph{why} a given gene lands there---encoder saturation, a missing
-non-additive grammar, or genuine out-of-ontology
-untranslatability---and therefore whether the remedy is a better
-translator (architecture), a richer source vocabulary
-(micro-environment channels) or a different source modality
-altogether (RNA-seq, radiology).
+What the three-regime taxonomy adds is the diagnostic of \emph{why} a
+given gene lands there, and with it a remedy specific to that gene
+rather than to the cohort---a mapping developed below.
 The recurring lesson across all of these tasks is the one our
 Conclusive/Inconclusive verdict operationalises: the value of a
 cross-domain map is set by the physics of the source, not by the
@@ -252,9 +243,9 @@ atom means the \emph{source vocabulary} is the binding constraint
 and only a new channel will move it; and a pattern-side atom that is
 non-empty but unestimable means the \emph{cohort} is the binding
 constraint, so more positives of the same kind are exactly what is
-needed. The last two matter most in practice because they are
-indistinguishable on a leaderboard and call for opposite investments:
-KEAP1 will not yield to more slides at any number, RBM10 plausibly will.
+needed. The last two matter most in practice, because they call for
+opposite investments: KEAP1 will not yield to more slides at any
+number, RBM10 plausibly will.
 
 The translation frame does more than organise the results; it
 suggests a different stance on interpretability itself.
@@ -316,11 +307,10 @@ The operational rule that follows is deliberately restrictive. An
 Inconclusive gene licenses no diagnostic use by the reporting
 pathologist---not a hedged call, not a ranked shortlist---until the
 deficit the decomposition names has been repaired. What the regime adds
-is \emph{which} repair counts: an empty pattern-side atom is not repaired
-by more slides at any number, only by a new source channel; an
-unestimable one is repaired by more positives of the same kind; a diluted
-subpopulation is not repaired at the cohort level at all, but by moving
-the unit of deployment to the slide, where KRAS is already
+is \emph{which} repair counts---the atom-conditional mapping set out
+above, extended to the two states that arise only at deployment: a
+diluted subpopulation is not repaired at the cohort level at all, but by
+moving the unit of deployment to the slide, where KRAS is already
 well-calibrated; and a heterogeneous target is repaired by refining the
 label rather than the model. Reporting the verdict without the regime
 would leave the clinician with a prohibition and no route out of it.
@@ -454,9 +444,9 @@ developed in the text.}
 What makes this domain worth the effort is the target, not the
 method.
 MGMT promoter methylation has resisted prediction from preoperative
-MRI for a decade. Beyond the BraTS 2021 challenge result already
-noted, CNN, ViT and Swin variants evaluated externally collapse to
-chance
+MRI for a decade. The BraTS 2021 challenge was won at only
+$\auroc\!\approx\!0.62$ on its own validation split, CNN, ViT and Swin
+variants evaluated externally collapse to chance
 ($\auroc\!\approx\!0.50$--$0.56$),\cite{baid2021brats,saeed2023mgmt} a systematic
 re-evaluation concluded that the algorithms developed to date are
 ``not suitable for clinical application'',\cite{robinet2023mgmt} and
@@ -541,8 +531,7 @@ encoder-saturated (regime~(i)) and 1p/19q is an additive complementarity case
 (regime~(ii-a): concat fusion recovers what neither channel captures alone) on
 the TCGA-LGG cohort; a sex control is correctly Inconclusive. MGMT, scored at
 full power on the $n\!=\!577$ BraTS cohort (dagger footnote), is Inconclusive
-in every condition---regime~(iii). Only the non-additive form of the 1p/19q
-interaction remains deferred to a larger cohort.}
+in every condition---regime~(iii).}
 \label{tab:glioma_domainb}
 \end{table}
 
@@ -701,13 +690,9 @@ centre is in preparation.
 The two cross-domain instantiations of
 \cref{tab:crossdomain_protocol} were stated as predictions with their
 cohorts, source ontologies and expected regime assignments fixed in advance,
-and both are now measured: the electrocardiogram domain carries the empirical
-physiological-state result of \cref{tab:ecg_domainc}, and the glioma domain
-carries the results of \cref{tab:glioma_domainb}---IDH encoder-saturated,
-1p/19q recovered by fusion, and MGMT Inconclusive at full power on the
-$n\!=\!577$ BraTS cohort. Both show the two-channel decomposition and the
-Conclusive/Inconclusive verdict transferring intact to a new modality family.
-What remains predicted is now narrow---the \emph{non-additive} form of the
+and both are now measured
+(\cref{tab:glioma_domainb,tab:ecg_domainc}).
+What remains predicted is narrow---the \emph{non-additive} form of the
 1p/19q interaction at full power, and the laboratory and
 structural-heart-disease targets of the electrocardiogram domain; for those
 the generality of the framework rests on the structural argument and the
@@ -854,17 +839,13 @@ as a complaint.
 \centering
 \input{tables/tab_cptac_transfer}
 \caption{Empirical within-domain cohort-transfer result on CPTAC-LUAD
-($498$ slides, $106$ genotyped patients), the frozen TCGA-trained pipeline
-applied off-the-shelf. The one well-powered gene, \textit{TP53}, collapses
-from a TCGA AUROC of $0.717$ to $0.53$ ($95\%$ CI $0.42$--$0.64$), and no
-gene under any aggregator exceeds $0.62$. Reinhard stain normalisation to a
-TCGA-LUAD reference does not recover transfer (\textit{TP53} $0.48$), ruling
-out a global colour/stain cast. Read off-the-shelf, the TCGA
-verdicts do not transfer. What fails, however, is the transported decision
-function and not the tissue: re-fitting the four conditions inside CPTAC with
-only the representation carried over returns \textit{TP53} to $0.698$
-(\cref{tab:cptac_refit}), so no assignment is licensed as near-intrinsic on
-this evidence, but neither is the coupling itself cohort-local.}
+($498$ slides, $106$ genotyped patients): the frozen TCGA-trained
+pipeline applied off-the-shelf. Read this way the TCGA verdicts do not
+transfer. What fails, however, is the transported decision function and
+not the tissue, so no assignment is licensed as near-intrinsic on this
+evidence, but neither is the coupling itself cohort-local. The
+per-gene values, the aggregator and stain-normalisation controls and the
+power caveat are set out below the table.}
 \label{tab:cptac_transfer}
 \end{table}
 
