@@ -97,7 +97,7 @@ the BraTS-2021 challenge was itself won at only
 $\auroc\!\approx\!0.62$ on its own validation
 split\cite{baid2021brats}. Our two cross-domain tests therefore measure
 two different things, and we keep them apart: CPTAC is a transfer
-failure, where the one well-powered gene is Conclusive in-cohort and
+failure, where the one well-powered gene is Conclusive on TCGA and
 collapses under distribution shift (\cref{tab:cptac_transfer}); MGMT is
 an absent signal, already visible without leaving the cohort at all.
 
@@ -402,8 +402,10 @@ heterogeneity---published with per-subject scores and reported
 inter-observer agreement for the TCGA glioma
 collections.\cite{gutman2013vasari,vasari_tcia}
 The transfer of our pipeline is one-to-one: a VASARI-feature
-classifier trained on the TCIA-annotated subset ($n=178$ LGG,
-$n=75$ GBM) and propagated to the $\sim$1{,}251 BraTS 2021
+classifier trained on the TCIA-annotated seed ($n=178$ LGG and $n=75$
+GBM carry expert scores, of which $63$ LGG also carry the co-registered
+preoperative MRI and molecular call the protocol needs) and propagated
+to the $\sim$1{,}251 BraTS 2021
 subjects\cite{baid2021brats} occupies the position that
 \fuzzyarc{}\,V2 trained on Zenodo-ANORAK and propagated to TCGA-LUAD
 occupies here in the LUAD two-channel architecture
@@ -585,9 +587,11 @@ multimodal setting in which the missingness correction of
 Between them the two domains buy complementary evidence: the glioma
 instantiation tests the framework against the hardest available negative
 case (MGMT), while the electrocardiogram instantiation tests whether the
-three regimes remain distinguishable at $10^2$ targets rather than $6$ and
-whether a natively graded source vocabulary strengthens or weakens the fuzzy
-explanation layer. Neither requires new data collection, proprietary access
+three regimes survive a change of modality family and whether a natively
+graded source vocabulary strengthens or weakens the fuzzy explanation
+layer. Whether they remain distinguishable at $10^2$ targets rather than
+$6$ is the further question the laboratory targets pose, and it is not
+one this paper answers. Neither requires new data collection, proprietary access
 or a foundation-scale cohort; both are reachable from public archives, which
 is the point.
 
@@ -760,10 +764,10 @@ near-chance values are, as stated in advance, claims about power; but the
 one well-powered gene is unambiguous.
 
 Two readings survive this. The first is genuine cohort-relativity: the
-morphology-to-genotype
-coupling learned on TCGA does not hold in CPTAC, so a regime assignment
-is a property of the (source ontology, learned encoder, cohort) triple
-and not of the gene. The second is an uncorrected technical domain gap:
+morphology-to-genotype coupling is itself local to TCGA, in which case
+nothing about the gene is recoverable in CPTAC by any means and
+harmonisation would be wasted effort.
+The second is an uncorrected technical domain gap:
 CPTAC reaches the model through a DICOM-to-pyramidal-TIFF conversion on
 different scanners, and TCGA-trained models are known to encode
 site-specific batch signatures that correlate with mutation prevalence,
@@ -788,11 +792,11 @@ whether the \emph{learned decision function} transfers---the \ctranspath{}
 encoder, the ANORAK pattern head and the selected per-gene aggregator applied
 as one predictor---and it does not.
 
-What it cannot say is why, and the distinction prescribes opposite
-investments. Cohort-relativity would mean the coupling itself is local, in
-which case harmonisation is wasted effort; a transported-model failure would
-mean the coupling is present and only the fitted decision function failed to
-survive the move. These are separable by experiment, and we ran it. Freezing
+What it cannot say is which of the two readings above holds, and they
+prescribe opposite investments: the second would mean the coupling is
+present and only the fitted decision function failed to survive the move,
+which harmonisation can repair. They are separable by experiment, and we
+ran it. Freezing
 only the \emph{representation}---the \ctranspath{} embeddings and ANORAK
 pattern probabilities recomputed on CPTAC tiles---and re-fitting the four
 conditions with patient-disjoint cross-validation inside CPTAC recovers
