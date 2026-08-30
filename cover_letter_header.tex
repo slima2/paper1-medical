@@ -1,0 +1,11 @@
+% Header for pandoc -> pdflatex conversion of the cover letters.
+% Pandoc injects this before it loads hyperref, so options must be passed
+% forward rather than set with \hypersetup, which is not yet defined here.
+% xurl allows a break at any character inside a URL; without it the long
+% deployment and repository links overrun the right margin.
+\PassOptionsToPackage{hyphens}{url}
+\PassOptionsToPackage{breaklinks=true}{hyperref}
+\usepackage{xurl}
+\usepackage{microtype}
+\sloppy
+\setlength{\emergencystretch}{3em}
