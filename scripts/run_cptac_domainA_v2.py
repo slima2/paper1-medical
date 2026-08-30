@@ -382,6 +382,67 @@ SIGNATURE_TO_REGIME = {
     "pattern-side unique/floor (B3 > B2)": "(iii)",
 }
 
+# Which contrast the point-estimate rule above actually decided on. A regime is
+# a claim about that contrast, so it is that contrast whose uncertainty has to
+# carry the claim.
+DECIDING_CONTRAST = {
+    "pattern-side unique/floor (B3 > B2)": ("B3-B2", +1),
+    "synergy (non-additive Choquet beats concat)": ("FC-PI", +1),
+    "additive fusion (concat helps, Choquet does not)": ("PI-B2", +1),
+}
+
+
+def adjudicate_regime(sig: str, boot: dict, margin: float = 0.02) -> tuple[str, str]:
+    """Gate the point-estimate regime read on whether the bootstrap supports it.
+
+    ``regime_signature`` compares point estimates against fixed thresholds, which
+    is what the bootstrap loop needs (it re-runs the rule per draw). It is not
+    enough for the headline read: a contrast of $+0.03$ clears a $0.015$
+    threshold while sitting well inside a fold's spread, and reporting a regime
+    off it would assert a direction the data does not carry. So:
+
+    * a directional regime (ii-a, ii-b, iii) requires its deciding contrast to
+      have a bootstrap CI excluding zero;
+    * saturation (i) is a claim that *no* contrast is meaningful, so it requires
+      the CIs of all four to fall inside +/- ``margin`` -- an equivalence test,
+      not the absence of a significant one, which wide intervals would satisfy
+      vacuously.
+
+    Returns (regime, reason). ``regime`` is None when the read does not survive.
+    """
+    if sig == "incomplete":
+        return None, "conditions did not all evaluate"
+
+    decided = DECIDING_CONTRAST.get(sig)
+    if decided is not None:
+        name, direction = decided
+        entry = boot.get(name)
+        if entry is None:
+            return None, f"no bootstrap for the deciding contrast {name}"
+        lo, hi = entry["ci_lo"], entry["ci_hi"]
+        if lo <= 0.0 <= hi:
+            return None, (f"{name} = {entry['mean']:+.3f} "
+                          f"(95% CI {lo:+.3f} to {hi:+.3f}) does not exclude "
+                          f"zero, so the direction the regime asserts is not "
+                          f"separable from noise at this sample size")
+        if direction > 0 and hi <= 0.0:
+            return None, f"{name} bootstrap sits opposite the point estimate"
+        return SIGNATURE_TO_REGIME[sig], f"{name} excludes zero (CI {lo:+.3f} to {hi:+.3f})"
+
+    if sig == "encoder saturation (fusion ~ encoder)":
+        wide = [(n, e) for n, e in boot.items()
+                if not n.startswith("_")
+                and (e["ci_lo"] < -margin or e["ci_hi"] > margin)]
+        if wide:
+            n, e = wide[0]
+            return None, (f"saturation asserts every contrast is negligible, but "
+                          f"{n} spans {e['ci_lo']:+.3f} to {e['ci_hi']:+.3f}, "
+                          f"outside the +/-{margin} margin; the intervals are too "
+                          f"wide to accept equivalence")
+        return "(i)", f"all contrasts within +/-{margin}"
+
+    return None, f"point-estimate signature '{sig}' has no adjudication rule"
+
 
 def bootstrap_contrasts(oof: dict, y: np.ndarray, ref: dict, n_boot: int,
                         rng: np.random.Generator) -> dict:
@@ -554,13 +615,18 @@ def main() -> None:
         results[gene] = {"pooled_oof": pooled, "fold_mean": fold_mean,
                          "fold_sd": fold_sd, "folds": per_fold,
                          "n": int(evaluated.sum()), "n_pos": n_pos}
+        adjudicated, why = adjudicate_regime(sig, boot)
         regimes[gene] = {
             "best_auroc": best,
             "verdict": "Conclusive" if best >= CONCLUSIVE_THRESHOLD else "Inconclusive",
             "signature": sig,
-            "cptac_regime": cptac_regime,
+            "cptac_regime_point_estimate": cptac_regime,
+            "cptac_regime": adjudicated,
+            "regime_resolved": adjudicated is not None,
+            "adjudication": why,
             "tcga_regime": ref.get("regime"),
-            "agrees_with_tcga": (cptac_regime == ref.get("regime")),
+            "agrees_with_tcga": (None if adjudicated is None
+                                 else adjudicated == ref.get("regime")),
             "p_regime_matches_tcga": boot.get("_p_regime_matches_tcga"),
             "powered": powered,
             "n_pos": n_pos,
@@ -574,9 +640,16 @@ def main() -> None:
             boot_rows.append({"gene": gene, "contrast": name, **entry})
 
         print(f"  pooled OOF: " + ", ".join(f"{c}={pooled[c]:.3f}" for c in conditions))
-        print(f"  -> {cptac_regime} vs TCGA {ref.get('regime')} "
-              f"[{'agree' if cptac_regime == ref.get('regime') else 'DIFFER'}], "
-              f"P(regime reproduces)={boot.get('_p_regime_matches_tcga')}")
+        print(f"  point estimate: {cptac_regime} ({sig})")
+        if adjudicated is None:
+            print(f"  -> UNRESOLVED: {why}")
+            print(f"     TCGA reads {ref.get('regime')}; this cohort neither "
+                  f"confirms nor contradicts it")
+        else:
+            print(f"  -> {adjudicated} vs TCGA {ref.get('regime')} "
+                  f"[{'agree' if adjudicated == ref.get('regime') else 'DIFFER'}] "
+                  f"({why})")
+        print(f"     P(regime reproduces)={boot.get('_p_regime_matches_tcga')}")
 
     # Carry the feature arm into the output path. The native, Reinhard and
     # field-of-view-matched arms are meant to be compared against each other, so
