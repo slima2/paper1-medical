@@ -203,17 +203,14 @@ as the reference decomposition against which our model-side signatures are
 read.
 \Cref{eq:pid} makes the three regimes mutually exclusive
 predictions rather than post-hoc descriptions: regime~(i) is
-$\Ired$-dominated (so any fusion of $\mathbf{P}$ into $\mathbf{E}$
-is a no-op); regime~(ii)---inter-pattern co-occurrence---is the
+$\Ired$-dominated, so any fusion of $\mathbf{P}$ into $\mathbf{E}$
+is a no-op; regime~(ii)---inter-pattern co-occurrence---is the
 regime in which the pattern channel carries information the encoder
-does not, and it admits two sub-forms: \emph{additive
+does not, in either of two sub-forms, \emph{additive
 complementarity} (ii-a), $\Iuni{\mathbf{P}}>0$ with
-$\Isyn\!\approx\!0$, in which concat fusion already recovers the
-signal ($\mathrm{PI}\!>\!\max(\mathrm{B2},\mathrm{B3})$ while
-$\mathrm{FC}\!\approx\!\mathrm{PI}$), and \emph{non-additive synergy}
-(ii-b), $\Isyn>0$, which only a non-additive aggregator can realise
-($\mathrm{FC}\!>\!\mathrm{PI}$ with $\max_{j<k} I_{jk}>0$); and
-regime~(iii) requires
+$\Isyn\!\approx\!0$, or \emph{non-additive synergy}
+(ii-b), $\Isyn>0$, which only a non-additive aggregator can realise;
+and regime~(iii) requires
 $\Iuni{\mathbf{P}}\!\approx\!\Isyn\!\approx\!0$ with
 $I(\mathbf{P},\mathbf{E};Y)$ itself near the estimation floor.
 
@@ -370,19 +367,13 @@ We use the plug-in L5 ablation---zeroing a channel and reading the drop
 in \auroc{}---whereas the principled replacement is a latent-variable
 estimator of instance-level modality impact,\cite{madaan2026primo} which
 we adopt in the external-validation protocol.
-The third is the reason we never quote a numerical value for an
-individual atom of \cref{eq:pid}. Any such estimate would have to be
-built from the outputs of the two single-channel models
-(B2, encoder only; B3, pattern only), and those models are themselves
-noisy: their per-fold \auroc{} varies by $\pm 0.031$ to $\pm 0.081$
-across folds (\cref{tab:mutation_luad_resultssec}). Because the
-differences between the atoms we would be trying to separate are no
-larger than that fold-to-fold noise, a point estimate of any single atom
-would be dominated by sampling error. We therefore report the
-decomposition per gene as a \emph{structural} claim---which atoms are
-present, and with what sign---evidenced by its three model-side
-signatures (\cref{tab:pid_regimes}), and do not attempt point estimates
-of individual atoms.
+The third is the sampling-noise bound behind the policy stated above.
+Any numerical atom would have to be built from the outputs of the two
+single-channel models (B2, encoder only; B3, pattern only), whose
+per-fold \auroc{} varies by $\pm 0.031$ to $\pm 0.081$ across folds
+(\cref{tab:mutation_luad_resultssec}). The differences we would be
+trying to separate are no larger than that, so a point estimate of any
+single atom would be dominated by sampling error.
 
 % =====================================================================
 \subsection*{Cross-validation and statistical analysis}
@@ -558,20 +549,16 @@ provenance attached to every $e\in E$
 them, preserving full auditability.
 
 % =====================================================================
-\subsection*{Reproducibility, data and code availability}
+\subsection*{Reproducibility}
 % =====================================================================
 
 All experiments were run on a single H100 GPU (training) and
-a T4 GPU (inference; live LCHAI deployment at
-\url{https://lchai.gptfy.biz}).
+a T4 GPU (inference; the live \lchai{} deployment).
 PyTorch 2.x, CTransPath checkpoint as published.\cite{wang2022ctranspath}
 Seeds: 42, 123, 2026.
-System source code: \url{https://github.com/slima2/lchai}.
-Manuscript source, figures and analysis scripts:
-\url{https://github.com/slima2/paper1-medical}.
-TCGA-LUAD data: \url{https://portal.gdc.cancer.gov}.
-ANORAK Zenodo dataset: \cite{ANORAKZenodo}.
-Mutation calls (MAF): GDC, accessed 03~April~2026.
+Mutation calls (MAF) were retrieved from the GDC on 03~April~2026.
+Cohort, source-code and derived-artefact locations are given in the
+Data and Code availability statements.
 
 % =====================================================================
 \subsection*{Ethical approval}

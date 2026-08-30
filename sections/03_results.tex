@@ -120,16 +120,15 @@ $P(\text{KRAS}) = 0.965$, true positive) together with a negative
 interaction
 $I(\text{lepidic}\!\times\!\text{micropapillary})\!=\!-0.018$
 (\cref{fig:kras_lepidic_solid_proxy}).
-The pattern channel therefore carries KRAS information that is
-available only from the \emph{joint} state of a pattern pair.
-This is the histological proxy for invasive mucinous
+The pattern channel therefore carries KRAS information available only
+from the \emph{joint} state of a pattern pair---which is precisely
+what an additive head cannot express, since concat fusion sums the two
+contributions where the Choquet operator can pay for their
+conjunction.
+The pair it recovers is the histological proxy for invasive mucinous
 adenocarcinoma (IMA), the KRAS-enriched subtype historically
 characterised as lepidic mucinous-acinar-solid coexistence with a
 mucinous component.\cite{shim2015krasmucinous,rekhtman2013krassolid,cha2017imapatterns,hwang2017nonlepidicima}
-The additive concat fusion of \piabmil{} cannot encode an
-\emph{AND} of two patterns, only their summed contribution;
-the 2-additive Choquet operator does, and it picks up exactly
-the pair that LUAD pathologists associate with the IMA phenotype.
 KRAS therefore fails the cohort-level Conclusive threshold
 (mean AUROC $0.609 < 0.70$) but at the per-slide level the
 prediction is well-calibrated and the explanation is
@@ -150,11 +149,8 @@ the clearest reason in this cohort to keep the two words apart.
 at each and the scope of the claims each supports.} The
 Conclusive/Inconclusive verdict and the three-regime taxonomy are
 population-level objects; the six-level explanation stack is a
-slide-level and tile-level object; neither transfers to the other. The
-KRAS case above is the canonical illustration: a mediocre
-population statistic ($0.609$) coexists with a well-calibrated,
-clinically argumentative slide-level call because the two live at
-different levels.}
+slide-level and tile-level object; neither transfers to the other.
+KRAS, above, is the canonical illustration.}
 \label{tab:levels_of_analysis}
 \end{table}
 
@@ -182,11 +178,10 @@ different levels.}
     \label{fig:kras_proxy_b}
   \end{subfigure}
   \caption{\textbf{KRAS regime (ii-b): inter-pattern co-occurrence in
-  its non-additive sub-form, as an IMA proxy.} The additive concat fusion of \piabmil{} cannot
-  encode an \emph{AND} of two patterns, only their summed
-  contribution; the 2-additive Choquet operator does, and on
-  TCGA-55-7815 it isolates exactly the pair that LUAD pathologists
-  associate with the invasive mucinous phenotype.}
+  its non-additive sub-form, as an IMA proxy.} The textbook morphology
+  (a) is placed beside the aggregator's readout on a single slide (b),
+  so that what the Choquet head recovers can be checked against what a
+  LUAD pathologist would name.}
   \label{fig:kras_lepidic_solid_proxy}
 \end{figure}
 
@@ -231,11 +226,9 @@ to the negative class.\cite{bowman2016posteriorcollapse}
 RBM10's biology---defective alternative
 splicing\cite{bechara2013rbm10,cao2024rbm10egfr}---has no
 established morphological correlate at the level the encoder sees.
-It is nevertheless the one gene of the three for which the pattern
-channel is not empty: B3 ($0.653$) exceeds B2 ($0.642$), which
-happens for no other gene, and the decomposition below argues that
-RBM10 is therefore a data-floor rather than an out-of-ontology
-failure.
+It is nevertheless the one gene of the three whose pattern channel is
+not empty, which is why the decomposition below reclassifies it as a
+data-floor rather than an out-of-ontology failure.
 
 The three-regime taxonomy is summarised in
 \cref{fig:signal_tree} and informs the Conclusive/Inconclusive
@@ -397,13 +390,10 @@ Inconclusive.
 The explanation layer wraps the six-level evidence bundle in an
 LLM agent grounded in a three-layer knowledge graph built from
 NCIt\cite{sioutos2007ncit} and MONDO.\cite{mondo_shefchek2020}
-The fuzzy labels constrain \emph{how} the agent speaks (no
-spurious decimal precision, no monotonic claims on probabilities
-inside the \emph{moderate} band) and the KG constrains \emph{what}
-entities and edges may appear in the narrative
-(deactivation-without-deletion records corrections as evidence,
-preserving an audit trail).
-Both constraints are architectural: they are enforced by the prompt
+The fuzzy labels constrain \emph{how} the agent speaks and the
+knowledge graph constrains \emph{what} entities and edges may appear in
+the narrative.
+Both constraints are architectural, enforced by the prompt
 grammar and the knowledge-graph guard described in Methods, and we
 report no reader-study measurement of their effect.
 A live-system view of the complete stack on the KRAS case is shown in
