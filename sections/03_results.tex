@@ -459,23 +459,30 @@ This work reports six driver genes simultaneously on the public
 TCGA-LUAD cohort under a single MIL aggregator;
 prior work typically reports two to three driver genes on either
 the same public cohort (Coudray, Saldanha, Zhao) or on proprietary
-cohorts an order of magnitude larger (CHIEF, EAGLE).}
+cohorts an order of magnitude larger (CHIEF, EAGLE).
+Within \textbf{This work}, bold marks the better of the two aggregators
+for each gene. No value is bolded \emph{across} studies: the protocols
+are not comparable, mixing held-out test sets with cross-validation and
+public with proprietary cohorts, so a column maximum would not identify
+a better method.}
 \label{tab:literature_comparison_resultssec}
 \end{table}
 
 \cref{tab:literature_comparison_resultssec} places our results
 beside the published competition.
-On TP53 our $0.717$ sits below Coudray's $0.733$.
+On TP53 our $0.717$ sits below Coudray's $0.760$.
 On EGFR our pattern-informed $0.694$ sits just under the
 encoder-only ceiling ($0.701$, the value that places EGFR in the
 Conclusive, encoder-saturated regime~(i)) and below Saldanha's $0.76$
 (external CPTAC validation), Coudray's $0.826$ and Campanella's EAGLE
 $0.890$; the last of these uses a proprietary cohort an order of magnitude
 larger and a foundation model fine-tuned end-to-end for EGFR.
-On STK11 ($0.695$), KEAP1 ($0.610$) and RBM10 ($0.661$) our
-upper-tier conditions deliver per-gene numbers that are
-\emph{not} reported in most prior work; STK11 and KEAP1 are
-typically dropped from method papers because of their small
+On STK11 ($0.695$) and KEAP1 ($0.610$) the only prior per-gene values
+we are aware of are Coudray's $0.856$ and $0.675$; both exceed ours,
+but they are measured on a $62$-slide held-out test set with intervals
+of $[0.709,0.964]$ and $[0.466,0.865]$ against our five-fold
+cross-validation on $687$ slides, so the two are not like-for-like.
+Every other study drops these genes, typically because of their small
 positive sets, and RBM10 is to our knowledge first reported
 here at the per-slide level.
 
