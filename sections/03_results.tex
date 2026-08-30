@@ -58,16 +58,22 @@ Best per gene in bold.}
   \caption{\textbf{Three-regime taxonomy of mutation-predictive signal
   on TCGA-LUAD.} For each of the six target genes, the cohort-level
   AUROC under five baselines is decomposed into three regimes:
-  \emph{encoder saturation} (TP53, EGFR; the \ctranspath{} embedding
+  \emph{encoder saturation}~(i) (TP53, EGFR; the \ctranspath{} embedding
   alone already reaches the cohort ceiling, so the 6-d ANORAK pattern
   channel adds $\leq 0.02$ AUROC), \emph{inter-pattern
-  co-occurrence} (KRAS; only an aggregator capable of representing
+  co-occurrence}~(ii) (KRAS; only an aggregator capable of representing
   positive interactions recovers the lepidic$\times$solid joint
   activation that maps to the invasive mucinous adenocarcinoma
-  phenotype), and \emph{out-of-ontology} (STK11, KEAP1; the predictive signal
+  phenotype), and \emph{out-of-ontology}~(iii) (STK11, KEAP1; the predictive signal
   lives in the immune microenvironment or in a biochemical state with
   no H\&E correlate), with RBM10 a distinct estimation-floor case
-  (non-empty pattern-side atoms unestimable at $n_+\!=\!37$). The
+  (non-empty pattern-side atoms unestimable at $n_+\!=\!37$).
+  Regime~(ii) is drawn with both of its sub-forms: KRAS occupies the
+  non-additive one~(ii-b), while the additive one~(ii-a), in which
+  concat fusion alone recovers the signal, is not populated in this
+  cohort and is shown empty---it is the sub-form that glioma 1p/19q
+  occupies (\cref{tab:glioma_domainb}) and that the CPTAC refit returns
+  as a point estimate (\cref{tab:cptac_refit}). The
   three regimes are the
   redundant, synergistic and unique atoms of the partial
   information decomposition of the pattern and embedding channels
