@@ -1,0 +1,53 @@
+% Table tab:cptac_refit — CPTAC-internal refit of the four conditions.
+% Only the representation is frozen (CTransPath embeddings + ANORAK pattern
+% probabilities recomputed on CPTAC tiles); the four aggregation conditions are
+% re-fitted with 5-fold patient-disjoint CV inside CPTAC. TP53 only: it is the
+% one gene clearing the n_+=37 estimation floor in this subset (n_+=55).
+% "Native" tiles CPTAC at level 0 exactly as the TCGA pipeline does. "FOV-matched"
+% centre-crops and rescales every tile so its physical field of view matches a
+% 40x TCGA tile (target 0.25 micron/pixel), testing the scanner-magnification
+% account of the transfer failure.
+\footnotesize
+\setlength{\tabcolsep}{6pt}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{l c c}
+\toprule
+\textbf{Condition (\textit{TP53}, $n_+\!=\!55$)} & \textbf{Native} & \textbf{FOV-matched} \\
+\midrule
+B2 \quad encoder only                & $0.665$ & $0.561$ \\
+B3 \quad pattern channel only        & $0.667$ & $0.570$ \\
+\piabmil{} \quad concat fusion       & $0.698$ & $0.632$ \\
+\fcmil{} \quad $2$-additive Choquet  & $0.669$ & $0.538$ \\
+\midrule
+$\piabmil{}-\mathrm{B2}$             & $+0.032$ & $+0.073$ \\
+Regime, point estimate               & (ii-a) & (ii-a) \\
+Regime, adjudicated                  & unresolved & unresolved \\
+$P(\text{regime reproduces TCGA})$   & $0.214$ & $0.129$ \\
+\midrule
+\multicolumn{3}{l}{\emph{Reference:} TCGA-LUAD $0.717$; frozen transfer $0.53$
+($0.42$--$0.64$), \cref{tab:cptac_transfer}} \\
+\bottomrule
+\end{tabular}
+\begin{flushleft}\footnotesize
+Pooled out-of-fold AUROC over $5$ patient-disjoint folds on the $106$
+genotyped CPTAC patients ($498$ slides). Only the \emph{representation} is
+carried over from TCGA; the aggregation conditions are re-fitted inside CPTAC,
+which is the comparison the frozen-pipeline test of \cref{tab:cptac_transfer}
+cannot make. The native arm recovers $0.698$ against the TCGA value of $0.717$,
+so the morphology-to-genotype coupling for \textit{TP53} is present in CPTAC at
+comparable strength and the off-the-shelf collapse to $0.53$ is a property of
+the transported decision function, not of the encoder or of the tissue.
+The \textbf{FOV-matched} arm is a negative control for the
+scanner-magnification account (TCGA-LUAD is $76.4\%$ $40\times$, CPTAC-LUAD
+$98.6\%$ $20\times$): matching the physical field of view lowers every
+condition and inflates fold-to-fold spread (B2 ranges $0.373$--$0.918$ across
+folds, against $0.587$--$0.791$ natively), so scale mismatch is not the
+mechanism, though the centre-crop is itself lossy and the arm is not evidence
+in the opposite direction either.
+Regime adjudication follows the noise-aware rule of the Methods: the deciding
+contrast is $\piabmil{}-\mathrm{B2}$, whose $2000$-sample paired-bootstrap
+$95\%$ CI is $-0.041$ to $+0.102$ natively and $-0.038$ to $+0.174$
+FOV-matched. Both span zero, so the point-estimate read of (ii-a) is
+\emph{not} separable from noise and no regime is asserted; the cohort neither
+confirms nor contradicts the TCGA reading of~(i).
+\end{flushleft}

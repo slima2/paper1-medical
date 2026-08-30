@@ -203,15 +203,63 @@ regime~(iii) requires
 $\Iuni{\mathbf{P}}\!\approx\!\Isyn\!\approx\!0$ with
 $I(\mathbf{P},\mathbf{E};Y)$ itself near the estimation floor.
 
+\paragraph{The ceiling is the modality, not the encoder.}
+Both channels are deterministic functions of the same whole-slide image
+$W$: $\mathbf{E}=f(W)$ under the frozen \ctranspath{} encoder and
+$\mathbf{P}=g(W)$ under the frozen ANORAK pattern classifier. The data
+processing inequality\cite{cover2006elements} therefore bounds the
+entire left-hand side of \cref{eq:pid} by a quantity that belongs to the
+tissue rather than to any model,
+\begin{equation}
+I\!\left(\mathbf{P},\mathbf{E};Y\right) \;\leq\; I\!\left(W;Y\right),
+\label{eq:modality_ceiling}
+\end{equation}
+and this is what makes the three regimes statements of different kinds
+rather than three positions on one scale. Regime~(i) says $\mathbf{E}$
+already attains the bound in \cref{eq:modality_ceiling}, so a second
+channel has nothing left to recover; regime~(ii) says $\mathbf{E}$ falls
+short of it and $\mathbf{P}$ restores part of the shortfall; regime~(iii)
+says the bound itself is near zero, which no encoder, no aggregator and
+no label budget can move---the deficit is in the tissue, not in the
+pipeline. Only regime~(iii) is therefore a claim about the modality; the
+other two are claims about a particular encoder's coverage of it.
+Strictly, what any experiment observes is the left-hand side of
+\cref{eq:modality_ceiling}, and a total near the estimation floor
+licenses the statement about $I(W;Y)$ only insofar as neither frozen
+channel is itself discarding the relevant signal. We therefore report
+regime~(iii) as the strongest evidence currently obtainable for a
+modality ceiling, not as a proof that one has been reached, and the
+remedy it prescribes---a new source channel rather than a larger
+model---follows from the evidence either way.
+
+A recent analysis of \emph{molecular translators}---systems that map
+H\&E onto predicted molecular readouts---invokes the same inequality for
+the case in which the translated representation \emph{replaces} its
+source, and draws the consequence that any apparent gain must be a
+learnability effect rather than recovered
+information.\cite{saisan2026ceilings}
+Our setting is the augmenting one and the distinction matters:
+$\mathbf{P}$ is supplied \emph{alongside} $\mathbf{E}$ rather than in
+place of it, so $I(\mathbf{P},\mathbf{E};Y)$ is not bounded by
+$I(\mathbf{E};Y)$. It is bounded by \cref{eq:modality_ceiling} instead,
+and the gap between the two is exactly the room in which regime~(ii)
+lives---the slide information a $512$-d encoding discarded and a
+$6$-d pattern vocabulary happens to retain.
+
 \paragraph{Correspondence with the Choquet interaction index.}
 For a $2$-additive fuzzy measure, \cref{eq:fuzzy_measure} assigns
 the pair $\{j,k\}$ a value that exceeds the sum of its singletons
 exactly when $I_{jk}>0$; the aggregator therefore pays for the
 \emph{joint} activation of patterns $j$ and $k$ over and above
-their separate activations.\cite{grabisch1996application,marichal2000determination}
+their separate
+activations.\cite{grabisch1996application,marichal2000determination}
 This is the decision-theoretic counterpart of a positive
 synergistic atom in \cref{eq:pid}, and, symmetrically, $I_{jk}<0$
 is the counterpart of redundancy between the two patterns.
+The sign convention is the axiomatic one: the interaction index of a
+pair is positive when the pair is complementary, negative when it is
+redundant, and zero under additive
+independence.\cite{grabisch1999interaction}
 We therefore treat the learned $I_{jk}$ as the model-side estimator
 of pattern-pair synergy, and the additive concat fusion of
 \piabmil{} as an aggregator whose hypothesis space forces
@@ -257,6 +305,24 @@ cohort-invariant: the contrasts are themselves computed from
 cohort-dependent \auroc{}s, so a change of case mix can in principle move a
 gene between regimes. What we claim travels is the instrument, not its
 per-gene reading, and only the former is tested here.
+
+\paragraph{Why four conditions rather than a channel ablation.}
+Reading a channel's contribution from the \auroc{} it costs when removed
+has been criticised as a contribution measure, on the grounds that a
+single drop conflates two different situations: a channel that is
+informative in its own right, and a channel whose value exists only in
+interaction with the other.\cite{padegal2025modality}
+The four-condition design answers that objection by construction rather
+than by argument. B2 and B3 expose each channel alone, \piabmil{} their
+additive combination, and \fcmil{} their $2$-additive Choquet
+combination, so the two situations separate: additive complementarity
+raises \piabmil{} above both single channels while leaving
+$\mathrm{FC}\!\approx\!\mathrm{PI}$, whereas interaction raises \fcmil{}
+above \piabmil{} and is corroborated independently by the sign of the
+learned $I_{jk}$, which is read off the fuzzy measure and not from any
+\auroc{} at all. The L5 single-channel ablation is accordingly used only
+to corroborate the unique atoms it can legitimately evidence, and never
+to adjudicate synergy.
 
 \begin{table}[ht!]
 \centering
