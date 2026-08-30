@@ -461,7 +461,16 @@ a better method.}
 \end{table}
 
 \cref{tab:literature_comparison_resultssec} places our results
-beside the published competition.
+beside the published competition, and one caveat belongs before the
+numbers rather than after them.
+A per-gene AUROC does not answer the question this paper asks:
+whichever study reports the higher one, the number does not say
+whether the signal it measures lies \emph{inside} the source ontology
+or \emph{outside} it, and that is what decides whether the next
+experiment is a larger cohort, a richer vocabulary or a different
+modality altogether.
+No study below reports a regime or a per-gene verdict, so on the axis
+this paper contributes there is as yet nothing to compare against.
 On TP53 our $0.717$ sits below Coudray's $0.760$.
 On EGFR our pattern-informed $0.694$ sits just under the
 encoder-only ceiling ($0.701$, the value that places EGFR in the
@@ -474,6 +483,10 @@ we are aware of are Coudray's $0.856$ and $0.675$; both exceed ours,
 but they are measured on a $62$-slide held-out test set with intervals
 of $[0.709,0.964]$ and $[0.466,0.865]$ against our five-fold
 cross-validation on $687$ slides, so the two are not like-for-like.
+The KEAP1 interval is the more informative of the two, because it
+spans chance: that value is not evidence against the out-of-ontology
+reading we give the gene, which is precisely the kind of statement the
+regime axis makes and a column of point estimates cannot.
 Every other study drops these genes, typically because of their small
 positive sets, and RBM10 is to our knowledge first reported
 here at the per-slide level.
