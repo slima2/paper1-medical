@@ -8,21 +8,21 @@ directly measure are reported as a cohort-average hiding which
 targets are reachable.
 We treat them as imperfect translation, reporting per-target
 translatability.
-Our three-regime taxonomy---encoder saturation, inter-pattern
-co-occurrence, out-of-ontology---corresponds to the redundant,
+Our three regimes---encoder saturation, inter-pattern
+co-occurrence, out-of-ontology---are the redundant,
 synergistic and unique atoms of a partial information decomposition of
-the source ontology against the encoder, paired with a
+the source ontology against the encoder, with a
 Conclusive/Inconclusive verdict and a six-level explanation stack.
-On TCGA-LUAD TP53 and EGFR saturate the
-encoder, KRAS is synergistic, STK11 and KEAP1 fall outside it.
+On TCGA-LUAD TP53 and EGFR saturate the encoder, STK11 and KEAP1 fall
+outside it, and KRAS is synergistic---Inconclusive at 0.609 yet 0.965
+on one slide.
 Frozen transfer to CPTAC-LUAD collapses (TP53 0.72 to 0.53), yet
 re-fitting there recovers 0.70: the transported model fails, not the
-coupling, though the cohort's power neither confirms nor contradicts
-the regime.
-The framework transfers: on the public electrocardiogram dataset
-{PTB-XL} it recovers physiological state (AUROC 0.90), and a glioma MRI
-instantiation reproduces the regimes---IDH saturated, 1p/19q
-fusion-recovered, and MGMT Inconclusive at full power.
+coupling; power neither confirms nor contradicts the regime.
+The framework transfers: on the electrocardiogram dataset
+{PTB-XL} it recovers physiological state (AUROC 0.90), and glioma MRI
+reproduces the regimes---IDH saturated, 1p/19q
+fusion-recovered, MGMT Inconclusive at full power.
 \end{abstract}
 
 \paragraph{Keywords.}
