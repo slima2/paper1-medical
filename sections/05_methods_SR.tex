@@ -393,7 +393,9 @@ data\cite{williams2010pid,bertschinger2014unique,liang2023quantifying} and no
 agreed axiom set singles one out, so a point value for $\Isyn$ is not an
 identified quantity and would not become one at infinite $n$. Sample size
 compounds this rather than causing it: a direct estimate on the $512$-d
-channel is intractable at $n=444$ under any of those definitions. Reading the
+channel is intractable at $n=444$ under any of those definitions
+(\cref{fig:pid_estimator}; the estimator we specify but decline to use
+is \cref{tab:pid_estimator}). Reading the
 \emph{sign} of contrasts between fully retrained models is what those two
 facts license---it is the correct response to a non-identified target, not a
 fallback forced by a small cohort. Instead each
@@ -619,7 +621,8 @@ per-subject scores and reported inter-observer agreement for the TCGA
 glioma collections.\cite{gutman2013vasari,vasari_tcia} Of these, $26$
 were retained after dropping features constant or unscored across the
 cohort, and min--max rescaled. The encoder channel is a 2.5D CNN with
-\abmil{} over axial slices of four co-registered sequences, occupying the
+\abmil{} over axial slices of four co-registered sequences
+(\cref{fig:glioma_example}), occupying the
 position \ctranspath{} with tile-level \abmil{} holds in LUAD. IDH,
 1p/19q and a patient-sex control are scored on the TCGA-LGG subjects
 carrying real neuroradiologist VASARI scores, co-registered preoperative
@@ -650,7 +653,8 @@ vocabulary is already \emph{graded}, each statement carrying a
 $0$--$100$ likelihood score extracted from the report, so the fuzzy
 membership the pattern classifier must supply in LUAD is here given as
 data; and the target set is an order of magnitude larger. The encoder channel is a compact 1D
-convolutional network over the raw twelve-lead signal at $100$\,Hz.
+convolutional network over the raw twelve-lead signal at $100$\,Hz
+(\cref{fig:ecg_ptbxl}).
 Patient sex and age are recorded for every case and are not derivable
 from the statements, which is what makes them a leakage-free pair. Many
 patients contribute more than one record, so the bootstrap resamples
@@ -757,7 +761,8 @@ empty, non-empty on a subpopulation, non-empty but unestimable, or a
 heterogeneous gene-level label---with different remedies; the four
 levels of analysis at which the quantities of this paper are estimated,
 and the claims each supports, are set out in Supplementary Note~4 and
-\cref{tab:levels_of_analysis}.
+\cref{tab:levels_of_analysis}, and instantiated for the three modalities
+in \cref{tab:levels_crossdomain}.
 
 % =====================================================================
 \subsection*{Released per-slide tooling}

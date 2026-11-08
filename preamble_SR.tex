@@ -77,7 +77,12 @@
 \usepackage{xr-hyper}
 % [nocite]: import labels only, not the other document's \bibcite
 % entries (each document carries its own numbered reference list).
-\externaldocument[][nocite]{\SRexternaldoc}
+% Overleaf drops .aux files from uploaded ZIPs, so when the other
+% document's .aux is absent the labels are read instead from the snapshot
+% xr_<job>.tex that build_SR.ps1 exports (export_xr_labels.py).
+\IfFileExists{\SRexternaldoc.aux}
+  {\externaldocument[][nocite]{\SRexternaldoc}}
+  {\makeatletter\input{xr_\SRexternaldoc}\makeatother}
 
 \usepackage[colorlinks,linkcolor=linkblue,citecolor=linkblue,urlcolor=linkblue,
   pdftitle={\SRpdftitle}]{hyperref}

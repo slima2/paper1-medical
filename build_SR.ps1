@@ -25,6 +25,9 @@ foreach ($round in 1, 2) {
     if ($LASTEXITCODE -ne 0) { throw "supplementary_SR.tex failed (round $round)" }
 }
 
+# Label snapshots for Overleaf, which strips .aux files from uploaded ZIPs.
+python export_xr_labels.py
+
 Write-Host ""
 Write-Host "=== warnings that matter ==="
 foreach ($log in "main_SR.log", "supplementary_SR.log") {

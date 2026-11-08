@@ -24,8 +24,20 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 OUT = ROOT / "SR_latex_source.zip"
 JOBS = ["main_SR", "supplementary_SR"]
-EXTRA = ["main_SR.bbl", "supplementary_SR.bbl", "build_SR.ps1",
-         "data/luad_hierarchical_contrasts.csv"]
+# The two .aux files are shipped so that the xr-hyper cross-document
+# references (\cref to main-text equations/tables from the SI and vice
+# versa) resolve on the first compile of either document. Overleaf drops
+# .aux and .bbl files from uploaded ZIPs, so the label snapshots
+# xr_<job>.tex (read by the preamble when the .aux is absent) and the .bib
+# (so Overleaf can run BibTeX) are shipped as well.
+EXTRA = ["main_SR.bbl", "supplementary_SR.bbl", "main_SR.aux",
+         "supplementary_SR.aux", "xr_main_SR.tex", "xr_supplementary_SR.tex",
+         "shared/references.bib", "build_SR.ps1", "export_xr_labels.py",
+         "data/luad_hierarchical_contrasts.csv",
+         "data/glioma_mgmt_bootstrap_aurocs.csv",
+         "data/glioma_mgmt_bootstrap_contrasts.csv",
+         "data/ecg_bootstrap_aurocs.csv",
+         "data/ecg_bootstrap_contrasts.csv"]
 
 
 def inputs_from_fls(job: str) -> set[str]:
@@ -55,10 +67,17 @@ def build_zip() -> list[str]:
     for job in JOBS:
         names |= inputs_from_fls(job)
     names |= set(EXTRA)
-    names = sorted(n for n in names if (ROOT / n).exists())
+    # The .bib lives one level up (shared/ is a sibling of paper1_medical/,
+    # found at build time through BIBINPUTS=..); inside the bundle it goes
+    # to shared/references.bib, which is the path \bibliography names.
+    sources = {n: ROOT / n for n in names}
+    bib = ROOT.parent / "shared" / "references.bib"
+    if not sources["shared/references.bib"].exists() and bib.exists():
+        sources["shared/references.bib"] = bib
+    names = sorted(n for n in names if sources[n].exists())
     with zipfile.ZipFile(OUT, "w", zipfile.ZIP_DEFLATED) as z:
         for n in names:
-            z.write(ROOT / n, n)
+            z.write(sources[n], n)
     size = OUT.stat().st_size / 1e6
     print(f"wrote {OUT.name}: {len(names)} files, {size:.1f} MB")
     for n in names:
@@ -70,9 +89,13 @@ def test_zip() -> None:
     tmp = Path(tempfile.mkdtemp(prefix="sr_bundle_"))
     with zipfile.ZipFile(OUT) as z:
         z.extractall(tmp)
+    # Mimic Overleaf, which discards .aux and .bbl from uploaded ZIPs: the
+    # documents must compile from the .bib and the xr_*.tex snapshots alone.
+    for p in list(tmp.glob("*.aux")) + list(tmp.glob("*.bbl")):
+        p.unlink()
     env = dict(os.environ, BIBINPUTS=".;")
     ok = True
-    for rnd in (1, 2):
+    for rnd in (1,):
         for job in JOBS:
             r = subprocess.run(
                 ["latexmk", "-pdf", "-interaction=nonstopmode",
