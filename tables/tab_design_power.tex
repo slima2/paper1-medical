@@ -1,0 +1,81 @@
+% Table tab:design_power — prospective design guidance for testing a
+% conditional (regime ii-b) claim. This is NOT a post-hoc power calculation on
+% the observed effect, which would be uninformative by construction. The
+% variance component is estimated from the hierarchical bootstrap at n=444 and
+% rescaled as 1/sqrt(n); the target effects delta are stipulated a priori, not
+% observed. Two-sided alpha = 0.05, 80% power.
+%
+% NOTE(seeds): the SE comes from the five-seed run stratified_kras_final, the
+%   same basis as tab_kras_coactivation and tab_mutation_luad. An earlier draft
+%   used the three-seed stage-1 SEs (0.0572 and 0.0772), which gave MDE
+%   0.160/0.216 and 12,700/23,100 patients at delta=0.03; those are superseded.
+%   Five seeds narrow the bootstrap, so every number here is smaller and the
+%   argument is correspondingly weaker -- which is the honest direction.
+%
+% NOTE(derivation): stratum_differences.csv reports percentile intervals only,
+%   with no SE column, so SE is recovered as (ci_hi - ci_lo)/(2*1.959964):
+%   0.048108 patient-preserved, 0.058770 site-preserved. The intervals are
+%   near-symmetric about the bootstrap mean (3.6% and 1.2% asymmetry), so the
+%   normal approximation this inversion assumes is safe. MDE at n=444 is then
+%   2.801582*SE; required n is 444*(MDE_444/delta)^2; MDE at other n is
+%   MDE_444*sqrt(444/n). This recipe reproduced every cell of the superseded
+%   three-seed table exactly, which is why it is trusted here.
+%
+% NOTE(prevalence): the KRAS+ column now uses 27.9%, the patient-level
+%   prevalence (124 of 444, matching tab_mutation_luad and the tercile counts
+%   of tab_kras_coactivation). The earlier 27.5% was the slide-level figure
+%   (126 of 458), which is the wrong unit for a table whose rows count
+%   patients.
+\footnotesize
+\setlength{\tabcolsep}{6pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{c c c c}
+\toprule
+\textbf{Target effect} &
+  \multicolumn{2}{c}{\textbf{Patients required}} &
+  \textbf{KRAS$^{+}$ required} \\
+\cmidrule(lr){2-3}
+$\delta$ (FC${-}$PI, high ${-}$ low) &
+  \textbf{Patient-preserved} & \textbf{Site-preserved} &
+  \textbf{(at $27.9\%$)} \\
+\midrule
+$0.02$ & $20{,}200$ & $30{,}100$ & $5{,}600$ \\
+$0.03$ & $9{,}000$  & $13{,}400$ & $2{,}500$ \\
+$0.05$ & $3{,}200$  & $4{,}800$  & $900$ \\
+$0.08$ & $1{,}300$  & $1{,}900$  & $350$ \\
+$0.10$ & $810$      & $1{,}200$  & $230$ \\
+\midrule
+\multicolumn{4}{l}{\emph{Smallest effect resolvable at a given cohort size}} \\
+\multicolumn{2}{l}{$n\!=\!444$ (this study)} & $0.135$ & $0.165$ \\
+\multicolumn{2}{l}{$n\!=\!1{,}000$}         & $0.090$ & $0.110$ \\
+\multicolumn{2}{l}{$n\!=\!2{,}000$}         & $0.063$ & $0.078$ \\
+\multicolumn{2}{l}{$n\!=\!5{,}000$}         & $0.040$ & $0.049$ \\
+\multicolumn{2}{l}{$n\!=\!10{,}000$}        & $0.028$ & $0.035$ \\
+\bottomrule
+\end{tabular}
+\begin{flushleft}\footnotesize
+Cohort sizes required to resolve a stipulated difference $\delta$ in the
+FC${-}$PI contrast between the high and low co-activation strata, at two-sided
+$\alpha\!=\!0.05$ and $80\%$ power, under equal tercile allocation.
+The target effects are set a priori and span the range the field would
+consider meaningful; the standard error is taken from the hierarchical
+bootstrap of \cref{tab:kras_coactivation} at $n\!=\!444$ and rescaled as
+$n^{-1/2}$. This is a prospective design calculation: it does not use the
+observed effect and is therefore not a post-hoc power statement about the
+null reported here.
+Two consequences bear on how conditional claims should be reported. First,
+the present cohort resolves only $\delta\!\geq\!0.135$, an effect several times
+larger than any aggregator gain reported in this literature
+(\cref{tab:literature_power_audit}), so a
+non-significant conditional contrast at TCGA scale carries almost no
+evidential weight in either direction and should not be presented as
+supporting a mechanism. Second, site preservation costs a factor of
+${\sim}1.5$ in cohort size for the same resolution, which is the price of
+excluding centre effects and should be budgeted at design time rather than
+discovered afterwards.
+A study powered for $\delta\!=\!0.05$ under site preservation needs
+approximately $4{,}800$ patients---roughly an order of magnitude beyond
+TCGA-LUAD, and beyond any single public cohort---so testing interaction-level
+mechanistic claims in computational pathology is a multi-institutional
+undertaking, not a re-analysis.
+\end{flushleft}

@@ -39,5 +39,10 @@ env.sh
 */README (*).md
 
 # ---- compiled output & local previews ----
-main.pdf
+main_SR.pdf
+supplementary_SR.pdf
+main_SR_preview.*
 _preview/
+_bundle/
+*.zip
+*.tgz

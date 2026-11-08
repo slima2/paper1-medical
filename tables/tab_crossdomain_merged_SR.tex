@@ -1,0 +1,95 @@
+% Table tab:crossdomain_merged — main Table 3 (Scientific Reports build).
+% Levels only: pooled OOF AUROC per condition with its 95% hierarchical
+% (five seeds x patients) bootstrap interval, verdict and regime. The
+% contrasts the regime rule reads are Table 4 (tab_crossdomain_contrasts_SR).
+% The n~63 glioma pilot rows (IDH, 1p/19q, sex control) are Supplementary
+% Table tab:glioma_domainb and Supplementary Note 1; per-gene CPTAC transfer
+% values and the stain/field-of-view controls are Supplementary Tables.
+\footnotesize
+\setlength{\tabcolsep}{5pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{l cccc l l}
+\toprule
+\textbf{Target} & \textbf{B2} & \textbf{B3} & \textbf{PI} & \textbf{FC} &
+  \textbf{Verdict} & \textbf{Regime} \\
+ & encoder & vocabulary & concat & Choquet & & \\
+\midrule
+\multicolumn{7}{l}{\emph{(a) Glioma MRI $\rightarrow$ MGMT methylation.}
+  VASARI semantic MR features; BraTS~2021, $n\!=\!577$} \\
+\addlinespace[2pt]
+MGMT\textsuperscript{$\dagger$} &
+  \makecell{$0.539$\\{[}0.50, 0.58{]}} &
+  \makecell{$0.519$\\{[}0.48, 0.56{]}} &
+  \makecell{$0.525$\\{[}0.48, 0.57{]}} &
+  \makecell{$\mathbf{0.552}$\\{[}0.51, 0.59{]}} &
+  Inconclusive & (iii) modality ceiling \\
+\addlinespace[2pt]
+\midrule
+\multicolumn{7}{l}{\emph{(b) Electrocardiogram $\rightarrow$ physiological
+  state.} $71$ graded SCP-ECG statements; PTB-XL, $21{,}799$ records,
+  $18{,}869$ patients} \\
+\addlinespace[2pt]
+Sex &
+  \makecell{$0.884$\\{[}0.877, 0.892{]}} &
+  \makecell{$0.612$\\{[}0.604, 0.621{]}} &
+  \makecell{$\mathbf{0.888}$\\{[}0.883, 0.893{]}} &
+  \makecell{$0.885$\\{[}0.880, 0.891{]}} &
+  Conclusive & (i) encoder-saturated \\
+\addlinespace[3pt]
+Age $\geq 65$ &
+  \makecell{$0.825$\\{[}0.817, 0.834{]}} &
+  \makecell{$0.732$\\{[}0.725, 0.739{]}} &
+  \makecell{$\mathbf{0.828}$\\{[}0.822, 0.833{]}} &
+  \makecell{$\mathbf{0.828}$\\{[}0.821, 0.835{]}} &
+  Conclusive & (i) encoder-saturated \\
+\addlinespace[2pt]
+\midrule
+\multicolumn{7}{l}{\emph{(c) Cohort transfer, TCGA-LUAD $\rightarrow$
+  CPTAC-LUAD.} \textit{TP53}, the one gene clearing the estimation
+  floor ($n_+\!=\!55$)} \\
+\addlinespace[2pt]
+Frozen pipeline & \multicolumn{4}{c}{$0.53$ \ [0.42, 0.64]; \ $0.48$ after
+  stain normalisation} & Inconclusive & not testable\textsuperscript{$\ddagger$} \\
+\addlinespace[2pt]
+Re-fitted in CPTAC & $0.665$ & $0.667$ & $\mathbf{0.698}$ & $0.669$ &
+  Inconclusive & unresolved\textsuperscript{$\S$} \\
+\bottomrule
+\end{tabular}
+\begin{flushleft}\footnotesize
+Panels \textbf{a} and \textbf{b}: pooled out-of-fold $\auroc$ over five
+patient-disjoint folds and five seeds, with its $95\%$ hierarchical
+bootstrap interval ($2{,}000$ draws resampling seeds and then patients,
+as in LUAD; in \textbf{b} all records of a resampled patient travel
+together). Conditions as in LUAD: $\mathrm{B2}$ encoder only,
+$\mathrm{B3}$ source vocabulary only, $\mathrm{PI}$ concat fusion,
+$\mathrm{FC}$ encoder $+$ $2$-additive Choquet over the vocabulary; best
+per target in bold. The \emph{Verdict} thresholds the level at $0.70$;
+the \emph{Regime} is read from the between-condition contrasts of
+\cref{tab:crossdomain_contrasts}, never from the largest cell.
+\textsuperscript{$\dagger$}MGMT is scored on the balanced BraTS~2021
+cohort (${\sim}52\%$ methylated). The verdict is resolved at full power:
+the upper bound of the best condition ($0.59$) lies below $0.70$. The
+regime is the one case read from levels rather than from a contrast:
+every condition, the encoder alone included, sits at chance, which is the
+modality-ceiling form of (iii) (Methods). The VASARI channel is
+propagated from the annotated seed rather than expert-scored, so the
+claim rests on the unconstrained encoder remaining at chance, not on the
+strict empty-atom separation that expert VASARI licenses. The
+$n\!\sim\!63$ TCGA-LGG pilot with expert-scored VASARI (IDH, 1p/19q, sex
+control) is \cref{tab:glioma_domainb}.
+\textbf{(c)}~$498$ slides from $106$ genotyped CPTAC patients; $95\%$
+CI from $2{,}000$ patient resamples.
+\textsuperscript{$\ddagger$}The frozen arm applies one transported
+predictor per gene and therefore cannot express a regime, which is a
+contrast across four conditions; it tests the decision function, not the
+assignment.
+\textsuperscript{$\S$}Re-fitting the four conditions inside CPTAC with
+only the representation carried over reaches \textit{TP53} $0.698$
+against the TCGA value of $0.661$, so the morphology-to-genotype coupling
+is present in the second cohort and the off-the-shelf collapse is a
+property of the transported decision function. The deciding contrast
+$\piabmil{}-\mathrm{B2}$ is $+0.032$ with a $95\%$ CI of $-0.041$ to
+$+0.102$, which spans zero, so no regime is asserted. Per-gene transfer
+values and the stain-normalisation and field-of-view controls are in
+\cref{tab:cptac_transfer,tab:cptac_refit}.
+\end{flushleft}

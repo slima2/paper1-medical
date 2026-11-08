@@ -1,9 +1,23 @@
 % =====================================================================
-% Table tab:mutation_luad — adapted from thesis ch06:622-652
+% Table tab:mutation_luad — cohort v4, five seeds, two protocols.
+%
+% Source: results_luad_robustness_v4, 1200/1200 units aggregated
+%   (5 seeds x 2 protocols x 6 genes x 4 conditions x 5 folds).
+%   Point values: bootstrap_v4_final/luad_pooled_oof_aurocs_by_seed.csv,
+%     pooled out-of-fold AUROC per seed, reported as mean +- SD across
+%     the five seeds.
+%   B3-B2 intervals: bootstrap_v4_final/luad_hierarchical_contrasts.csv,
+%     hierarchical patient bootstrap (site-clustered under protocol b).
+%
+% NOTE(conditions): the v4 run scored B2, B3, PI and FC only. The former
+%   B1 (XGBoost on the 7-d pattern vector) and A (one-hot ablation)
+%   columns are not reproducible from this run and have been dropped
+%   rather than carried over from the superseded cohort. See
+%   TODO(b1-and-a) in 03_results_NMI.tex.
+%
 % Eight columns of mean$\pm$SD overflow the 166 mm text block at \small,
 % so the table is wrapped in \resizebox exactly as
-% tab_literature_comparison.tex is. Rules are booktabs for consistency
-% with the other tables in this manuscript.
+% tab_literature_comparison.tex is.
 % =====================================================================
 \resizebox{\linewidth}{!}{%
 \small
@@ -13,28 +27,55 @@
 \toprule
 \textbf{Cond.} & \textbf{TP53} & \textbf{EGFR} & \textbf{STK11} &
 \textbf{KEAP1} & \textbf{KRAS} & \textbf{RBM10} & \textbf{Mean} \\
+ & {\scriptsize $n_+\!=\!220$} & {\scriptsize $67$} & {\scriptsize $58$}
+ & {\scriptsize $79$} & {\scriptsize $124$} & {\scriptsize $30$} & \\
 \midrule
-B1 (XGBoost)
-  & .518$\pm$.025 & .634$\pm$.033 & .545$\pm$.055
-  & .489$\pm$.034 & .522$\pm$.057 & .474$\pm$.101 & .530 \\
+\multicolumn{8}{l}{\textbf{a}, Patient-preserved outer folds}\\
+\addlinespace[1pt]
 B2 (ABMIL embeddings)
-  & \textbf{.718}$\pm$.053 & \textbf{.701}$\pm$.049
-  & .684$\pm$.042 & .597$\pm$.081 & .607$\pm$.078
-  & .642$\pm$.054 & .658 \\
+  & \textbf{.661}$\pm$.033 & \textbf{.582}$\pm$.060 & .591$\pm$.019
+  & \textbf{.488}$\pm$.029 & \textbf{.517}$\pm$.026
+  & .536$\pm$.047 & .562 \\
 B3 (ABMIL patterns)
-  & .616$\pm$.043 & .625$\pm$.044 & .617$\pm$.050
-  & .588$\pm$.031 & .545$\pm$.076 & .653$\pm$.081 & .607 \\
-\midrule
+  & .579$\pm$.029 & .480$\pm$.023 & .499$\pm$.017
+  & .485$\pm$.038 & .486$\pm$.031 & .490$\pm$.037 & .503 \\
 PI-ABMIL (ours)
-  & .717$\pm$.058 & .694$\pm$.051 & \textbf{.695}$\pm$.023
-  & \textbf{.610}$\pm$.071 & .590$\pm$.071 & .640$\pm$.064 & .658 \\
-A (one-hot ablation)
-  & .716$\pm$.050 & .695$\pm$.046 & .691$\pm$.050
-  & .594$\pm$.082 & .594$\pm$.071 & .623$\pm$.048 & .652 \\
+  & .658$\pm$.020 & .580$\pm$.046 & .578$\pm$.050
+  & .446$\pm$.032 & .516$\pm$.025
+  & \textbf{.552}$\pm$.027 & .555 \\
 FC-MIL (ours)
-  & .716$\pm$.047 & .684$\pm$.037 & .658$\pm$.077
-  & .589$\pm$.080 & \textbf{.609}$\pm$.059
-  & \textbf{.661}$\pm$.063 & .653 \\
+  & .646$\pm$.031 & .567$\pm$.060 & \textbf{.608}$\pm$.021
+  & .460$\pm$.020 & .506$\pm$.019 & .528$\pm$.038 & .553 \\
+\addlinespace[2pt]
+B3$-$B2 [95\% CI]
+  & \textbf{$-$.082} & \textbf{$-$.102} & \textbf{$-$.092}
+  & $-$.003 & $-$.031 & $-$.046 & \\
+  & {\scriptsize[$-$.134,$-$.027]} & {\scriptsize[$-$.178,$-$.030]}
+  & {\scriptsize[$-$.170,$-$.021]} & {\scriptsize[$-$.076,\,.070]}
+  & {\scriptsize[$-$.094,\,.024]} & {\scriptsize[$-$.161,\,.073]} & \\
+\midrule
+\multicolumn{8}{l}{\textbf{b}, Site-preserved outer folds}\\
+\addlinespace[1pt]
+B2 (ABMIL embeddings)
+  & \textbf{.640}$\pm$.024 & \textbf{.584}$\pm$.038
+  & \textbf{.605}$\pm$.019 & .482$\pm$.021 & \textbf{.507}$\pm$.028
+  & \textbf{.525}$\pm$.055 & .557 \\
+B3 (ABMIL patterns)
+  & .561$\pm$.032 & .485$\pm$.052 & .523$\pm$.044
+  & \textbf{.488}$\pm$.059 & .475$\pm$.039 & .517$\pm$.045 & .508 \\
+PI-ABMIL (ours)
+  & .630$\pm$.043 & .576$\pm$.050 & .593$\pm$.024
+  & .472$\pm$.019 & .502$\pm$.045 & .512$\pm$.057 & .547 \\
+FC-MIL (ours)
+  & .636$\pm$.026 & .557$\pm$.040 & .597$\pm$.056
+  & .471$\pm$.015 & .501$\pm$.023 & .511$\pm$.071 & .546 \\
+\addlinespace[2pt]
+B3$-$B2 [95\% CI]
+  & \textbf{$-$.079} & \textbf{$-$.099} & $-$.083
+  & $+$.006 & $-$.032 & $-$.007 & \\
+  & {\scriptsize[$-$.131,$-$.024]} & {\scriptsize[$-$.174,$-$.019]}
+  & {\scriptsize[$-$.181,\,.001]} & {\scriptsize[$-$.067,\,.093]}
+  & {\scriptsize[$-$.093,\,.035]} & {\scriptsize[$-$.103,\,.108]} & \\
 \bottomrule
 \end{tabular}%
 }

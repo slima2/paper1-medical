@@ -1,0 +1,75 @@
+% Table tab:literature_power_audit — are published aggregator gains resolvable
+% by the designs that report them?
+%
+% Every AUROC and every class count below is transcribed from the primary text
+% of the cited source, not from an abstract or a leaderboard. Reproduced by
+% scripts/literature_power_audit.py.
+%
+% MDE column: minimum difference in AUROC detectable at two-sided alpha=0.05
+% and 80% power. Computed as (z_{0.975}+z_{0.80}) * f * SE_HM, where SE_HM is
+% the Hanley-McNeil analytic SE of a single AUROC evaluated at the study's own
+% reported AUROC and class counts, and f=0.66 is the ratio of paired-contrast
+% SE to analytic SE measured in our own five-seed hierarchical bootstrap.
+% f<1 credits each audited design with the full benefit of pairing.
+\footnotesize
+\setlength{\tabcolsep}{5pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{l r r r r r c}
+\toprule
+\textbf{Claim} & $\boldsymbol{n^{+}}$ & \textbf{base} & \textbf{prop.} &
+  $\boldsymbol{\Delta}$ & \textbf{MDE} & $\boldsymbol{\Delta/}$\textbf{MDE} \\
+\midrule
+\multicolumn{7}{l}{\emph{Brattoli et al.\cite{brattoli2025asymtransdec}, 1{,}223 WSI, 5-fold CV, AsymTransDec vs.\ ABMIL (Table 1, ViT)}} \\
+\quad \textit{ALK}      &  70 & 0.875 & 0.884 & 0.009 & 0.049 & 0.18 \\
+\quad \textit{BRAF}     & 100 & 0.824 & 0.865 & 0.041 & 0.044 & 0.94 \\
+\quad \textit{EGFR}     & 275 & 0.893 & 0.908 & 0.015 & 0.023 & 0.65 \\
+\quad \textit{ERBB2}    &  78 & 0.755 & 0.801 & 0.046 & 0.057 & 0.81 \\
+\quad \textit{KRAS}     & 184 & 0.842 & 0.859 & 0.017 & 0.033 & 0.51 \\
+\quad \textit{MET}ex14  &  88 & 0.841 & 0.864 & 0.023 & 0.047 & 0.49 \\
+\addlinespace
+\multicolumn{7}{l}{\emph{Same study, contributions isolated (six-task averages)}} \\
+\quad architecture (vs.\ vanilla decoder) & 94 & 0.849 & 0.863 & 0.014 & 0.045 & 0.31 \\
+\quad tissue stratification (vs.\ none)   & 94 & 0.855 & 0.863 & 0.008 & 0.045 & 0.18 \\
+\midrule
+\multicolumn{7}{l}{\textbf{This work}, 444 patients, 5 seeds $\times$ 2 protocols} \\
+\quad \textit{TP53} (best powered) & 220 & \multicolumn{2}{c}{---} & --- & 0.037 & --- \\
+\quad \textit{RBM10} (worst)       &  30 & \multicolumn{2}{c}{---} & --- & 0.105 & --- \\
+\bottomrule
+\end{tabular}
+\begin{flushleft}\footnotesize
+$\Delta$ is the reported gain of the proposed method over the stated baseline;
+MDE is the smallest difference the study's own design could have distinguished
+from zero at two-sided $\alpha\!=\!0.05$ and $80\%$ power.
+$\Delta/\text{MDE}\!<\!1$ means the reported gain lies below the resolution of
+the design that produced it. All eight audited claims do, and none is
+accompanied by a confidence interval or a significance test in the source.
+This is not a claim that the gains are spurious. It is a claim that the
+experiments cannot distinguish them from zero, so the reader has no basis for
+either accepting or rejecting them.
+\par\medskip
+Two independent lines corroborate this from within the field.
+First, when comparisons \emph{are} tested, most do not survive: Ghaffari Laleh
+et al.\cite{ghaffarilaleh2022benchmarking} evaluated six pipelines on five
+mutation-prediction tasks with DeLong's test and found $24$ of the $75$
+pairwise comparisons significant, leaving $68\%$ that were not.
+Second, the same aggregator on the same public benchmark moves further between
+reimplementations than any of these gains: in the cross-source compilation of
+Chen et al.\cite{chen2024benchmarking}, DS-MIL on \textsc{Camelyon}16 is
+reported between $0.818$ and $0.946$ and ABMIL between $0.838$ and $0.940$,
+spreads of $12.8$ and $10.2$ AUROC points, against claimed improvements of one
+to three points.
+\par\medskip
+\emph{Method.} The MDE transports a variance component measured here onto each
+published design, because none reports its own. We compute the Hanley--McNeil
+analytic standard error of a single AUROC at the study's reported AUROC and
+class counts, then multiply by $f\!=\!0.66$, the median ratio of our
+hierarchical paired-contrast SE to that analytic SE across our six genes
+(range $0.51$--$0.79$). Since $f\!<\!1$, the audited studies are credited with
+the full variance reduction that scoring both models on the same patients
+affords. The transport is approximate in one direction we flag explicitly:
+$f$ was calibrated at AUROC $0.49$--$0.66$ whereas the audited studies operate
+at $0.75$--$0.91$. Hanley--McNeil already adjusts the standard error for the
+level of the AUROC, but the seed-to-seed component folded into $f$ need not
+transport identically. The remedy is not a better transport; it is for such
+studies to report the interval themselves.
+\end{flushleft}

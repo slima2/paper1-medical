@@ -1,0 +1,133 @@
+% =====================================================================
+% Table tab:controls — the full control grid, cohort v4.
+%
+% Source: results_controls/{patient,site}_seed{42,142,242}/oof/oof_*.csv,
+%   360 scored units (3 seeds x 2 protocols x 3 targets x 2 conditions
+%   x 5 folds), plus results_tumor/{patient,site}_seed{42,142,242} for the
+%   tumour-versus-normal arm, a further 60 units (3 seeds x 2 protocols
+%   x 1 target x 2 conditions x 5 folds). Pooled out-of-fold AUROC, slides
+%   aggregated to the patient by mean probability before scoring, exactly
+%   as tab_mutation_luad does. Recomputed by scripts/verify_controls.py,
+%   which writes controls_recomputed.csv.
+%
+% NOTE(tumour arm): added after the sex control returned an uninformative
+%   result. It exists to break a circularity in the earlier draft, which
+%   used TP53 both as the paper's headline measurement and as the proof
+%   that the pipeline producing it works. Tumour-versus-normal is
+%   independent of every mutation label and is the one discrimination H&E
+%   is certain to support, so it can carry that burden without borrowing
+%   from the arm it is meant to validate. 520 slides: the 458 of the main
+%   cohort plus the 62 solid-tissue-normal sections Methods excludes.
+%
+% NOTE(seeds): the control arm ran three seeds, not the five of the main
+%   arm. The SD columns are therefore over three values and are reported
+%   only to show spread, not as an interval. Inference against chance
+%   uses the analytic Hanley-McNeil SE quoted in the caption.
+%
+% NOTE(supersedes): this table replaces the four loose numbers the earlier
+%   draft carried in the Results text (0.515 / 0.482 / 0.588 / 0.647). Those
+%   were not wrong, they were a different estimator: they are the mean of the
+%   five fold AUROCs for seed 42 under the patient-preserved protocol, read
+%   off results_controls/patient_seed42/summary_table.csv. tab_mutation_luad
+%   reports pooled out-of-fold AUROC, so the controls are recomputed the same
+%   way here. The two estimators differ by up to 0.05 on the same predictions
+%   (sex: 0.588 as a mean of folds, 0.549 pooled, both for seed 42), which is
+%   itself a reason to state which one a number is.
+% =====================================================================
+\small
+\setlength{\tabcolsep}{5pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{l l r c c c c}
+\toprule
+\textbf{Target} & \textbf{Cond.} & $\boldsymbol{n_+}$ &
+\textbf{s42} & \textbf{s142} & \textbf{s242} & \textbf{mean}$\pm$\textbf{SD} \\
+\midrule
+\multicolumn{7}{l}{\textbf{a}, Patient-preserved outer folds}\\
+\addlinespace[1pt]
+tumour vs.\ normal\textsuperscript{$\ddagger$}
+                & B2 & $444$ & .980 & .972 & .977 & \textbf{.976}$\pm$.004 \\
+tumour vs.\ normal\textsuperscript{$\ddagger$}
+                & B3 & $444$ & .775 & .815 & .810 & \textbf{.800}$\pm$.022 \\
+\addlinespace[2pt]
+\textit{TP53}   & B2 & $220$ & .636 & .696 & .684 & .672$\pm$.032 \\
+\textit{TP53}   & B3 & $220$ & .529 & .594 & .595 & .573$\pm$.037 \\
+\addlinespace[2pt]
+\textit{TP53} permuted & B2 & $220$ & .508 & .489 & .493 & .496$\pm$.010 \\
+\textit{TP53} permuted & B3 & $220$ & .476 & .482 & .504 & .487$\pm$.015 \\
+\addlinespace[2pt]
+patient sex     & B2 & $238$ & .549 & .506 & .563 & .539$\pm$.029 \\
+patient sex     & B3 & $238$ & .467 & .520 & .496 & .494$\pm$.027 \\
+\midrule
+\multicolumn{7}{l}{\textbf{b}, Site-preserved outer folds}\\
+\addlinespace[1pt]
+tumour vs.\ normal\textsuperscript{$\ddagger$}
+                & B2 & $444$ & .956 & .982 & .965 & \textbf{.968}$\pm$.013 \\
+tumour vs.\ normal\textsuperscript{$\ddagger$}
+                & B3 & $444$ & .731 & .788 & .771 & \textbf{.763}$\pm$.029 \\
+\addlinespace[2pt]
+\textit{TP53}   & B2 & $220$ & .617 & .657 & .660 & .645$\pm$.024 \\
+\textit{TP53}   & B3 & $220$ & .590 & .594 & .567 & .584$\pm$.014 \\
+\addlinespace[2pt]
+\textit{TP53} permuted & B2 & $220$ & .514 & .463 & .465 & .481$\pm$.029 \\
+\textit{TP53} permuted & B3 & $220$ & .486 & .512 & .472 & .490$\pm$.021 \\
+\addlinespace[2pt]
+patient sex     & B2 & $238$ & .525 & .532 & .531 & .530$\pm$.004 \\
+patient sex     & B3 & $238$ & .494 & .481 & .494 & .489$\pm$.008 \\
+\bottomrule
+\end{tabular}
+\begin{flushleft}\footnotesize
+Pooled out-of-fold \auroc{}, three seeds, both protocols. B2 and B3 are
+the conditions of \cref{tab:mutation_luad_resultssec}. Labels are
+permuted at the patient level, so a slide never carries a label drawn
+from its own patient. \textsuperscript{$\ddagger$}The tumour-versus-normal
+arm scores $506$ patients---the $444$ of the main cohort against the
+$62$ solid-tissue-normal sections excluded from it (Methods)---and no
+patient contributes to both classes, so the patient-level pooling is the
+same operation as in every other row. All other rows score the $444$.
+\par\medskip
+\emph{The negative control passes.} All four permuted rows lie within
+$0.019$ of chance, and every one contains $0.5$ in its analytic
+$95\%$ interval. Nothing in the protocol manufactures discrimination.
+\par\medskip
+\emph{The positive control passes, on both channels.} Tumour versus
+normal reaches $0.976$ patient-preserved (analytic $95\%$ CI
+$0.965$--$0.988$, $81$ standard errors from chance) and $0.968$
+site-preserved. This is the control that establishes the pipeline
+learns, and it was chosen because it is the one discrimination H\&E is
+certain to support, so a failure here would have been unambiguous. The
+pattern channel clears chance too, at $0.800$ ($0.752$--$0.848$) and
+$0.763$: the ANORAK head is functional, which forecloses the reading
+that its near-chance mutation values in
+\cref{tab:mutation_luad_resultssec} reflect a broken classifier rather
+than an absent signal. Neither number licenses any inference about
+mutation prediction. A cohort where the intended target is separable at
+$0.98$ and \textit{TP53} stops at $0.66$ is a cohort in which the
+machinery works and the target is hard, which is precisely the
+distinction the controls exist to draw.
+\par\medskip
+\emph{\textit{TP53} replicates the main arm.} At $0.672$
+patient-preserved it sits $0.011$ from the five-seed estimate of
+\cref{tab:mutation_luad_resultssec} ($0.661\pm0.033$), and
+site-preserved the gap is $0.005$ ($0.645$ vs.\ $0.640$). Three seeds
+run for a different purpose therefore reproduce the main arm. We report
+this as replication rather than as evidence that the pipeline learns,
+which would use the measurement to certify the instrument that produced
+it; the tumour arm carries that burden instead.
+\par\medskip
+\emph{The sex control is uninformative, and we say so.} Patient sex was
+prespecified before the tumour arm existed, on the expectation that it
+is recoverable from H\&E. It is not, here: $0.539$
+($0.485$--$0.593$, $p\!=\!0.15$) on the embedding channel and $0.494$ on
+the pattern channel, with the site-preserved arm lower still. The design
+cannot settle this either way---at $n_+\!=\!238$ the smallest deviation
+from chance it resolves at $80\%$ power is $0.077$, so any true sex
+effect below $0.577$ was always going to return this result. It is
+therefore neither passed nor failed but underpowered, which is the same
+verdict this paper issues on the aggregator gains of
+\cref{tab:literature_power_audit} and we see no principled reason to
+exempt ourselves from it. One inference does survive: because sex is not
+recoverable from these embeddings at this scale, the \textit{TP53} and
+\textit{EGFR} signal in \cref{tab:mutation_luad_resultssec} cannot be a
+demographic shortcut. A control that fails to establish what it was
+chosen to establish can still exclude something else.
+\end{flushleft}

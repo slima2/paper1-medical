@@ -1,0 +1,90 @@
+% Table tab:pid_regimes — the three regimes as partial-information-decomposition
+% atoms, with the model-side signature that evidences each atom.
+% Scientific Reports build: Supplementary Table. All signature values are
+% read off tab:mutation_luad; no additional experiment is introduced here.
+% Differs from tab_pid_regimes.tex in the KEAP1 row, which is stated from
+% the four conditions alone.
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\linewidth}{l c l X X}
+\toprule
+\textbf{Gene} & \textbf{Regime} & \textbf{Dominant atom} &
+  \textbf{Model-side signature (this cohort)} &
+  \textbf{Implied remedy} \\
+\midrule
+\textit{TP53}  & (i)   & $\Ired$
+  & Pattern channel is a no-op on top of the embedding:
+    $\auroc$ $.661\!\to\!.658$ (PI) and $.646$ (FC)
+  & Stronger encoder; the vocabulary is not the deficit \\
+\textit{EGFR}  & (i)   & $\Ired$
+  & Same signature: $.582\!\to\!.580$ (PI), $.567$ (FC)
+  & Stronger encoder; the vocabulary is not the deficit \\
+\midrule
+\textit{KRAS}  & (ii-b) \emph{not} supported & $\Isyn$ untested
+  & Capacity learns $I(\text{lep}\!\times\!\text{sol})={+}0.032$, but
+    FC $.506$ sits \emph{below} PI $.516$ unconditionally and the
+    FC${-}$PI contrast does not concentrate where the pair
+    co-activates (\cref{tab:kras_coactivation})
+  & Cohort about $10\times$ larger before the conditional test can
+    resolve (\cref{tab:design_power}) \\
+\midrule
+\textit{STK11} & (iii) & $\Iuni{\mathbf{E}}$
+  & Pattern-only B3 falls $.092$ below B2, interval excluding zero;
+    concat fusion loses ($.591\!\to\!.578$) and only the Choquet head
+    edges up ($.608$), within a fold's spread
+  & Micro-environment channels (TIL, budding, tumour--stroma ratio) \\
+\textit{KEAP1} & (iii) & $\Iuni{\mathbf{E}}$
+  & Every condition at or below $.49$ under both protocols: both
+    single channels empty and fusion does not lift them
+  & RNA-seq; NRF2 immunostaining \\
+\textit{RBM10} & (iii) & Atoms not estimable
+  & Pattern-only B3 ($.490$) does \emph{not} exceed embedding-only B2
+    ($.536$); across-seed SD reaches $\pm.071$ at $n_+\!=\!30$,
+    swamping every contrast
+  & Cohort size before any new channel \\
+\bottomrule
+\end{tabularx}
+\begin{flushleft}\footnotesize
+Regimes (i)--(iii) are encoder saturation, complementarity and
+out-of-ontology respectively;
+atoms are those of \cref{eq:pid}.
+Regime~(ii) admits an additive sub-form (ii-a, $\Iuni{\mathbf{P}}$,
+recovered by concat fusion) and a non-additive one
+(ii-b, $\Isyn$, inter-pattern co-occurrence, requiring the Choquet
+aggregator);
+both sub-forms are empty in this cohort
+(\cref{tab:atom_operationalization}).
+The $\Isyn$ signature cannot be read from an unconditional
+$\mathrm{FC}\!>\!\mathrm{PI}$ together with $I_{jk}>0$: both hold on
+\textit{KRAS} while the gain fails to track the co-activation the
+index names, which is why the sub-form requires the stratified
+contrast of \cref{tab:kras_coactivation}.
+All rows below \textit{EGFR} carry an Inconclusive population
+verdict, and in this cohort that one label hides three different
+states (a fourth, a heterogeneous gene-level label, is flagged as an
+untested confound in \cref{tab:levels_of_analysis}): for
+\textit{KEAP1} the pattern-side atoms are empty, for \textit{RBM10}
+they are non-empty but unestimable at the available prevalence, and
+for \textit{KRAS} the pattern side carries a measurable association
+with the target while the contrast that would attribute it to the
+aggregator is unresolved by a margin this cohort cannot close.
+The three look identical in an AUROC table and imply different next
+experiments; only the first is untranslatability
+(\cref{tab:levels_of_analysis}).
+\par\medskip
+Every regime in this column is the \emph{pre-registered expectation} against
+which the adjudication was run, not an established assignment: no LUAD cell
+establishes equivalence at the $\pm0.02$ margin, so all six remain unresolved
+(\cref{tab:threshold_sensitivity}). \textit{KEAP1} carries the sharpest
+qualification. Under the patient-preserved protocol its gating contrasts are
+$\mathrm{PI}-\mathrm{B2}\!=\!-0.042$ and $\mathrm{FC}-\mathrm{B2}\!=\!-0.028$,
+both beyond the margin in the direction of fusion \emph{costing} accuracy
+rather than being a no-op, so equivalence there is unattainable at any cohort
+size and the (iii) read on that protocol rests on the single-channel
+evidence alone---both B2 and B3 at chance. This is the one boundary at
+which the per-slide read-outs are load-bearing rather than illustrative
+(Methods), and for \textit{KEAP1} it is corroborated from outside the
+model by the biochemical rather than morphological character of the
+NRF2 axis.
+\end{flushleft}

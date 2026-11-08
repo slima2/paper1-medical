@@ -1,0 +1,33 @@
+% Scientific Reports front matter.
+% Abstract: <= 200 words, unstructured, a general introduction and a brief
+% non-technical summary of the main results and their implications; no
+% citations, no figures. Keywords: <= 6. No plain-language summary in this
+% journal. The Communications Medicine abstract is 01_abstract_CM.tex.
+\begin{abstract}
+\noindent
+Medical machine learning increasingly asks one kind of data to report on
+something it does not directly measure: a tissue section on a tumour's
+mutations, a brain scan on its molecular markers, an electrocardiogram
+on a patient's physiology. Such predictors are judged by one
+cohort-average accuracy per target, a number that cannot say whether
+the target is reachable at all, or what to change if not. Here we report per-target \emph{translatability} instead.
+Pairing an expert vocabulary of the source data with an unconstrained
+learned encoder gives two sources of evidence about each target, and
+the four ways two sources can share information define three
+regimes---encoder saturation, complementarity and
+out-of-ontology---each with a different remedy. Regimes are read from
+the direction of contrasts between four retrained models, adjudicated
+by a hierarchical bootstrap, and issued as a Conclusive/Inconclusive
+verdict at the level at which it was established. On 444 lung
+adenocarcinoma patients, the scarcity typical of public cohorts, the
+instrument resolves one contrast, declines to assign any regime, and
+reports the cohort size that could. The
+same protocol runs unchanged on glioma MRI, declining MGMT at full
+power, on the electrocardiogram, and across cohorts, where it turns
+Inconclusive rather than confidently wrong.
+\end{abstract}
+
+\paragraph{Keywords.}
+Cross-domain prediction; partial information decomposition; model
+evaluation; interpretability; multiple-instance learning; computational
+pathology.

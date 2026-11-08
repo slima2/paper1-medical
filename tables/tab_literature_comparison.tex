@@ -33,9 +33,10 @@ Wang~et~al.\cite{wang2024chief} (CHIEF) &
   2024 & Nature & 60{,}530 & FM, pan-cancer &
   ---\textsuperscript{\S} & $>$\,0.70 & --- & --- & --- & --- \\
 \midrule
-\multirow{2}{*}{\textbf{This work}} & \multirow{2}{*}{2026} & \multirow{2}{*}{---} & \multirow{2}{*}{\textbf{687}}
-  & \piabmil{} & \textbf{0.717} & \textbf{0.694} & 0.590 & \textbf{0.695} & \textbf{0.610} & 0.640 \\
-  & & & & \fcmil{} & 0.716 & 0.684 & \textbf{0.609} & 0.658 & 0.589 & \textbf{0.661} \\
+\multirow{3}{*}{\textbf{This work}} & \multirow{3}{*}{2026} & \multirow{3}{*}{---} & \multirow{3}{*}{\textbf{458}}
+  & B2 (encoder only)\textsuperscript{\textbardbl} & \textbf{0.661} & \textbf{0.582} & \textbf{0.517} & 0.591 & \textbf{0.488} & 0.536 \\
+  & & & & \piabmil{} & 0.658 & 0.580 & 0.516 & 0.578 & 0.446 & \textbf{0.552} \\
+  & & & & \fcmil{} & 0.646 & 0.567 & 0.506 & \textbf{0.608} & 0.460 & 0.528 \\
 \bottomrule
 \end{tabular}%
 }
@@ -48,7 +49,7 @@ and \textit{STK11}, not a per-gene value for either \textit{TP53} or any other
 gene. Their intervals are correspondingly wide, e.g.\ \textit{STK11}
 $[0.709,0.964]$ and \textit{KEAP1} $[0.466,0.865]$.
 $^{\dagger}$Kather~et~al.\ report LUAD per-gene AUROCs only in a bar chart
-(Extended Data Fig.~2); the values shown are read from that figure and lie
+(their Extended Data Fig.~2); the values shown are read from that figure and lie
 within the paper's stated LUAD range of $0.60$--$0.78$ (3-fold CV on TCGA).
 \textsuperscript{\P}Saldanha~et~al.\ report only \textit{EGFR} for LUAD
 (AUROC $0.76\!\pm\!0.03$, external validation on CPTAC); the other LUAD
@@ -65,4 +66,21 @@ Cohort sizes ($N$) are slide counts.
 ``---'' indicates the gene was not reported in the corresponding study;
 Coudray is the only prior study reporting \textit{STK11} and \textit{KEAP1}
 individually, and \textit{RBM10} is reported by none of them.
+\textsuperscript{\textbardbl}Our rows are pooled out-of-fold \auroc{},
+patient-preserved folds, averaged over five seeds
+(\cref{tab:mutation_luad_resultssec}); B2 is the encoder-only ceiling
+baseline and is included because it, not either fusion condition, is the
+best this cohort yields on four of six genes.
+\par\smallskip
+\textbf{This row is not commensurable with the rows above it, and the gap
+should not be read as a method comparison.} Ours are scored under nested
+cross-validation, with early stopping on an inner split and the outer fold
+scored exactly once, on a cohort restricted to adenocarcinoma cases with a
+mutation call and cleared of solid-tissue-normal sections. The prior line
+predominantly reports values selected on the same fold they are scored on,
+and on inventories that retain squamous and normal sections. Removing those
+two sources of optimism is what separates the two blocks; a like-for-like
+comparison would require rerunning each prior method under this protocol,
+which we do not do. The audit of what these cohorts can resolve at all is
+\cref{tab:literature_power_audit}.
 \end{flushleft}

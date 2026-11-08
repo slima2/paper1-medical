@@ -1,0 +1,130 @@
+% ============================================================
+% Preamble — Scientific Reports build (main_SR.tex and
+% supplementary_SR.tex share it).
+% Journal guidance (https://www.nature.com/srep/author-instructions/
+% submission-guidelines): single-column, unjustified text; Arabic page
+% number in the footer; default Computer Modern fonts; numeric citations
+% in square brackets in Nature style; line numbers recommended;
+% equations cited as "equation (1)".
+%
+% The file that \input{}s this preamble must define \SRexternaldoc
+% (the jobname of the companion document whose labels are read with
+% xr-hyper: the article reads the supplement and vice versa) and
+% \SRpdftitle.
+% ============================================================
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage{lmodern}
+\usepackage{microtype}
+
+\usepackage[a4paper,top=25mm,bottom=25mm,left=25mm,right=25mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+% Unjustified single-column text, as the journal asks of revised files.
+\usepackage[document]{ragged2e}
+\setlength{\RaggedRightParindent}{\parindent}
+
+% Line numbers on every page of the article (journal recommendation).
+\usepackage[mathlines]{lineno}
+\linenumbers
+\renewcommand\linenumberfont{\normalfont\tiny\color{gray}}
+
+\usepackage{amsmath,amssymb,bm,mathtools}
+\usepackage{graphicx}
+\graphicspath{{figures/casegrid_1600/}{figures/}}
+\usepackage{float}
+\usepackage{placeins}
+\usepackage{subcaption}
+\usepackage[labelfont=bf,font=small]{caption}
+
+\setcounter{topnumber}{3}
+\setcounter{bottomnumber}{2}
+\setcounter{totalnumber}{4}
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.7}
+\renewcommand{\textfraction}{0.1}
+\renewcommand{\floatpagefraction}{0.5}
+
+% Inside table floats the size ladder is the 10 pt one (normal 10,
+% small 9, footnote 8, script 7) so that no table overruns one page.
+\usepackage{etoolbox}
+\newcommand{\tablesizes}{%
+  \renewcommand{\normalsize}{\fontsize{10}{12}\selectfont}%
+  \renewcommand{\small}{\fontsize{9}{10.5}\selectfont}%
+  \renewcommand{\footnotesize}{\fontsize{8}{9.5}\selectfont}%
+  \renewcommand{\scriptsize}{\fontsize{7}{8}\selectfont}%
+  \normalsize}
+% Inside floats the ragged2e paragraph indent is dropped, otherwise a
+% \resizebox{\linewidth} table starts an indented paragraph and overruns
+% the text block by exactly \parindent.
+\AtBeginEnvironment{table}{\tablesizes\setlength{\parindent}{0pt}%
+  \setlength{\RaggedRightParindent}{0pt}\setlength{\CenteringParindent}{0pt}}
+\AtBeginEnvironment{figure}{\setlength{\parindent}{0pt}%
+  \setlength{\RaggedRightParindent}{0pt}\setlength{\CenteringParindent}{0pt}}
+
+\usepackage{booktabs,multirow,makecell,longtable,tabularx,array}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+
+\usepackage[dvipsnames,table]{xcolor}
+\definecolor{linkblue}{RGB}{0,70,140}
+
+% Cross-document references: the article cites Supplementary items and
+% the Supplementary Information cites main-text equations, tables and
+% figures. xr-hyper must precede hyperref.
+\usepackage{xr-hyper}
+% [nocite]: import labels only, not the other document's \bibcite
+% entries (each document carries its own numbered reference list).
+\externaldocument[][nocite]{\SRexternaldoc}
+
+\usepackage[colorlinks,linkcolor=linkblue,citecolor=linkblue,urlcolor=linkblue,
+  pdftitle={\SRpdftitle}]{hyperref}
+\usepackage{xurl}
+\usepackage[capitalise,noabbrev]{cleveref}
+\crefformat{equation}{equation~(#2#1#3)}
+\Crefformat{equation}{Equation~(#2#1#3)}
+% Supplementary items are numbered S1, S2, ... and cited as
+% "Supplementary Fig. S1" / "Supplementary Table S1" (journal style).
+\crefname{suppfigure}{Supplementary Fig.}{Supplementary Figs.}
+\Crefname{suppfigure}{Supplementary Fig.}{Supplementary Figs.}
+\crefname{supptable}{Supplementary Table}{Supplementary Tables}
+\Crefname{supptable}{Supplementary Table}{Supplementary Tables}
+
+% Numeric citations in square brackets, Nature reference style.
+\usepackage[numbers,sort&compress,square]{natbib}
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{\SRrunninghead}}
+\fancyfoot[C]{\small\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+\newcommand{\auroc}{\text{AUROC}}
+\newcommand{\auprc}{\text{AUPRC}}
+\newcommand{\fuzzyarc}{\textsc{FuzzyArcLoss}}
+\newcommand{\abmil}{\textsc{ABMIL}}
+\newcommand{\lchai}{\textsc{LCHAI}}
+\newcommand{\ctranspath}{\textsc{CTransPath}}
+\newcommand{\fcmil}{\textsc{FC-MIL}}
+\newcommand{\piabmil}{\textsc{PI-ABMIL}}
+\newcommand{\xgb}{\textsc{XGBoost}}
+
+\DeclareMathOperator{\softmax}{softmax}
+\newcommand{\sigmoid}{\sigma}
+
+% Partial information decomposition (Williams & Beer atoms).
+\newcommand{\pid}{\textsc{PID}}
+\newcommand{\Ired}{\mathcal{R}}          % redundant information
+\newcommand{\Iuni}[1]{\mathcal{U}_{#1}}  % unique information of source #1
+\newcommand{\Isyn}{\mathcal{S}}          % synergistic information
+
+% Uniform-size case-study panel: fixed box, image scaled to fit.
+\newlength{\casepanelht}\setlength{\casepanelht}{4.4cm}
+\newcommand{\casepanel}[1]{%
+  \begin{minipage}[c][\casepanelht][c]{\linewidth}%
+    \centering
+    \includegraphics[width=\linewidth,height=\casepanelht,keepaspectratio]{#1}%
+  \end{minipage}}

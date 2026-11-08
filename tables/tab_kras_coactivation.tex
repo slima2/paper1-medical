@@ -1,0 +1,62 @@
+% Table tab:kras_coactivation — the conditional test of regime (ii-b) on KRAS.
+% Strata are terciles of patient-level lepidic x solid co-activation, computed
+% from the ANORAK pattern head alone and therefore independent of every
+% mutation-side quantity in the table. FC-PI intervals are the hierarchical
+% bootstrap of Methods (2000 resamples, seeds resampled before patients,
+% site-clustered under the site-preserved protocol).
+% Source: stratified_luad_contrast.py, stratified_summary.json, from the run
+% stratified_kras_final (seeds 42, 142, 242, 342, 442), which is the same
+% five-seed basis as tab_mutation_luad. An earlier draft of this table carried
+% the three-seed stage-1 values (high-low -0.029 and -0.011); those are
+% superseded. The two differ materially in one place: under site preservation
+% the point estimate moves from -0.011 to +0.025, so the high-low estimates
+% now disagree in sign across protocols rather than agreeing on negative.
+\footnotesize
+\setlength{\tabcolsep}{5pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{l c c c c c}
+\toprule
+\textbf{Co-activation} & \textbf{Patients} & \textbf{KRAS$^{+}$} &
+  \textbf{Prevalence} & \multicolumn{2}{c}{\textbf{FC${-}$PI $\Delta\auroc$ [95\% CI]}} \\
+\cmidrule(lr){5-6}
+\textbf{stratum} & & & & \textbf{Patient-preserved} & \textbf{Site-preserved} \\
+\midrule
+Low    & $148$ & $33$ & $22.3\%$
+  & $-0.004$ $[-0.072,\,{+}0.062]$ & $-0.028$ $[-0.102,\,{+}0.042]$ \\
+Mid    & $148$ & $42$ & $28.4\%$
+  & $-0.000$ $[-0.078,\,{+}0.086]$ & ${+}0.021$ $[-0.044,\,{+}0.095]$ \\
+High   & $148$ & $49$ & $33.1\%$
+  & $-0.028$ $[-0.095,\,{+}0.041]$ & $-0.003$ $[-0.095,\,{+}0.079]$ \\
+\midrule
+\textbf{High ${-}$ Low} & --- & --- & ---
+  & $\mathbf{-0.024}$ $[-0.117,\,{+}0.072]$
+  & $\mathbf{+0.025}$ $[-0.090,\,{+}0.141]$ \\
+\bottomrule
+\end{tabular}
+\begin{flushleft}\footnotesize
+Terciles of patient-level lepidic$\,\times\,$solid co-activation, defined as
+$\min(f_{\text{lep}}, f_{\text{sol}})$ over the slide's hard pattern
+assignment and averaged across a patient's slides
+($n\!=\!444$ patients, $458$ slides). The cut uses only the ANORAK pattern
+head, so it is independent of every mutation-side quantity reported here and
+cannot have been chosen to favour the contrast. Strata are disjoint in
+co-activation range (low ends at $0.0028$, mid begins at $0.0028$, high begins
+at $0.0098$) and disjoint in patients, so the two bootstrap distributions in
+the last row are independent and their elementwise difference is a valid
+interval for the difference.
+Regime~(ii-b) predicts that FC${-}$PI grows with co-activation. It does not.
+None of the six stratum intervals excludes zero, and the high${-}$low
+difference is $-0.024$ patient-preserved against ${+}0.025$ site-preserved:
+the two protocols disagree in sign, which is what a null looks like and not
+what an effect too small to resolve looks like, since a real effect would at
+least agree on direction. In the high tercile, where the premise should hold
+best, FC${-}$PI is $-0.028$ and $-0.003$. The design could only have
+resolved a difference of $0.135$ ($0.165$ under site preservation) at
+$80\%$ power, so this is a bounded null and not a refutation
+(\cref{tab:design_power}).
+The stratifying variable is itself associated with the target---co-activation
+alone predicts KRAS at $\auroc\!=\!0.582$ $[0.522,\,0.641]$, with prevalence
+rising monotonically across terciles (risk ratio high\,vs\,low $1.56$
+$[1.07,\,2.29]$, Cochran--Armitage $p\!=\!0.021$)---so the null concerns the
+aggregator, not the morphology.
+\end{flushleft}

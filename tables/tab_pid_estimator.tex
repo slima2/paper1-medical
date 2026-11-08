@@ -1,0 +1,68 @@
+% Table tab:pid_estimator — the plug-in estimator of each atom of Eq.(3) that
+% the analysis specifies but declines to use, and how each atom maps onto the
+% sign-based regime test of Eq.(5). Method-side "decoder ring"; complements
+% tab:pid_regimes (which reports the per-gene outcomes). No new experiment is
+% introduced here and no numerical atom value is reported.
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabularx}{\linewidth}{@{}l
+  >{\hsize=.80\hsize\raggedright\arraybackslash}X
+  >{\hsize=1.45\hsize\raggedright\arraybackslash}X
+  >{\hsize=.75\hsize\raggedright\arraybackslash}X@{}}
+\toprule
+\textbf{Term (\cref{eq:pid})} & \textbf{What it captures} &
+  \textbf{How a plug-in estimator would compute it on the
+    $4\!\times\!4\!\times\!2$ table} &
+  \textbf{Regime role} \\
+\midrule
+$I(\mathbf{P},\mathbf{E};Y)$ & total signal both channels carry about $Y$
+  & Mutual information of the joint contingency table (pooled out-of-fold
+    B3 and B2 logits, $Q\!=\!4$ quantile bins each)
+  & $\le\epsilon_0\Rightarrow$ (iii) \\
+\addlinespace[2pt]
+$\Ired$ & information present \emph{redundantly} in both channels
+  & Recovered by subtraction from \cref{eq:pid} once the unique atoms are
+    fixed; cross-checked by the L3 SHAP embedding/pattern split
+  & dominates $\Rightarrow$ (i) \\
+\addlinespace[2pt]
+$\Iuni{\mathbf{E}}$ & information in the \emph{encoder} channel only
+  & Bertschinger minimum over the polytope preserving the
+    $(\mathbf{E},Y)$ marginal; L5 read-out is the B2-ablation drop
+  & supports (i) \\
+\addlinespace[2pt]
+$\Iuni{\mathbf{P}}$ & information in the \emph{pattern} channel only
+  & Bertschinger minimum over the polytope preserving the
+    $(\mathbf{P},Y)$ marginal; L5 read-out is the B3-ablation drop
+  & $>\epsilon$ with $\Isyn\!\le\!\epsilon$: additive complementarity \\
+\addlinespace[2pt]
+$\Isyn$ & information available \emph{only} in the joint state
+  & Subtraction from \cref{eq:pid}; sign confirmed on the model side by
+    $\mathrm{FC}\!>\!\mathrm{PI}$ \emph{and} $\max_{j<k}I_{jk}\!>\!0$
+    (L4 Choquet index, \cref{eq:fuzzy_measure})
+  & $>\epsilon\Rightarrow$ (ii) \\
+\bottomrule
+\end{tabularx}
+\begin{flushleft}\footnotesize
+This table specifies the plug-in estimator the analysis defines but does
+not use; it is a decoder ring for what each atom means operationally,
+not a source of reported values. Each channel would first be replaced by
+a task-relevant scalar---the held-out single-channel logit (B3 for
+$\mathbf{P}$, B2 for $\mathbf{E}$)---pooled across the five folds and
+discretised into $Q\!=\!4$ quantile bins, giving the
+$4\!\times\!4\!\times\!2$ joint table on which every atom would be
+computed, with confidence intervals and estimation floors $\epsilon$ (per
+atom) and $\epsilon_0$ (total) from $2{,}000$ patient-level bootstrap
+resamples. Because each logit is a deterministic function of its channel,
+the data-processing inequality would make every entry a \emph{lower}
+bound on the corresponding atom of the full channels: such a
+decomposition can prove an atom \emph{present} but reports its
+\emph{absence} only against the floor, never as an exact zero. At the
+per-fold variability of the single-channel conditions ($\pm 0.031$ to
+$\pm 0.081$ \auroc{}) the differences it would have to separate are no
+larger than its own sampling error, which is why every regime reported
+here---including the out-of-ontology call---is assigned by the
+directional rule of the Methods rather than by any numerical atom. The
+orthogonal magnitude test is the Conclusive verdict of
+\cref{eq:conclusive_verdict}.
+\end{flushleft}

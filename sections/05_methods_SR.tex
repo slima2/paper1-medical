@@ -1,0 +1,826 @@
+% Scientific Reports Article Methods (placed after the Discussion, as the
+% journal suggests; no word limit). Derived from 05_methods_CM.tex:
+%  (1) the FuzzyArcLoss V2 companion manuscript (under review, no preprint)
+%      is mentioned in the text only, since the journal does not allow
+%      unpublished work in the reference list; the published origin of the
+%      loss family is cited instead;
+%  (2) the tab_atom_operationalization float is in the Supplementary
+%      Information (it is adjudication apparatus, not a headline result);
+%  (3) the ethics statement and the statement on the use of large language
+%      models are in this section, as the journal requires;
+%  (4) the six-level interpretability stack and the LLM explanation layer
+%      are condensed into one "Released per-slide tooling" paragraph: they
+%      are released software, not an evaluated result of this study.
+\section*{Methods}
+
+% =====================================================================
+\subsection*{Cohort and labels}
+% =====================================================================
+
+\paragraph{TCGA-LUAD acquisition.}
+We obtained $1{,}054$ haematoxylin-and-eosin (H\&E) WSIs
+from the LUAD collection of The Cancer Genome Atlas via the
+GDC portal.\cite{tcga2014luad}
+After quality filtering (Otsu tissue mask, pen-marker detector,
+blur threshold; see \emph{Slide quality control} below), $687$
+analysable images remained. That figure is an inventory rather than a
+cohort, and three exclusions separate the two. The GDC LUAD project
+directory contains slides from patients whose MAF assigns them to
+LUSC; cross-referencing barcodes against the LUAD and LUSC mutation
+tables removes $150$ slides from squamous patients and $17$ from
+patients with no mutation call for any of the six target genes.
+Sample-type code \texttt{11A} in the TCGA barcode marks
+solid-tissue-normal sections, which carry the patient's germline
+barcode and therefore inherit a mutation label while containing no
+tumour; $62$ such slides were removed. What remains is $458$ tumour
+slides from $444$ patients across $33$ tissue-source sites, and this
+is the cohort behind every LUAD number we report. Nine patients
+contributed more than one slide, which accounts for the excess of $14$
+slides over patients; cross-validation is performed at the
+\emph{patient} level, and repeated under site-preserved folds, to
+prevent leakage through either unit.
+
+The retained slides are not restricted to diagnostic FFPE blocks:
+$183$ are FFPE (DX) and $275$ are frozen (TS/BS) sections, so the
+cohort is $40\%$ FFPE. We retain the mixture deliberately and state it
+plainly, because a frozen majority is a transferability hazard rather
+than a neutral composition detail. Three considerations decide it.
+First, arithmetic: filtering to FFPE leaves $183$ slides, at which
+\textit{RBM10} would carry roughly $13$ positives and four of six genes
+would fall below the estimation floor defined below, so the
+FFPE-only cohort cannot support per-gene adjudication at all and the
+choice is between a mixed cohort and no cohort.
+Second, direction of bias: frozen sections carry freezing artefact,
+poorer nuclear detail and section-thickness variability, all of which
+degrade the growth-pattern vocabulary more than the unconstrained
+encoder, so the mixture works \emph{against} the pattern channel and
+therefore against the complementarity findings rather than for them; a
+regime-(i) saturation call is the reading that a frozen majority most
+easily manufactures, which is why the site-preserved protocol matters
+for TP53 and EGFR specifically.
+Third, external validity: CPTAC-LUAD is FFPE throughout, so the
+cohort-transfer arm below is itself a preparation-shift test, and the
+frozen fraction here is one of the candidate mechanisms for the
+collapse it reports, alongside scanner and site signature. We do not
+claim to separate preparation from site, and say so where the
+transfer is discussed.
+
+\paragraph{Target genes.}
+Six driver mutations were retained on the basis of
+LUAD-relevance and prevalence $\geq 5\%$ in the cohort
+(\cref{tab:mutation_prevalence}), quoted over the $458$-slide cohort:
+\textit{TP53} (49.6\%, $n_+\!=\!227$), \textit{EGFR}
+(15.5\%, $71$), \textit{KRAS} (27.5\%, $126$), \textit{STK11}
+(12.9\%, $59$), \textit{KEAP1} (18.6\%, $85$) and
+\textit{RBM10} (7.0\%, $32$). The lower rates that appear against the
+$687$-image inventory are diluted by the squamous cases and normal
+sections excluded above.
+
+The corresponding mutation calls (MAF files) were obtained from
+GDC and only non-silent variants retained: missense, nonsense,
+frameshift, splice-site, in-frame insertion/deletion.
+Synonymous and intronic variants were excluded.
+
+\paragraph{Slide quality control.}
+Each WSI was checked for: (i)~presence of a tissue area
+$\geq 20\,\text{mm}^{2}$; (ii)~absence of large pen-marker
+regions ($>10\%$ of the tissue area, detected by an HSV
+band-pass); (iii)~per-tile blur (variance of the Laplacian)
+above an empirically fixed threshold; (iv)~absence of large
+histology artefacts (tears, folds, air bubbles).
+Slides failing any criterion were excluded.
+
+% =====================================================================
+\subsection*{Tile extraction and tissue mask}
+% =====================================================================
+
+Each WSI was tiled at level~0 into non-overlapping
+$224 \times 224$~px patches, that is, at each slide's native scanning
+resolution, with no resampling to a common microns-per-pixel.
+The analysable cohort is not uniform in that respect: of the $458$
+slides, $76.4\%$ were scanned at $40\times$
+($\mathrm{mpp}\!<\!0.35$) and $22.6\%$ at $20\times$
+($0.35\!\leq\!\mathrm{mpp}\!<\!0.75$; the remaining $1\%$ carry no
+resolution metadata), so a fixed $224$~px window spans
+about $56~\mu\text{m}$ of tissue on the former and about
+$112~\mu\text{m}$ on the latter, and \ctranspath{}---pretrained at
+$20\times$\cite{wang2022ctranspath}---sees the majority of our tiles at
+twice its training linear scale.
+Training and cross-validation run over this same mixture, so the
+within-cohort estimates reported here are internally consistent; the
+consequence is for transfer to a cohort with a different magnification
+profile, which we measure directly in the field-of-view control of
+\cref{tab:cptac_refit} rather than assume.
+A per-slide Otsu tissue mask discarded blank or background tiles
+($<10\%$ tissue).
+Per-tile pen-marker, blur and artefact checks were re-applied at
+the tile level.
+A 4-channel input ($\text{RGB}\,+\,\text{tissue-mask}$) was passed
+to the encoder.\cite{wang2022ctranspath}
+
+% =====================================================================
+\subsection*{Pattern classifier (Artefact 1)}
+% =====================================================================
+
+The six-pattern classifier was trained on the Zenodo-ANORAK
+dataset\cite{anorak2024,ANORAKZenodo}---$732$ expert-annotated
+tiles spanning lepidic, acinar, papillary, micropapillary,
+solid and cribriform, reduced to $637$ after exclusion of
+``other tissue'' (class~0) tiles---using a \ctranspath{}
+backbone\cite{wang2022ctranspath} and a fuzzy angular-margin head
+(FuzzyArcLoss~V2, the computational-pathology extension of the
+angular-margin loss family introduced in
+ref.~\cite{limareina2025fuzzyarc}; its full derivation and loss-family
+ablation are reported in a companion manuscript under review, which is
+cited here in the text only, as the journal's reference policy
+requires for unpublished work).
+Per-sample fuzzy modulation of the ArcFace
+margin\cite{deng2019arcface} is calibrated by Optuna
+($s^{*}=46.1$, $m^{*}=0.518$, $\tau^{*}=0.448$,
+$50$~trials, TPE sampler, MedianPruner).
+Training protocol: AdamW (lr~$1\times10^{-4}$), cosine schedule
+to $10^{-6}$, $5$-epoch warm-up, $120$ epochs, batch size $32$,
+fp32; MixUp disabled.
+Reported macro-F1 = $92.31\% \pm 2.04$ across 15 runs (5-fold $\times$
+3 seeds) with $p = 0.001$ vs SphereFace and Cohen's $d = 1.00$.
+Tile probabilities $\mathbf{p}\in\Delta^5$ become the pattern
+channel used downstream.
+
+% =====================================================================
+\subsection*{MIL aggregation: PI-ABMIL and FC-MIL}
+% =====================================================================
+
+\paragraph{Tile representation.}
+For each slide we retained the top $200$ tiles by encoder
+embedding norm to keep the bag size constant.
+Each tile contributed a $512$-d \ctranspath{} embedding
+$\mathbf{e}\in\mathbb{R}^{512}$ and a $6$-d pattern probability
+$\mathbf{p}\in\Delta^5$.
+Four conditions were ablated as inputs:
+B2 ($512$-d embeddings only to
+gated ABMIL\cite{ilse2018attention}); B3 ($6$-d pattern
+probabilities only); PI-ABMIL ($512+6$ concat); and
+FC-MIL ($512$-d embeddings to gated
+attention $+$ $6$-d patterns to a fuzzy Choquet head).
+Two further conditions of the superseded protocol---B1, a $7$-d
+slide-level pattern-fraction and entropy vector to
+XGBoost, and A, a one-hot of
+$\arg\max\mathbf{p}$---were not scored in the nested-cross-validation
+run and are reported nowhere in this paper. They are named here only so
+that the four-condition grid is not mistaken for the whole of the
+original design.
+
+\paragraph{PI-ABMIL.}
+Gated attention\cite{ilse2018attention} computes
+$\alpha_i = \softmax(\mathbf{v}^\top \tanh(\mathbf{W}_a
+[\mathbf{e}_i;\mathbf{p}_i]) \odot \sigmoid(\mathbf{W}_b
+[\mathbf{e}_i;\mathbf{p}_i]))$, and the slide representation is
+$\mathbf{z} = \sum_i \alpha_i [\mathbf{e}_i;\mathbf{p}_i]$
+followed by a linear gene head.
+Hidden dim $128$, two-layer attention; $\approx 199{,}553$
+parameters total.
+
+\paragraph{FC-MIL (2-additive fuzzy Choquet).}
+The slide-level pattern vector $\mathbf{P}\in\Delta^5$ is
+aggregated by a differentiable
+$2$-additive Choquet
+integral~\cite{grabisch1996application}.
+A general fuzzy measure over $n\!=\!6$ patterns would require
+$2^{n}\!-\!2\!=\!62$ parameters; the 2-additive approximation
+reduces this to $6 + \binom{6}{2}\!=\!21$ parameters, fully
+determined by singletons and pairs:
+\begin{equation}
+g(A) = \sum_{k\in A}\phi_k \;+\; \sum_{\{j,k\}\subseteq A} I_{jk},
+\qquad A \subseteq \{1,\ldots,6\},
+\label{eq:fuzzy_measure}
+\end{equation}
+where the singletons $\phi_k$ are Shapley
+values~\cite{shapley1953value} (intrinsic contribution of pattern
+$k$) and $I_{jk}$ are pairwise interaction indices
+(positive $\Rightarrow$ synergy, negative $\Rightarrow$ redundancy).
+We parameterise the singletons via a softmax
+$\phi_k = e^{\psi_k}/\sum_l e^{\psi_l}$ on a learnable vector
+$\psi\in\mathbb{R}^{6}$; the interactions are stored as a learnable
+upper-triangular matrix with an $L_1$ sparsity prior
+$\mathcal{R}_\text{int}=\lambda_I\sum_{j<k}|I_{jk}|$ and a soft
+monotonicity penalty
+$\mathcal{R}_\text{mono} =
+\sum_{A\subseteq B}\max(0,\,g(A)\!-\!g(B))$
+sampled by Monte Carlo at every batch.
+
+For a slide-level fuzzy pattern probability vector
+$\mathbf{P}\in\Delta^{5}$ sorted in ascending order
+$P_{(1)}\!\leq\!P_{(2)}\!\leq\!\cdots\!\leq\!P_{(6)}$, the discrete
+Choquet integral is
+\begin{equation}
+C_g(\mathbf{P}) \;=\; \sum_{k=1}^{6}
+\bigl[P_{(k)}-P_{(k-1)}\bigr]\, g\!\left(A_{(k)}\right),
+\quad A_{(k)} \!=\! \{(k),\ldots,(6)\},
+\label{eq:choquet_integral}
+\end{equation}
+with $P_{(0)}\!:=\!0$.
+The output $\mathbf{c}_s\in\mathbb{R}^{6}$ is concatenated with the
+gated-attention embedding $\mathbf{z}_\mathrm{attn}\in\mathbb{R}^{256}$
+and projected to the per-gene prediction.
+\fcmil{} is the architectural primitive that exposes
+pattern--pattern interactions as the $15$ scalars $I_{jk}$ for
+direct clinical inspection at inference time.
+
+% =====================================================================
+\subsection*{Partial information decomposition of the pattern and
+embedding channels}
+% =====================================================================
+
+\paragraph{Decomposition.}
+The three-regime taxonomy is stated as a claim about how the
+information the slide carries about the mutation label is
+distributed between the two channels the aggregator receives.
+Let $Y\in\{0,1\}$ be the per-gene mutation label, and let the two
+sources be the slide-level pattern channel $\mathbf{P}\in\Delta^{5}$
+and the \ctranspath{} embedding channel
+$\mathbf{E}\in\mathbb{R}^{512}$.
+Partial information decomposition
+(\pid{})\cite{williams2010pid,bertschinger2014unique} splits the
+joint mutual information\cite{cover2006elements} into four
+non-negative atoms,
+\begin{equation}
+I\!\left(\mathbf{P},\mathbf{E};Y\right) \;=\;
+\Ired \;+\; \Iuni{\mathbf{P}} \;+\; \Iuni{\mathbf{E}} \;+\; \Isyn ,
+\label{eq:pid}
+\end{equation}
+where $\Ired$ is the information available \emph{redundantly} from
+either channel, $\Iuni{\mathbf{P}}$ and $\Iuni{\mathbf{E}}$ the
+information available from one channel only, and $\Isyn$ the
+information available only from their \emph{joint} state.
+What we take from \cref{eq:pid} is its \emph{exhaustiveness}, not its
+values. Two sources distribute their information about a target in these
+four ways and in no other, so a taxonomy whose categories are the four
+atoms is complete by construction: it cannot harbour an unnoticed fifth
+regime, and it can name a category before any observed case occupies it.
+That is a property of the partition, and it survives the
+non-uniqueness of the decomposition---the competing definitions disagree
+on how to apportion information among the atoms, not on how many atoms
+there are. Where naming one requires a definitional convention we follow
+Bertschinger~et~al.\cite{bertschinger2014unique} No numerical atom value
+is reported or used to support any claim in this paper, so no result
+depends on that choice.
+\Cref{eq:pid} makes the three regimes mutually exclusive
+predictions rather than post-hoc descriptions: regime~(i) is
+$\Ired$-dominated, so any fusion of $\mathbf{P}$ into $\mathbf{E}$
+is a no-op; regime~(ii)---\emph{complementarity}---is the
+regime in which the pattern channel carries information the encoder
+does not, in either of two sub-forms, \emph{additive
+complementarity} (ii-a), $\Iuni{\mathbf{P}}>0$ with
+$\Isyn\!\approx\!0$, or \emph{non-additive synergy}, equivalently
+inter-pattern co-occurrence, (ii-b), $\Isyn>0$, which only a
+non-additive aggregator can realise;
+and regime~(iii)---\emph{out-of-ontology}---requires only that the
+vocabulary-side atoms vanish,
+$\Iuni{\mathbf{P}}\!\approx\!\Isyn\!\approx\!0$, and says nothing about
+$\Ired$ or $\Iuni{\mathbf{E}}$, either of which may be large. Its strict
+sub-state, in which $I(\mathbf{P},\mathbf{E};Y)$ itself sits near the
+estimation floor, is a claim of a different order, and we name it
+separately as a \emph{modality ceiling}.
+
+\paragraph{The ceiling is the modality, not the encoder.}
+Both channels are deterministic functions of the same whole-slide image
+$W$: $\mathbf{E}=f(W)$ under the frozen \ctranspath{} encoder and
+$\mathbf{P}=g(W)$ under the frozen ANORAK pattern classifier. The data
+processing inequality\cite{cover2006elements} therefore bounds the
+entire left-hand side of \cref{eq:pid} by a quantity that belongs to the
+tissue rather than to any model,
+\begin{equation}
+I\!\left(\mathbf{P},\mathbf{E};Y\right) \;\leq\; I\!\left(W;Y\right),
+\label{eq:modality_ceiling}
+\end{equation}
+and this is what separates a claim about the \emph{vocabulary} from a
+claim about the \emph{modality}. Regime~(i) says $\mathbf{E}$
+already attains the bound in \cref{eq:modality_ceiling}, so a second
+channel has nothing left to recover; regime~(ii) says $\mathbf{E}$ falls
+short of it and $\mathbf{P}$ restores part of the shortfall;
+regime~(iii) says $\mathbf{P}$ restores none of it, which condemns the
+vocabulary and not the tissue. \textit{STK11} is the illustration: the
+encoder alone reaches $0.591$ on the same slides against $0.499$ for the
+vocabulary alone, a gap whose interval excludes zero, so the modality
+plainly carries something, and the remedy---tumour-infiltrating
+lymphocytes, budding, tumour--stroma ratio---is a new vocabulary over
+the \emph{same} H\&E rather than a new modality.
+
+Only the strict sub-state is a claim about the modality. When
+$I(\mathbf{P},\mathbf{E};Y)$ itself sits near the estimation floor the
+bound in \cref{eq:modality_ceiling} is near zero, and then no encoder,
+no aggregator and no label budget can move it, because the deficit is in
+the tissue rather than in the pipeline. Even there the claim is
+evidential rather than proved: what any experiment observes is the
+left-hand side of \cref{eq:modality_ceiling}, and a total near the floor
+licenses the statement about $I(W;Y)$ only insofar as neither frozen
+channel is itself discarding the relevant signal. We therefore report a
+modality ceiling as the strongest evidence currently obtainable that one
+has been reached rather than as a proof, and its remedy---a source
+outside the modality altogether---follows from the evidence either way.
+Glioma MGMT is the only target in this work whose total sits at the
+floor under every condition. For \textit{KEAP1} the case that the limit
+is the modality rather than the vocabulary rests on the biochemical
+nature of the NRF2 axis and on both single-channel conditions sitting at
+chance, not on a total at the floor, and we present it on that basis.
+
+The same inequality has been invoked for \emph{molecular translators}
+in which the translated representation \emph{replaces} its
+source.\cite{saisan2026ceilings} Our setting is the augmenting one:
+$\mathbf{P}$ is supplied alongside $\mathbf{E}$, so
+$I(\mathbf{P},\mathbf{E};Y)$ is bounded by \cref{eq:modality_ceiling}
+rather than by $I(\mathbf{E};Y)$, and the gap between the two is the
+room in which regime~(ii) lives.
+
+\paragraph{Correspondence with the Choquet interaction index.}
+For a $2$-additive fuzzy measure, \cref{eq:fuzzy_measure} assigns
+the pair $\{j,k\}$ a value that exceeds the sum of its singletons
+exactly when $I_{jk}>0$; the aggregator therefore pays for the
+\emph{joint} activation of patterns $j$ and $k$ over and above
+their separate
+activations.\cite{grabisch1996application}
+This is the decision-theoretic counterpart of a positive
+synergistic atom in \cref{eq:pid}, and, symmetrically, $I_{jk}<0$
+is the counterpart of redundancy between the two patterns.
+The sign convention is the axiomatic one: the interaction index of a
+pair is positive when the pair is complementary, negative when it is
+redundant, and zero under additive independence.
+It matters what kind of object $I_{jk}$ is. It is not an estimator of
+$\Isyn$ and is never used as one. It is a parameter of our own
+aggregator, learned by gradient descent and read off the fitted fuzzy
+measure, whose semantics are fixed by the axioms above rather than
+inferred from the data. What it records is whether the aggregator found
+it worthwhile to pay for the joint activation of a pattern pair over and
+above their separate activations---a fact about the fitted decision
+function, available exactly. Its bearing on \cref{eq:pid} is
+qualitative: an aggregator profits from a conjunction its additive
+counterpart cannot express only when there is something in the joint
+state to profit from, which is the content of a non-empty synergistic
+atom. Symmetrically, the additive concat fusion of \piabmil{} is an
+aggregator whose hypothesis space forces any such conjunction to be
+discarded, which is what makes the \fcmil{}-versus-\piabmil{} contrast
+informative.
+Two further per-slide read-outs of the fitted model stand in the same
+relation to the other atoms: the SHAP embedding/pattern split tracks
+$\Ired$ against $\Iuni{\mathbf{E}}$, and the single-channel ablation
+reports what removing a channel costs. Each is a property of the fitted
+model that a given atom predicts; none is a measurement of that atom.
+
+\emph{Which of these carries evidential weight.} The four training conditions
+do; the per-slide read-outs do not. B2, B3, \piabmil{} and \fcmil{} are
+complete retrainings under one protocol, so a contrast between them compares
+what each hypothesis space can extract from the data. The SHAP split and
+the ablation instead
+interrogate a single fitted function: the split attributes that
+function's output, and the ablation reports what zeroing an input at
+inference costs a model that never saw that input at zero. That measures what
+the fitted function depends on, not what the channel contains---a redundant
+channel can be load-bearing for one fit and still carry nothing the other
+channel lacks. The retrained-without-the-channel form of that question is
+already in the design, and it is precisely B2 and B3. We therefore rest every
+regime claim on the four conditions and read the per-slide read-outs as
+illustrations
+of the mechanism a claim asserts, never as its warrant. The single place they
+are load-bearing is the (i)-versus-(iii) boundary, where the four conditions
+collide by construction; we mark that dependence where it arises rather than
+spreading it silently across the taxonomy.
+
+\paragraph{Reading the atoms from the model-side signature.}
+We do not estimate the atoms of \cref{eq:pid} numerically, and the governing
+reason is identification rather than sample size. Competing decompositions
+return different atom values on identical
+data\cite{williams2010pid,bertschinger2014unique,liang2023quantifying} and no
+agreed axiom set singles one out, so a point value for $\Isyn$ is not an
+identified quantity and would not become one at infinite $n$. Sample size
+compounds this rather than causing it: a direct estimate on the $512$-d
+channel is intractable at $n=444$ under any of those definitions. Reading the
+\emph{sign} of contrasts between fully retrained models is what those two
+facts license---it is the correct response to a non-identified target, not a
+fallback forced by a small cohort. Instead each
+atom's \emph{presence} is read from the model-side signatures introduced
+above---the sign of the learned Choquet interaction $I_{jk}$ for
+$\Isyn$, the SHAP embedding/pattern split for $\Ired$ versus
+$\Iuni{\mathbf{E}}$, and the single-channel ablations for the
+unique atoms---together with the contrast among the four training
+conditions B2/B3/PI/FC (\cref{tab:atom_operationalization}). The regime is
+therefore assigned from the
+\emph{direction} of these signatures, never from a point estimate of an
+atom or from the magnitude of any \auroc{}.
+
+\emph{The noise-aware rule.} Each regime is a claim about one deciding
+contrast, so it is that contrast whose uncertainty has to carry the
+claim. We resample patients with replacement from the pooled out-of-fold
+predictions, recompute every condition's \auroc{} on each draw, and take
+the $2.5$th and $97.5$th percentiles of the contrast as its interval.
+Resampling rather than retraining is what makes the replicate count
+affordable; it quantifies sampling noise in the contrast, which is the
+quantity the regime read depends on, and not training-time variance.
+Complementarity is then asserted only if its deciding contrast excludes
+zero---$\mathrm{PI}-\mathrm{B2}$ for the additive sub-form,
+$\mathrm{FC}-\mathrm{PI}$ for the non-additive one. Regimes~(i)
+and~(iii) make the opposite claim, that \emph{no} contrast is meaningful,
+so neither is a residual category: both require the two fusion-versus-encoder
+intervals, $\mathrm{PI}-\mathrm{B2}$ and $\mathrm{FC}-\mathrm{B2}$, to fall
+inside $\pm0.02$, which is an equivalence test rather than the mere
+absence of a significant contrast, since wide intervals would satisfy the
+latter vacuously. The other two contrasts we compute carry different claims
+and do not gate equivalence: $\mathrm{FC}-\mathrm{PI}$ decides (ii-b), and
+$\mathrm{B3}-\mathrm{B2}$ measures what the vocabulary omits rather than what
+fusion adds.
+The margin is not a convention. The eight published aggregator gains audited
+in \cref{tab:literature_power_audit} average $0.0216$, so $\pm0.02$ is the
+effect size this literature typically claims for an aggregator change;
+declaring equivalence at that margin is declaring that a fusion arm does not
+deliver what the field says such a change delivers. Sweeping
+$\delta\!\in\!\{0.01,0.02,0.03\}$ leaves every LUAD regime read unchanged; at
+$\delta\!=\!0.05$ two of the twelve cells would become equivalent, but that
+margin exceeds the largest gain in the entire audited literature ($0.046$), so
+it would certify as equivalent a difference larger than any this field has
+claimed (\cref{tab:threshold_sensitivity}). What binds at this cohort size is
+interval width rather than the margin: the median cell would need roughly
+$14{,}000$ patients before equivalence could be certified at $\pm0.02$, which
+is the same order as the conditional regime test
+(\cref{tab:design_power}). The framework is therefore adjudicable, but not at
+this $n$, and we state that as a design property rather than leaving it for
+the reader to infer from null results. A comparison meeting neither
+condition returns no regime, which is what every LUAD target and the
+CPTAC transfer do (\cref{tab:luad_contrasts}). One read is taken from
+levels rather than contrasts: when every condition, the encoder alone
+included, has an interval whose upper bound lies below the Conclusive
+threshold, no reader of the modality in the design reaches the target,
+which is the modality-ceiling form of (iii); it needs no contrast and
+is the only regime read in this work that a fusion-versus-encoder
+equivalence does not gate (glioma MGMT, \cref{tab:crossdomain_merged}).
+This is the rule referred
+to as noise-aware throughout, and it is what stops a difference smaller
+than the fold-to-fold spread from being promoted to a structural claim.
+The learned interaction indices $I_{jk}$ are exempt: they are parameters
+of the fitted measure rather than differences between \auroc{}s, so their
+sign is read directly, against a floor set by the smallest $|I_{jk}|$
+the $L_1$ prior leaves non-zero.
+
+\emph{The assignment.} The additive sub-form (ii-a) is declared when
+$\mathrm{PI}\!>\!\max(\mathrm{B2},\mathrm{B3})$ while $\mathrm{FC}$ does
+not exceed $\mathrm{PI}$ and no pair interaction clears the floor.
+Regime~(i) holds when no fusion arm adds to either single channel and
+$I_{jk}\!\le\!0$, and regime~(iii) when in addition the vocabulary-side
+atoms are empty, in the sense set out below.
+
+The non-additive sub-form (ii-b) carries a stricter criterion. An unconditional
+$\mathrm{FC}\!>\!\mathrm{PI}$ with $\max_{j<k}I_{jk}>0$ is not
+sufficient, because both can hold while the aggregator gain is unrelated
+to the pair the index names: $I_{jk}$ is a parameter of the fitted
+measure, shared across bags, and an unconditional contrast averages the
+cases where the pair co-activates with those where it does not. We
+therefore require the contrast to be \emph{conditional} on the
+co-activation the index points to. For the pair $(j,k)$ with the largest
+positive $I_{jk}$, per-bag co-activation is $\min(f_j,f_k)$ over the hard
+vocabulary assignment, averaged to the patient, and the cohort is cut
+into terciles of that quantity; the cut uses the source vocabulary only
+and no target-side quantity, so it cannot be tuned to the outcome.
+Sub-form (ii-b) is declared when the FC${-}$PI contrast in the high
+stratum exceeds that in the low stratum by an interval excluding zero
+under the hierarchical bootstrap, and under both the patient-preserved
+and site-preserved protocols. Where the interval includes zero we report
+the sub-form as unsupported together with the smallest difference the
+design could have resolved, so a null is distinguishable from an
+untested claim (\cref{tab:kras_coactivation,tab:design_power}).
+
+Note that (ii-b) does not
+require the additive arm to beat the encoder, and must not. An additive
+head losing what a non-additive head keeps is the signature a
+synergistic atom predicts, so gating (ii) on \piabmil{} alone would
+exclude exactly the case the sub-form exists to name; the criterion is
+stated this way for that reason and not because any gene here exhibits
+it. KRAS, the one gene whose learned index names a pair
+($I(\text{lepidic}\!\times\!\text{solid})\!=\!+0.032$), fails the
+criterion on both counts: the conditional contrast is unresolved
+(\cref{tab:kras_coactivation}), and the unconditional ordering is
+$\mathrm{FC}\!=\!0.506$ below $\mathrm{PI}\!=\!0.516$, both within a
+fold's spread of $\mathrm{B2}\!=\!0.517$. The regime axis remains
+orthogonal to the Conclusive/Inconclusive verdict
+(\cref{eq:conclusive_verdict}), which is the sole magnitude test.
+
+\emph{Where the signature map is not injective.} The map from atom
+configuration to model-side signature is not one-to-one, and two collisions
+are consequential enough that we name them rather than leave them to be found.
+
+The first is internal to the taxonomy. Regimes~(i) and~(iii) share the
+same four-condition signature---no fusion arm adds anything, no pair
+interaction survives---and are separated by the single-channel
+evidence rather than by the fusion contrasts: under (i) each channel
+alone carries the target and the SHAP split places a shared quantity on
+both, whereas under (iii) the vocabulary channel alone is at chance and
+zeroing it costs the fused model nothing. Because $\Ired$ can only be large where
+the target is predictable at all, this one boundary is not independent of
+the magnitude axis, and we state that rather than claiming orthogonality
+for the taxonomy as a whole: what the KRAS case establishes is that
+regime~(ii) is verdict-independent, not that every boundary is. For
+\textit{KEAP1} the separation is additionally supported from outside the
+model, since the NRF2 axis the gene acts on is biochemical rather than
+morphological, which is evidence no fitted model supplies.
+
+The second collision conditions every reading of an empty vocabulary-side
+atom, and it is not resolvable from the four conditions at all: a
+\emph{redundant} atom seen through an encoder that represents the vocabulary
+and an \emph{absent} atom seen through an encoder blind to it produce the same
+table. Separating them requires an independent measurement of whether the
+encoder represents the vocabulary, and the reading here rests on one. On the
+annotated tile benchmark that defines the ANORAK
+vocabulary\cite{anorak2024,ANORAKZenodo}, heads trained on the frozen
+\ctranspath{} embedding recover the six growth patterns at $90.8$--$92.4\%$
+macro-$F_1$ across eleven objectives, with the two most contested classes
+separable at one-versus-one $\auroc$ $0.96$--$1.00$; a ViT-H/14 foundation
+encoder pretrained by a different group on a different corpus reaches
+$90.8$--$92.0\%$ on the same folds under a cached linear
+probe (companion manuscript under review, cited above). The embedding space already contains the
+vocabulary, and a modern encoder does not contain it better. That is what
+licenses reading $\mathrm{PI}\!\approx\!\mathrm{B2}$ as redundancy---%
+$\mathbf{E}$ carrying what $\mathbf{P}$ carries---rather than as an encoder
+failing to see what the pathologist named. It does not license the stronger
+claim that a different encoder would leave every assignment intact:
+representing the vocabulary and carrying the target's morphology are distinct
+capacities, and a gene could move regime under an encoder that captures
+target-relevant structure the vocabulary never named. That residual is the
+honest limit of the reading, and the assignment is a property of the triple
+(vocabulary, encoder, cohort) for exactly this reason.
+Because the assignment turns on the \emph{sign} of a contrast rather than
+on an absolute \auroc{}, the \emph{procedure} carries over to a new
+cohort or modality with no per-cohort threshold to recalibrate, which
+is what lets the same read-out run unchanged on glioma MRI and on the
+electrocardiogram. That bears on the operationalisation and not on any
+assignment it returns: the contrasts are computed from cohort-dependent
+\auroc{}s, so a change of case mix can move a gene between regimes.
+What we claim travels is the instrument, not its per-gene reading.
+
+\paragraph{Why four conditions rather than a channel ablation.}
+Reading a channel's contribution from the \auroc{} it costs when removed
+has been criticised as a contribution measure, on the grounds that a
+single drop conflates two different situations: a channel that is
+informative in its own right, and a channel whose value exists only in
+interaction with the other.
+The four-condition design answers that objection by construction rather
+than by argument. B2 and B3 expose each channel alone, \piabmil{} their
+additive combination, and \fcmil{} their $2$-additive Choquet
+combination, so the two situations separate: additive complementarity
+raises \piabmil{} above both single channels while leaving
+$\mathrm{FC}\!\approx\!\mathrm{PI}$, whereas interaction raises \fcmil{}
+above \piabmil{} and is corroborated independently by the sign of the
+learned $I_{jk}$, which is read off the fuzzy measure and not from any
+\auroc{} at all. The single-channel ablation is accordingly used only
+to corroborate the unique atoms it can legitimately evidence, and never
+to adjudicate synergy.
+
+The full mapping---every atom of \cref{eq:pid} against the model-side
+signature that evidences it, the directional decision rule on the four
+training conditions, the interpretability level that exposes it and the
+regime it drives---is given in \cref{tab:atom_operationalization}. The signatures are
+read, not numerically estimated; atom names follow the Bertschinger
+convention.\cite{bertschinger2014unique}
+
+\paragraph{Scope.}
+No missing-channel correction\cite{choi2025icym2i} is needed: the
+pattern channel $\mathbf{P}$ and the embedding channel $\mathbf{E}$ are
+both computed from the same H\&E slide, so every case carries both. The
+sampling-noise bound behind the directional policy is concrete: any
+numerical atom would have to be built from the outputs of the two
+single-channel models (B2, encoder only; B3, pattern only), whose
+per-fold \auroc{} varies by $\pm 0.031$ to $\pm 0.081$ across folds
+(\cref{tab:mutation_luad_resultssec}), and the differences to be
+separated are no larger than that.
+
+\paragraph{Relation to prior information-decomposition work.}
+\Cref{eq:pid} is not new; what is new is the axis (two readings of one
+modality rather than two modalities) and the purpose (adjudicating
+whether a target is reachable at all, under declared power, rather than
+choosing a fusion architecture). The position against the published
+decomposition work in computational
+pathology,\cite{liang2023quantifying,saisan2026ceilings} and the evidence
+that direct atom estimators do not yet track downstream
+performance,\cite{zhang2025evaluatingpid} are set out in Supplementary
+Note~3.
+
+% =====================================================================
+\subsection*{Cross-domain instantiation protocols}
+% =====================================================================
+
+% Relocated from the Discussion.
+
+The decomposition requires only an expert controlled vocabulary and an
+unconstrained learned encoder of the same modality, both available far
+from pathology. Cohorts, source ontologies and expected regime
+assignments were fixed in advance (\cref{tab:crossdomain_protocol}).
+
+\paragraph{Glioma MRI $\rightarrow$ genotype.}
+VASARI is a consensus-defined controlled terminology of roughly thirty
+semantic MR features---enhancement quality, necrosis, margin definition,
+oedema, ependymal contact, grey-level heterogeneity---published with
+per-subject scores and reported inter-observer agreement for the TCGA
+glioma collections.\cite{gutman2013vasari,vasari_tcia} Of these, $26$
+were retained after dropping features constant or unscored across the
+cohort, and min--max rescaled. The encoder channel is a 2.5D CNN with
+\abmil{} over axial slices of four co-registered sequences, occupying the
+position \ctranspath{} with tile-level \abmil{} holds in LUAD. IDH,
+1p/19q and a patient-sex control are scored on the TCGA-LGG subjects
+carrying real neuroradiologist VASARI scores, co-registered preoperative
+MRI and a matched molecular call (up to $n\!=\!63$; IDH resolved on four
+folds, one test fold single-class); that pilot is reported in
+\cref{tab:glioma_domainb} and Supplementary Note~1 as directional reads
+only. MGMT is scored on the full BraTS 2021
+cohort\cite{baid2021brats} ($n\!=\!577$, ${\sim}52\%$ methylated), where
+the VASARI channel is \emph{propagated} from the annotated seed rather
+than expert-scored; the MGMT claim therefore rests on the unconstrained
+encoder remaining at chance rather than on the strict empty-atom
+separation that real VASARI licenses in LUAD. In both this arm and the
+electrocardiogram the regime is adjudicated by the noise-aware rule
+above, with the same seed-and-patient hierarchical bootstrap as LUAD:
+each arm was trained with five seeds ($42$--$46$) and $2{,}000$ draws
+resample seeds with replacement and then patients within the pooled
+out-of-fold predictions of each drawn seed. The non-additive sub-form
+(ii-b) of the 1p/19q complementarity is not resolved at $n\!\sim\!63$,
+where the learned pair interactions shrink to
+$\lvert I_{jk}\rvert\!\lesssim\!0.005$; we record that as deferred.
+
+\paragraph{Electrocardiogram $\rightarrow$ physiological state.}
+PTB-XL supplies $21{,}799$ records from $18{,}869$ patients annotated by
+cardiologists with $71$ SCP-ECG statements, with the SNOMED-CT mapping
+of PTB-XL$+$.\cite{wagner2020ptbxl,strodthoff2023ptbxlplus} Two
+properties make this domain more favourable than histology: the source
+vocabulary is already \emph{graded}, each statement carrying a
+$0$--$100$ likelihood score extracted from the report, so the fuzzy
+membership the pattern classifier must supply in LUAD is here given as
+data; and the target set is an order of magnitude larger. The encoder channel is a compact 1D
+convolutional network over the raw twelve-lead signal at $100$\,Hz.
+Patient sex and age are recorded for every case and are not derivable
+from the statements, which is what makes them a leakage-free pair. Many
+patients contribute more than one record, so the bootstrap resamples
+patients and carries all of a patient's records together.
+Whether the regimes remain distinguishable at $10^{2}$ targets rather
+than six---as the published three-way partition of $108$ laboratory
+indicators poses\cite{xiao2025anyecglab}---is not a question this run
+settles.
+
+% =====================================================================
+\subsection*{Cohort-transfer protocol and controls (CPTAC-LUAD)}
+% =====================================================================
+
+% Relocated from the Discussion.
+
+CPTAC-LUAD carries all six target genes and is a genuine distribution
+shift rather than a resample of TCGA: it is enriched for never-smokers
+and \textit{EGFR}-mutant, demographically more diverse
+tumours.\cite{gillette2020cptacluad,cptacluad_data} We processed it
+off-the-shelf---the frozen TCGA-trained pipeline applied to the $498$
+slides from the $106$ genotyped patients with matched H\&E, with no stain
+normalisation, colour calibration or domain adaptation, and slide scores
+mean-pooled to the patient as stated in advance.
+
+Three controls delimit the conclusion. First, aggregation: a slide-level
+read-out ($n\!=\!498$), a max, a top-$2$/top-$3$ mean and a
+single-largest-slide read-out all place \textit{TP53} between $0.49$ and
+$0.57$, so the collapse is not an artefact of patient-level pooling.
+Second, colour: re-running the transfer with Reinhard stain
+normalisation of every tile to a representative TCGA-LUAD reference does
+not recover it, so a global stain cast is not the driver and any
+technical account must rest on deeper scanner- or site-level batch
+signatures\cite{howard2021site} (Macenko normalisation remains untested).
+Third, physical scale: the cohorts differ sharply in magnification
+(TCGA-LUAD $76.4\%$ $40\times$, CPTAC-LUAD $98.6\%$ $20\times$), so
+identical tiling at level~$0$ presents up to four times the tissue area
+per tile; centre-cropping and rescaling every CPTAC tile to the field of
+view of a $40\times$ TCGA tile lowers every condition and widens
+fold-to-fold spread substantially, so scale mismatch is not the
+mechanism, though the crop is itself lossy and the arm does not argue the
+other way either.
+
+The refit is within-cohort cross-validation and therefore establishes
+that CPTAC slides carry the signal, not that one model serves both
+cohorts. Regime adjudication follows the noise-aware rule above: the
+deciding contrast $\piabmil{}-\mathrm{B2}$ is $+0.032$ with a
+$2000$-sample paired-bootstrap $95\%$ CI of $-0.041$ to $+0.102$
+natively, and $+0.073$ ($-0.038$ to $+0.174$) under field-of-view
+matching. Both span zero, so the point-estimate read of (ii-a) is
+withheld. Clearing the $n_+\!=\!32$ estimation floor says a model can be
+\emph{fitted}; resolving a contrast between two fitted conditions is a
+stricter demand, because what must exceed sampling error is the
+\emph{difference} rather than either \auroc{}. Slide count does not
+relieve it, since the genotype is a patient-level label and slides from
+one tumour share it. Scaling the observed interval width to the observed
+effect puts the cohort needed at roughly five times the present one, on
+the order of $500$ genotyped patients.
+
+% =====================================================================
+\subsection*{Statistical analyses}
+% =====================================================================
+
+Five-fold patient-stratified cross-validation; folds were
+created with mutation-stratified shuffling at the patient level to
+preserve gene prevalence.
+Per-fold metrics: \auroc{} (primary, prevalence-invariant),
+\auprc{} (secondary, prevalence-sensitive),
+positive class operating thresholds via Youden's
+$J$.
+
+\paragraph{Conclusive verdict criterion.}
+The cohort-level Conclusive/Inconclusive flag
+(\cref{tab:viz_folds_methods}) is defined as
+\begin{equation}
+\mathrm{Conclusive}(\mathrm{gene}) \iff
+\frac{1}{5}\sum_{f=1}^{5}\auroc_{f}^{(\mathrm{gene})} \;\geq\; 0.70,
+\label{eq:conclusive_verdict}
+\end{equation}
+where $\auroc_f^{(\mathrm{gene})}$ is the held-out AUROC of fold $f$
+under the best MIL aggregator for that gene.
+The cut is the conventional lower bound of \emph{acceptable discrimination}
+for a fitted model,\cite{hosmer2000applied} and we treat it as a convention
+rather than a derived quantity. It is therefore reported together with its
+sensitivity: no LUAD target is Conclusive at $0.75$ or at $0.70$; lowering the
+cut to $0.65$ flips \textit{TP53} on the patient-preserved protocol alone
+($0.661$), and only at $0.60$ do \textit{TP53} and \textit{STK11} clear it
+under both protocols (\cref{tab:threshold_sensitivity}). That no target in this cohort is
+resolved is therefore a property of the estimates rather than of the
+threshold, across the whole range a reader might reasonably prefer.
+This is a population-level signal-presence flag, \emph{not} a
+per-slide confidence threshold; the per-slide $P$-value (the
+softmax-normalised mutation probability of the gene-specific head)
+is reported independently and inherits the calibration of the
+underlying \piabmil{} or \fcmil{} classifier.
+
+\paragraph{Scope of the verdict.}
+\Cref{eq:conclusive_verdict} thresholds a cohort mean, so the verdict is
+a population statement: a Conclusive verdict licenses no confident
+per-slide call, and an Inconclusive one does not imply that the modality
+carries no information about the target, since the mean is taken over a
+population that may be heterogeneous with respect to it. An Inconclusive
+verdict is compatible with four distinct states---source-side atoms
+empty, non-empty on a subpopulation, non-empty but unestimable, or a
+heterogeneous gene-level label---with different remedies; the four
+levels of analysis at which the quantities of this paper are estimated,
+and the claims each supports, are set out in Supplementary Note~4 and
+\cref{tab:levels_of_analysis}.
+
+% =====================================================================
+\subsection*{Released per-slide tooling}
+% =====================================================================
+
+The per-slide read-outs from which the model-side signatures above are
+read are released with the code as a browser deployment
+(\cref{fig:ui_stack}), numbered L1--L6 where the Supplementary tables
+refer to them: the \abmil{} attention map (L1) and the
+$\arg\max\mathbf{p}$ pattern overlay (L2) on the slide thumbnail; the
+DeepSHAP\cite{lundberg2017shap} slide-level contribution split into its
+embedding- and pattern-channel parts (L3); the per-slide Choquet--Shapley
+values and pairwise interaction indices
+$I_{jk}$ (L4);\cite{shapley1953value,grabisch1996application} the
+single-channel ablation $\Delta P(\mathrm{mut})$ (L5); and a fixed
+five-band trapezoidal mapping of each continuous score to a linguistic
+category (L6), held constant across genes, slides and folds so that no
+calibration data enter it. An optional narrative layer renders the bundle in prose through
+a language-model agent restricted to those categorical labels and to
+entities of a NCIt/MONDO knowledge
+graph.\cite{sioutos2007ncit,mondo_shefchek2020} These read-outs are
+computed at the slide and tile levels and are never aggregated into the
+verdict (\cref{tab:levels_of_analysis}). The tooling is released as
+software; its effect on a reader's decisions is not evaluated in this
+study and no claim about it is made.
+
+% =====================================================================
+\subsection*{Reproducibility}
+% =====================================================================
+
+All experiments were run on a single H100 GPU (training) and
+a T4 GPU (inference; the live \lchai{} deployment).
+PyTorch 2.x, CTransPath checkpoint as published.\cite{wang2022ctranspath}
+Seeds: 42, 142, 242, 342 and 442 for the five-seed mutation arm of
+\cref{tab:mutation_luad_resultssec,tab:luad_contrasts}; the three-seed
+control arm (\cref{tab:controls}) uses the first three. Each training
+unit's seed is derived deterministically from the base seed, the
+protocol, the gene, the fold and the condition, so every unit can be
+regenerated from these five integers.
+Mutation calls (MAF) were retrieved from the GDC on 03~April~2026.
+Cohort, source-code and derived-artefact locations are given in the
+Data and Code availability statements.
+
+% Journal policy: use of an LLM must be documented in Methods.
+\paragraph{Use of large language models.}
+A language model is an optional component of the released per-slide
+tooling (the narrative layer above, run with GPT-4 and Claude Sonnet);
+none of the results reported here depends on it. In
+preparing the manuscript language models were used for AI-assisted copy editing
+only; no analysis, result, figure or reference was generated by a
+language model, and no language model is an author.
+
+% =====================================================================
+\subsection*{Ethics statement}
+% =====================================================================
+
+The TCGA-LUAD cohort is a publicly available, de-identified
+research dataset published under the controlled-access policy of
+the NIH Genomic Data Commons.\cite{tcga2014luad}
+The CPTAC-LUAD, TCGA-LGG/GBM, BraTS~2021 and PTB-XL cohorts of the
+cohort-transfer and cross-domain arms are likewise public and
+de-identified.
+No new human-subject data were collected for this study, no
+patient-identifiable information was accessed, and no further ethics
+approval was required for this retrospective analysis of public data.
+

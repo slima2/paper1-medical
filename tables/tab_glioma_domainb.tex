@@ -22,13 +22,15 @@ IDH            & $0.856{\pm}0.100$ & $0.840{\pm}0.120$ &
 Sex \emph{(ctrl)} & $0.557{\pm}0.128$ & $0.304{\pm}0.106$ &
   $0.644{\pm}0.212$ & $0.579{\pm}0.207$ & Inconclusive & --- \\
 \midrule
-MGMT\textsuperscript{$\dagger$} & $0.562{\pm}0.065$ & $0.525{\pm}0.025$ &
-  $0.526{\pm}0.052$ & $0.554{\pm}0.036$ & Inconclusive &
-  (iii) out-of-ontology \\
+MGMT\textsuperscript{$\dagger$} & $0.539{\pm}0.013$ & $0.519{\pm}0.005$ &
+  $0.524{\pm}0.022$ & $0.551{\pm}0.012$ & Inconclusive &
+  (iii) modality ceiling, from levels \\
 \bottomrule
 \end{tabular}
 \begin{flushleft}\footnotesize
-Mean test $\auroc\pm$SD over five patient-disjoint folds.
+IDH, 1p/19q and sex control: mean test $\auroc\pm$SD over five
+patient-disjoint folds of one run. MGMT: pooled out-of-fold $\auroc$ per
+seed, mean$\,\pm\,$SD across five seeds ($42$--$46$).
 IDH, 1p/19q and the sex control are on the TCGA-LGG cohort
 (up to $n=63$ subjects with co-registered preoperative MRI, real
 neuroradiologist VASARI scores and a molecular call; IDH resolved on
@@ -50,5 +52,14 @@ are developed in the text.
 ($n\!=\!577$, ${\sim}52\%$ methylated, both classes far above the
 estimation floor), with the VASARI channel \emph{propagated} from the
 annotated seed rather than expert-scored---not the TCGA-LGG cohort used
-for the other rows.
+for the other rows. The five seeds are the runs whose out-of-fold
+predictions feed the hierarchical bootstrap of
+\cref{tab:crossdomain_merged}. The seed-$42$ run alone gave fold means
+of $\mathrm{B2}=0.531{\pm}0.053$, $\mathrm{B3}=0.525{\pm}0.025$,
+$\mathrm{PI}=0.524{\pm}0.035$ and $\mathrm{FC}=0.553{\pm}0.032$, and an
+earlier run with the same seed $\mathrm{B2}=0.562{\pm}0.065$: the
+between-seed spread of the encoder-side cells ($0.01$--$0.02$) is
+smaller than the ${\pm}0.04$ the bootstrap puts on each cell at this
+cohort size, so the seed term adds little to the interval and the
+chance-level read does not depend on which seed is inspected.
 \end{flushleft}

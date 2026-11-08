@@ -1,0 +1,320 @@
+% Scientific Reports Article Results (precedes the Discussion and the
+% Methods in this build). Derived from 03_results_CM.tex and then pruned so
+% that every main-text item is adequately powered and every claim is
+% adjudicated:
+%  - every deciding contrast of the regime rule is a main display item
+%    (Table 2, tab:luad_contrasts);
+%  - the KRAS conditional synergy test is one paragraph; its textbook
+%    morphology figure is Supplementary Fig. fig:kras_lepidic_solid_proxy;
+%  - the signal-tree taxonomy figure and the PID-regime mapping table are
+%    Supplementary items (fig:signal_tree, tab:pid_regimes): the LUAD reads
+%    are directional, so neither belongs among the headline results;
+%  - the n~63 glioma pilot (IDH, 1p/19q, sex control) is Supplementary
+%    Table tab:glioma_domainb and Supplementary Note 1; only the full-power
+%    MGMT test stays in the main cross-domain table;
+%  - the patient-sex control in LUAD is a row of Supplementary Table
+%    tab:controls and is not discussed;
+%  - the per-slide explanation tooling is described in Methods as released
+%    software and is not a result.
+%  Display items here: Table 1, Table 2, Table 3 (Fig. 1 is in the
+%  Introduction).
+
+\section*{Results}
+
+\subsection*{One contrast resolves; the per-gene reads do not}
+
+Quality filtering left $687$ analysable TCGA-LUAD images, but that
+inventory is not a LUAD cohort: restricting to adenocarcinoma cases with
+a mutation call and excluding solid-tissue-normal sections leaves $458$
+tumour slides from $444$ patients across $33$ sites (Methods).
+Prevalences span sevenfold, \textit{TP53} at $49.6\%$
+to \textit{RBM10} at $7.0\%$.
+
+Four conditions were ablated against a common \ctranspath{}
+encoder\cite{wang2022ctranspath}: B2, \abmil{} on embeddings; B3,
+\abmil{} on pattern probabilities; \piabmil{}, concat fusion; and
+\fcmil{}, the $2$-additive Choquet head. Each ran under nested
+cross-validation---early stopping on an inner split, the outer fold
+scored once---across five seeds and two outer protocols, patient- and
+site-preserved, for $1{,}200$ gene--condition--fold units. Contrasts are
+adjudicated by a hierarchical bootstrap over seeds and patients,
+site-clustered under the site protocol (Methods).
+
+The resulting \auroc{} is low throughout
+(\cref{tab:mutation_luad_resultssec}). \textit{TP53} is the only gene
+whose embedding baseline clears $0.60$ under both protocols, and two
+of six sit at or below $0.52$. \Cref{tab:luad_contrasts} reports every
+contrast the regime rule reads---$48$ in all, four per gene under each
+protocol---with its interval and the number of seeds on which its sign
+holds. Exactly one contrast resolves: the
+pattern channel alone is worse than the embedding alone---B3$-$B2
+negative, interval excluding zero, same sign in all five seeds---on
+\textit{TP53} and \textit{EGFR} under both protocols, \textit{STK11}
+under one. None of the $36$ fusion contrasts
+(\piabmil{}$-$B2, \fcmil{}$-$B2, \fcmil{}$-$\piabmil{}) excludes zero on
+any gene under either protocol, and none falls inside the $\pm0.02$
+equivalence margin either, so no gene can be read as saturated any more
+than as complementary; \piabmil{} and \fcmil{} sit within a fold's
+spread of B2 throughout and their per-seed signs disagree in $34$ of
+the $36$ cells. A cohort-mean ranking of these architectures would be reading
+noise.
+
+\begin{table}[htbp]
+\centering
+\input{tables/tab_mutation_luad}
+\caption{\textbf{Mutation prediction on $458$ TCGA-LUAD slides from
+$444$ patients, five seeds, two outer protocols.} Pooled out-of-fold
+\auroc{}, mean $\pm$ SD across seeds, under nested cross-validation.
+B2~$=$~\abmil{} on \ctranspath{} embeddings (the ceiling baseline);
+B3~$=$~\abmil{} on pattern probabilities only; PI~$=$~\piabmil{} concat
+fusion; FC~$=$~\fcmil{} $2$-additive Choquet. Best per gene in bold.
+The B3$-$B2 rows give the hierarchical bootstrap interval over seeds and
+patients, site-clustered in \textbf{b}; bold marks the genes on
+which it excludes zero---\textit{TP53}, \textit{EGFR} and \textit{STK11}
+in \textbf{a}, and only \textit{TP53} and \textit{EGFR} in \textbf{b},
+where the \textit{STK11} interval reaches $+0.001$---and these are the
+only resolved contrasts in the
+table. No fusion contrast (\piabmil{}$-$B2, \fcmil{}$-$B2,
+\fcmil{}$-$\piabmil{}) resolves on any gene under either protocol, and
+no equivalence is established either, at the $\pm0.02$ margin the
+regime reads require (\cref{tab:luad_contrasts,tab:design_power}).}
+\label{tab:mutation_luad_resultssec}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\input{tables/tab_luad_contrasts}
+\caption{\textbf{Every contrast the regime rule reads, with its
+interval.} For each gene and outer protocol, the four between-condition
+contrasts of the noise-aware rule (Methods): \piabmil{}$-$B2 decides
+additive complementarity (ii-a); \fcmil{}$-$B2 together with
+\piabmil{}$-$B2 must fall inside $\pm0.02$ for an equivalence read of
+regime (i) or (iii); \fcmil{}$-$\piabmil{} decides the non-additive
+sub-form (ii-b); and B3$-$B2 measures what the vocabulary omits. Each
+cell gives the pooled out-of-fold point contrast, its $95\%$
+hierarchical-bootstrap interval over seeds and patients ($2{,}000$
+draws; site-clustered in \textbf{b}), and the number of the five seeds
+on which the point contrast is positive. Bold marks an interval
+excluding zero; a superscript $\approx$ would mark an interval inside
+the $\pm0.02$ equivalence margin, and no cell earns one. Of $48$
+contrasts, five exclude zero and all five are B3$-$B2; none of the $36$
+fusion contrasts does, and none is equivalent to zero, which is why
+every LUAD regime read is reported as directional and unadjudicated.
+Generated from the same bootstrap output as the B3$-$B2 rows of
+\cref{tab:mutation_luad_resultssec}.}
+\label{tab:luad_contrasts}
+\end{table}
+
+\subsection*{The pipeline is calibrated and its ceiling is low}
+
+Controls ran on three seeds under both protocols
+(\cref{tab:controls}). Permuting
+\textit{TP53} labels across patients returns $0.496\pm0.010$ on B2 and
+$0.487\pm0.015$ on B3, so nothing in the protocol manufactures
+discrimination. That the pipeline learns is established independently of
+every mutation label: separating the $458$ tumour slides from the $62$
+solid-tissue-normal sections the cohort excludes reaches
+$0.976\pm0.004$ on B2 and $0.968\pm0.013$ site-preserved. The pattern
+channel clears chance too ($0.800\pm0.022$), so the ANORAK head is
+functional: its near-chance mutation values are an absent signal, not
+a broken classifier. \textit{TP53} then replicates the main arm on fresh
+seeds ($0.672\pm0.032$) without having to certify the pipeline that
+produced it. A cohort separable at $0.98$ on morphology stops at $0.66$
+on genotype.
+
+\subsection*{Three kinds of failure behind one Inconclusive label}
+
+Read alongside the per-gene biology, the six genes point towards two of
+the three regimes rather than onto a scale; the directions are given
+here, the adjudication in \cref{tab:luad_contrasts} confirms none of
+them, and no gene points towards regime~(ii).
+The full taxonomy, with each gene's directional read and its
+adjudication status, is drawn in \cref{fig:signal_tree}, and the
+mapping of each regime onto an atom of \cref{eq:pid} is in
+\cref{tab:pid_regimes}.
+
+\paragraph{Encoder saturation, regime~(i): TP53 and EGFR.}
+The embedding-only baseline B2 reaches $0.661$ and $0.582$ under
+patient-preserved folds; fusion moves the \auroc{} by $\leq0.02$ in
+point estimate, while the pattern channel alone falls $0.082$ and
+$0.102$ below the embedding. That is the predicted signature when the
+encoder already carries what the vocabulary names---TP53's high-grade
+nuclear pleomorphism, EGFR's lepidic-leaning low-grade phenotype. But
+the read requires an \emph{equivalence}: that fusion adds nothing, not
+merely that it appears to. Neither \piabmil{}$-$B2 nor \fcmil{}$-$B2
+falls inside the $\pm0.02$ band under either protocol, so the saturation
+read is directional and unadjudicated, and \textit{EGFR}, at
+$0.582\pm0.060$, carries the widest spread of any embedding baseline.
+
+\paragraph{Complementarity, regime~(ii): tested on KRAS and not
+supported.} The Choquet head learns a positive
+$I(\text{lepidic}\!\times\!\text{solid})\!=\!{+}0.032$ against a negative
+$I(\text{lepidic}\!\times\!\text{micropapillary})\!=\!-0.018$, and the
+pair it selects is the histological proxy for invasive mucinous
+adenocarcinoma, the KRAS-enriched
+subtype\cite{rekhtman2013krassolid} (\cref{fig:kras_lepidic_solid_proxy}).
+The regime claim is stronger than that agreement: that the Choquet head
+buys accuracy \emph{because} the two patterns co-occur. A cohort-wide
+contrast cannot test a conditional statement, so we cut the $444$
+patients into terciles of per-slide co-activation
+$\min(f_{\text{lep}}, f_{\text{sol}})$, using no mutation-side quantity.
+The premise holds only weakly: the pair co-occurs in $452$ of $458$
+slides but at low magnitude (median $0.005$), so there is no discrete
+subpopulation to isolate, although co-activation does track KRAS
+descriptively ($\auroc\!=\!0.582$; prevalence rising from $22.3\%$ to
+$33.1\%$ across terciles, risk ratio $1.56$ $[1.07,\,2.29]$). The
+conditional test returns nothing (\cref{tab:kras_coactivation}): no
+stratum interval excludes zero under either protocol, and the
+high${-}$low difference is $-0.024$ $[-0.117,\,{+}0.072]$
+patient-preserved and ${+}0.025$ $[-0.090,\,{+}0.141]$
+site-preserved---unresolved in both and disagreeing in sign, the
+pattern of no effect rather than of an effect too small to see. Two
+bounds explain that: at $n\!=\!444$ the design resolves only $0.135$
+\auroc{} ($0.165$ site-preserved) at $80\%$ power, several times any
+aggregator gain reported in this literature ($0.008$--$0.046$,
+\cref{tab:literature_power_audit}), and there was no gain to localise,
+since \fcmil{} scores $0.506$ on KRAS. The synergy cell is left empty.
+What survives is the morphological association, which the model does
+not convert: the hand-computed co-activation feature tracks KRAS better
+than the trained aggregator. That ordering admits two readings---a
+synergy the Choquet head fails to convert, or a marginal association no
+head would---and the cohort cannot separate them: the first is a claim
+about the aggregator's hypothesis space, and the stratified contrast
+that would test it is the one \cref{tab:design_power} puts beyond
+roughly $9{,}000$ patients. The alternative is reported as untested,
+not excluded.
+
+\paragraph{Out-of-ontology, regime~(iii): STK11, with KEAP1 and RBM10
+below it.} For these three the pattern channel converts into no usable
+gain, for three different reasons, and only the first is
+out-of-ontology in the intended sense. STK11 (best $0.608$) is a
+\emph{label-space mismatch}: the embedding carries signal the vocabulary
+does not, B3 falling $0.092$ below B2 with an interval excluding zero,
+its driver being an immune-cold
+microenvironment\cite{skoulidis2018stk11pd1} that an ontology built for
+tumour-cell growth patterns cannot name. KEAP1 is a stronger null than
+the regime allows: every condition sits at or below $0.49$ under both
+protocols, so the NRF2 oxidative-stress
+axis\cite{li2011keap1papillary} is invisible not merely to the
+vocabulary but to the encoder---the LUAD analogue of the MGMT result
+below. RBM10 (best $0.552$) is a \emph{collapse to prior} at
+$n_+\!=\!30$, where the across-seed spread exceeds every contrast we
+would want to read.
+
+This is where the decomposition earns its place: in separating kinds of
+failure that a leaderboard reports as one number. KEAP1 and RBM10 sit
+within $0.05$ \auroc{} on B2 and both would be called
+Inconclusive, yet they prescribe opposite next experiments. KEAP1's
+pattern side is empty and so is its embedding side---both channels at or
+below $0.49$ under both protocols---so more LUAD slides will not help
+and the deficit is the source modality. RBM10 is unestimable rather than
+empty: at $n_+\!=\!30$ its across-seed spread of $\pm0.027$ to
+$\pm0.071$ swamps the $\pm0.02$ contrasts, so the deficit is cohort
+size. KRAS adds a third kind, its pattern side
+tracking the target while the aggregator that should exploit it sits at
+chance. One Inconclusive label thus covers three states---empty,
+unestimable, unconverted---calling for a new modality, a larger cohort,
+and one larger by an order of magnitude (\cref{tab:design_power}).
+
+\subsection*{The procedure transfers; the predictor does not}
+
+Nothing in the decomposition is specific to histology, so we ran the
+identical four conditions, directional rule and threshold in two further
+modalities and across cohorts within one
+(\cref{tab:crossdomain_merged}); only the vocabulary and the encoder
+change.
+
+In \textbf{glioma MRI}, the VASARI controlled
+terminology\cite{gutman2013vasari} replaces ANORAK, and the target is
+the one a decade of work has failed to predict. MGMT is an
+\emph{encoder-ceiling} test, and the distinction is
+load-bearing. The balanced BraTS cohort ($n\!=\!577$, ${\sim}52\%$
+methylated) excludes a data floor outright, and every condition sits at
+chance ($0.52$--$0.55$ over five seeds; the upper bound of the best,
+$0.59$, is below the $0.70$ threshold), so the verdict is Inconclusive and is resolved at
+full power: the instrument declines to certify the best-documented
+untranslatable target in medical machine learning. The regime is read
+from those levels, not from a contrast. The fusion contrasts have
+half-widths near $0.04$ under the seed-and-patient bootstrap and resolve
+nothing at the $\pm0.02$ margin
+(\cref{tab:crossdomain_contrasts}), so what $577$ cases establish is that
+no reader of this modality in the design reaches the target---the
+modality-ceiling form of (iii)---and not that fusion equals the
+encoder, which would need roughly $2{,}500$ cases to certify. The VASARI
+channel here is propagated rather than expert-scored, so the two sources
+are not independent readings and the strict empty-atom separation real
+VASARI licenses does not apply. The null establishes that the target is
+unreachable from this modality by this encoder---not a falsification of
+the two-source framework, which this arm cannot test (Methods). A pilot on
+the $n\!\sim\!63$ TCGA-LGG subjects with expert-scored VASARI (IDH,
+1p/19q, a sex control) is reported in \cref{tab:glioma_domainb} and
+Supplementary Note~1; at that size its reads are directional only and
+we draw no regime from them.
+
+In the \textbf{electrocardiogram}, the $71$ graded SCP-ECG statements of
+PTB-XL\cite{wagner2020ptbxl} supply an already-fuzzy vocabulary.
+Patient sex and age are recorded for every case and are not derivable
+from the statements, so they furnish a leakage-free pair. Both are
+Conclusive, and both meet the equivalence condition of the noise-aware
+rule: $\mathrm{PI}-\mathrm{B2}$ and $\mathrm{FC}-\mathrm{B2}$ fall inside
+$\pm0.02$ with intervals of half-width ${\approx}0.008$ over five seeds
+and $18{,}869$
+patients, so regime~(i) is adjudicated here---the one cohort in this
+work large enough to certify it---with the encoder-saturated signature
+that TP53 and EGFR show directionally in LUAD. Both fusion contrasts
+are $+0.003$ on both targets with upper bounds of $+0.011$
+(\cref{tab:crossdomain_contrasts}): no gain
+excludes zero and none approaches the $0.02$ this literature claims for
+an aggregator change, so it is equivalence, not complementarity. No
+statement pair across all $\binom{71}{2}$ moves \fcmil{} off additive
+fusion ($\fcmil{}-\piabmil{}$ $-0.003$ and $-0.000$): the negative
+result the model-side signature is designed to report.
+
+Across \textbf{cohorts}, the frozen TCGA-trained pipeline applied
+off-the-shelf to CPTAC-LUAD gives a clean negative. \textit{TP53}'s
+\auroc{} falls from $0.661$ to
+$0.53$ ($95\%$ CI $0.42$--$0.64$), an interval excluding the TCGA point
+estimate; Reinhard stain normalisation does not recover it, so a global
+colour cast is not the driver. Both cohorts return Inconclusive, so what
+the transfer establishes is not a change of verdict but that the value
+itself does not survive the move. Re-fitting the
+four conditions inside CPTAC with only the representation carried over
+reaches \textit{TP53} $0.698$, marginally \emph{above} the TCGA value,
+with the encoder-only baselines agreeing to $0.004$---so the coupling is
+present in the second cohort at full strength and what failed is the
+transported decision function alone. The
+regime stays unresolved: the deciding contrast spans zero, and
+separating two fitted conditions is a stricter demand than fitting
+either, which $106$ patients do not meet (\cref{tab:cptac_refit}).
+
+\begin{table}[htbp]
+\centering
+\input{tables/tab_crossdomain_merged_SR}
+\caption{\textbf{The procedure run unchanged in two further modalities
+and across cohorts.} \textbf{a}, Glioma MRI\,$\rightarrow$\,MGMT
+promoter methylation with the VASARI vocabulary: the verdict is resolved
+at full power and the regime is read from levels.
+\textbf{b}, Electrocardiogram\,$\rightarrow$\,physiological
+state with the graded SCP-ECG statements: the one cohort in which the
+equivalence condition of the rule is met. \textbf{c}, Cohort transfer from
+TCGA-LUAD to CPTAC-LUAD. Only the vocabulary and the encoder change
+between panels; the four conditions, the directional regime rule and the
+Conclusive/Inconclusive threshold are identical throughout, which is the
+precise sense in which the procedure rather than the model transfers.
+The contrasts from which the regimes are read are
+\cref{tab:crossdomain_contrasts}.}
+\label{tab:crossdomain_merged}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\input{tables/tab_crossdomain_contrasts_SR}
+\caption{\textbf{Every contrast the regime rule reads in the cross-domain
+arms, with its interval.} The counterpart of \cref{tab:luad_contrasts}
+for the three full-power targets of \cref{tab:crossdomain_merged}:
+\textbf{a}, MGMT, where no contrast resolves and the regime is read from
+levels; \textbf{b}, \textbf{c}, sex and age from the electrocardiogram,
+where both fusion-versus-encoder contrasts fall inside the $\pm0.02$
+equivalence margin and regime~(i) is adjudicated.}
+\label{tab:crossdomain_contrasts}
+\end{table}

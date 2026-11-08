@@ -1,0 +1,103 @@
+% Table tab:threshold_sensitivity — do the two free thresholds carry the
+% conclusions? Reproduced by scripts/threshold_sensitivity.py from
+% data/luad_hierarchical_contrasts.csv (the published hierarchical bootstrap)
+% and the values of tab:mutation_luad.
+%
+% Panel a  sweeps the Conclusive cut of eq:conclusive_verdict.
+% Panel b  sweeps the equivalence margin delta on the two contrasts the
+%          adjudication actually gates on, PI-B2 and FC-B2
+%          (bootstrap_luad_contrasts.py::adjudicate_multiseed).
+% Panel c  gives the cohort size at which each cell would become certifiable.
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.1}
+
+\begin{tabular}{l c c c c c}
+\multicolumn{6}{l}{\textbf{a}, Conclusive verdict against the cut of
+  \cref{eq:conclusive_verdict}}\\
+\toprule
+\textbf{Gene} & \textbf{best \auroc{}} &
+  $\boldsymbol{0.60}$ & $\boldsymbol{0.65}$ &
+  $\boldsymbol{0.70}$ & $\boldsymbol{0.75}$ \\
+ & {\scriptsize pat.\ /\ site} & & & {\scriptsize (default)} & \\
+\midrule
+\textit{TP53}  & $.661$ / $.640$ & both & pat.\ only & --- & --- \\
+\textit{EGFR}  & $.582$ / $.584$ & ---  & ---        & --- & --- \\
+\textit{STK11} & $.608$ / $.605$ & both & ---        & --- & --- \\
+\textit{KEAP1} & $.488$ / $.488$ & ---  & ---        & --- & --- \\
+\textit{KRAS}  & $.517$ / $.507$ & ---  & ---        & --- & --- \\
+\textit{RBM10} & $.552$ / $.525$ & ---  & ---        & --- & --- \\
+\midrule
+\multicolumn{2}{l}{\emph{targets Conclusive}} & $2$ & $1$ & $\mathbf{0}$ & $0$ \\
+\bottomrule
+\end{tabular}
+
+\vspace{1.1em}
+
+\begin{tabular}{l c c c c c c c}
+\multicolumn{8}{l}{\textbf{b}, Equivalence gate against the margin $\delta$,
+  and \textbf{c}, the cohort that would certify it}\\
+\toprule
+\textbf{Gene} & \textbf{Prot.} & \textbf{binding} &
+  $\boldsymbol{.01}$ & $\boldsymbol{.02}$ & $\boldsymbol{.03}$ &
+  $\boldsymbol{.05}$ & \textbf{c}, $\boldsymbol{n}$ \\
+ & & {\scriptsize $\max|\mathrm{CI}|$} & & {\scriptsize (def.)} & & & \\
+\midrule
+\textit{TP53}  & pat.\ & $.042$ & . & . & . & \textbf{EQ} & $12{,}553$ \\
+               & site  & $.051$ & . & . & . & .           & $6{,}190$ \\
+\textit{EGFR}  & pat.\ & $.073$ & . & . & . & .           & $55{,}219$ \\
+               & site  & $.098$ & . & . & . & .           & \emph{never} \\
+\textit{STK11} & pat.\ & $.065$ & . & . & . & .           & $162{,}548$ \\
+               & site  & $.069$ & . & . & . & .           & $15{,}307$ \\
+\textit{KEAP1} & pat.\ & $.096$ & . & . & . & .           & \emph{never} \\
+               & site  & $.053$ & . & . & . & .           & $11{,}575$ \\
+\textit{KRAS}  & pat.\ & $.057$ & . & . & . & .           & $12{,}592$ \\
+               & site  & $.050$ & . & . & . & \textbf{EQ} & $4{,}267$ \\
+\textit{RBM10} & pat.\ & $.091$ & . & . & . & .           & $94{,}495$ \\
+               & site  & $.127$ & . & . & . & .           & $156{,}760$ \\
+\midrule
+\multicolumn{3}{l}{\emph{equivalences established}}
+  & $0$ & $\mathbf{0}$ & $0$ & $2$ & median $13{,}950$ \\
+\bottomrule
+\end{tabular}
+
+\begin{flushleft}\footnotesize
+Two parameters carry every categorical claim in this paper and neither is
+estimated: the Conclusive cut of \cref{eq:conclusive_verdict} and the
+equivalence margin $\delta$ gating regimes~(i) and~(iii). Both are swept here.
+Reproduced by \texttt{scripts/threshold\_sensitivity.py}.
+\par\medskip
+\textbf{a}, ``both'' means the gene clears the cut under both protocols,
+``pat.\ only'' under the patient-preserved protocol alone. No target is
+Conclusive at the default $0.70$ or at $0.75$; at $0.65$ one target changes
+label on one protocol; only at $0.60$---below the conventional band for
+acceptable discrimination\cite{hosmer2000applied}---do two clear it. The
+central negative result is a property of the estimates, not of the threshold.
+\par\medskip
+\textbf{b}, equivalence is established at margin $\delta$ when \emph{both}
+gating intervals satisfy $\max(|\mathrm{ci}_{\mathrm{lo}}|,
+|\mathrm{ci}_{\mathrm{hi}}|)\!\leq\!\delta$; ``binding'' is the larger of the
+two, so it is the smallest margin at which that cell would be declared. No
+cell is established at $\delta\!\in\!\{.01,.02,.03\}$: the reads are invariant
+over a threefold range around the default. Two cells appear at $\delta=.05$,
+\textit{TP53} patient-preserved ($.042$) and \textit{KRAS} site-preserved
+($.050$, at the boundary). We do not treat that as a live alternative, on the
+same grounds that fix the margin in the first place: $\delta=.05$ exceeds the
+largest aggregator gain in the entire audited
+literature ($.046$, \cref{tab:literature_power_audit}), so it would certify as
+equivalent a difference larger than any this field has claimed. Within the
+range the literature makes defensible, the regime reads do not move.
+\par\medskip
+\textbf{c}, the cohort at which the default margin becomes certifiable, from
+$|\text{point}| + \text{half-width}\sqrt{444/n} \leq .02$ on the binding
+contrast. \emph{never} marks the two cells whose point estimate already lies
+outside $\pm.02$ (\textit{KEAP1} patient-preserved, $\mathrm{PI}-\mathrm{B2}
+=-.042$; \textit{EGFR} site-preserved, $\mathrm{FC}-\mathrm{B2}=-.027$), where
+fusion is not a no-op but a measurable loss, so no cohort size certifies
+equivalence and the pre-registered regime label remains unresolved on that
+protocol rather than supported. The median certifiable cell needs
+$\sim\!14{,}000$ patients, in line with the $9{,}000$--$13{,}400$ the
+conditional regime test requires (\cref{tab:design_power}); the framework is
+adjudicable at that scale and not at this one, which is the design statement
+this table exists to make explicit.
+\end{flushleft}

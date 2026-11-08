@@ -10,20 +10,29 @@
   \makecell{\textbf{Per-slide score}\\\textbf{still reported?}} &
   \textbf{Genes (this cohort)} \\
 \midrule
-Conclusive   & $\geq 0.70$ & Yes &
-  \textit{TP53} ($0.717$), \textit{EGFR} ($0.701$)$^{\dagger}$ \\
+Conclusive   & $\geq 0.70$ & Yes & \emph{none} \\
 Inconclusive & $< 0.70$    & Yes &
-  \textit{KRAS} ($0.609$), \textit{STK11} ($0.695$)$^{\dagger}$,
-  \textit{KEAP1} ($0.610$), \textit{RBM10} ($0.661$) \\
+  \textit{TP53} ($0.661$), \textit{STK11} ($0.608$),
+  \textit{EGFR} ($0.582$), \textit{RBM10} ($0.552$),
+  \textit{KRAS} ($0.517$), \textit{KEAP1} ($0.488$) \\
 \bottomrule
 \end{tabularx}
 \begin{flushleft}\footnotesize
 The verdict is a population-level signal-presence flag, not a
 per-slide confidence threshold; the per-slide model probability is
 reported independently in every case.
-$^{\dagger}$EGFR and STK11 are within $\pm 0.01$ of the threshold
-under the upper-tier conditions and are reported here under their
-best-tier AUROC. The Conclusive/Inconclusive flag is robust to
-choice of MIL aggregator within the upper tier; the per-gene
-ranking is not.
+Values are the best of the four conditions per gene under
+patient-preserved folds, pooled out-of-fold and averaged over five seeds
+(\cref{tab:mutation_luad_resultssec}).
+\par\smallskip
+Under nested cross-validation on the corrected $458$-slide cohort,
+\textbf{no LUAD target clears the threshold}: the highest value in the
+study is \textit{TP53} at $0.661$, and the band is empty. Earlier
+single-split estimates on the superseded inventory placed \textit{TP53}
+and \textit{EGFR} above $0.70$; removing early stopping on the scored
+fold and excluding squamous and solid-tissue-normal sections removes that
+margin. The Conclusive band is populated in this work only by the other
+two modalities---glioma IDH and 1p/19q, and both electrocardiogram
+targets (\cref{tab:crossdomain_merged})---which is the intended
+behaviour of a verdict that is allowed to come back empty.
 \end{flushleft}

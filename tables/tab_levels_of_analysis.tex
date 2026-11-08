@@ -24,7 +24,7 @@ Population
     no posterior \\
 \midrule
 Patient
-  & patient (668)
+  & patient (444)
   & Mutation label; fold membership (stratification is at this level);
     $P(\mathrm{mut})$ pooled over that patient's slides
   & \emph{Licenses} the clinical decision---this is the unit a
@@ -32,7 +32,7 @@ Patient
     cohort claims, and inherits slide-level sampling of the tumour \\
 \midrule
 Slide
-  & WSI (687)
+  & WSI (458)
   & $P(\mathrm{mut})$; $\mathbf{c}_s$, $\mathbf{z}_{\mathrm{attn}}$;
     the whole L1--L6 stack; Choquet--Shapley $\Phi_k$ and interaction
     indices $I_{jk}$; the fuzzy linguistic label
@@ -57,10 +57,10 @@ verdict is compatible with four distinct states of the world, which
 the cohort mean cannot separate: information absent at every level
 (strict untranslatability, the KEAP1 candidate); information present
 in a morphologically defined \emph{subpopulation} and therefore
-diluted in the cohort average (KRAS, where the cohort mean is $0.609$
+diluted in the cohort average (KRAS, where the cohort mean is $0.517$
 yet TCGA-55-7815 carries $P=0.965$ with a coherent
 lepidic$\times$solid Choquet readout); information present but
-unestimable at the available positive-set size (RBM10, $n_+=37$); and a
+unestimable at the available positive-set size (RBM10, $n_+=32$); and a
 \emph{heterogeneous target}, in which the gene-level label unions
 variants with different morphological correlates whose signals partly
 cancel in the mixture. The last is the same dilution mechanism as the

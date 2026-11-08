@@ -19,26 +19,38 @@
               &                        & \textbf{AUROC} & \textbf{(/$106$)} &
   \textbf{($95\%$ CI)} & \textbf{AUROC} & \textbf{AUROC} \\
 \midrule
-\textit{TP53}$^\dagger$  & (i) saturation   & $0.717$ & $55$ & $0.53$ ($0.42$--$0.64$) & $0.48$ & $0.49$ \\
-\textit{EGFR}            & (i) saturation   & $0.701$ & $36$ & $0.57$ ($0.45$--$0.70$) & $0.57$ & $0.55$ \\
-\textit{KRAS}            & (ii-b) synergy   & $0.609$ & $32$ & $0.59$ ($0.48$--$0.71$) & $0.59$ & $0.57$ \\
-\textit{STK11}           & (iii)            & $0.695$ & $20$ & $0.46$ ($0.34$--$0.59$) & $0.48$ & $0.43$ \\
-\textit{KEAP1}           & (iii)            & $0.610$ & $12$ & $0.43$ ($0.23$--$0.64$) & $0.41$ & $0.50$ \\
-\textit{RBM10}           & est.\ floor      & $0.661$ & $5$  & $0.40$ ($0.23$--$0.55$) & $0.51$ & $0.43$ \\
+\textit{TP53}$^\dagger$  & (i) directional  & $0.661$ & $55$ & $0.53$ ($0.42$--$0.64$) & $0.48$ & $0.49$ \\
+\textit{EGFR}            & (i) directional  & $0.582$ & $36$ & $0.57$ ($0.45$--$0.70$) & $0.57$ & $0.55$ \\
+\textit{KRAS}            & (ii-b) not supp. & $0.517$ & $32$ & $0.59$ ($0.48$--$0.71$) & $0.59$ & $0.57$ \\
+\textit{STK11}           & (iii) directional& $0.608$ & $20$ & $0.46$ ($0.34$--$0.59$) & $0.48$ & $0.43$ \\
+\textit{KEAP1}           & encoder-ceiling null & $0.488$ & $12$ & $0.43$ ($0.23$--$0.64$) & $0.41$ & $0.50$ \\
+\textit{RBM10}           & est.\ floor      & $0.552$ & $5$  & $0.40$ ($0.23$--$0.55$) & $0.51$ & $0.43$ \\
 \bottomrule
 \end{tabular}
 \begin{flushleft}\footnotesize
-$^\dagger$Only \textit{TP53} clears the $n_+\!=\!37$ estimation floor in the
-genotyped-with-imaging subset ($n\!=\!106$); the other rows are underpowered
+$^\dagger$\textit{TP53} ($n_+\!=\!55$) and \textit{EGFR} ($n_+\!=\!36$)
+clear the $n_+\!=\!32$ estimation floor in the
+genotyped-with-imaging subset ($n\!=\!106$), and \textit{KRAS} sits
+exactly at it; the remaining rows are underpowered
 and their near-chance values are, as pre-registered, statements about power.
 CPTAC AUROC is the patient-level read-out (slides mean-pooled, the
 pre-registered aggregation) with a $2000$-sample bootstrap $95\%$ CI; the
 slide-level column ($n\!=\!498$, each slide inheriting its patient's genotype)
 and the max, top-$2$, top-$3$ and largest-slide aggregators (not shown) place
 every gene within $\pm0.06$ of the tabulated value, so the collapse is not an
-artefact of patient-level pooling. No off-the-shelf CPTAC AUROC exceeds $0.62$;
-the well-powered \textit{TP53} interval excludes its TCGA point estimate and
-flips the verdict from Conclusive to Inconclusive. The \textbf{Reinhard} column
+artefact of patient-level pooling. No off-the-shelf CPTAC AUROC exceeds $0.62$.
+Only \textit{TP53} is both well powered and high enough in TCGA for the
+transfer to be informative, and there its interval excludes the TCGA point
+($0.661$ lies above the upper limit $0.64$). Both cohorts return
+Inconclusive---no LUAD target clears $0.70$ in either---so what the transfer
+adds is not a change of verdict but the sharper statement that the
+\emph{value} does not survive the move.
+The remaining rows cannot carry that argument. \textit{EGFR} starts at
+$0.582$ and lands at $0.57$, a move too small to interpret in a cohort this
+size; \textit{KRAS} starts at $0.517$ and rises to $0.59$, in the opposite
+direction; and \textit{STK11}, \textit{KEAP1} and \textit{RBM10} are
+underpowered here. The transfer conclusion therefore rests on \textit{TP53}
+alone, and only for \textit{TP53} was there a value worth losing. The \textbf{Reinhard} column
 repeats the patient-level read-out after Reinhard stain normalisation of every
 tile to a representative TCGA-LUAD reference
 (\texttt{--stain-method reinhard}): it does not recover transfer
@@ -51,7 +63,8 @@ Every value in this table is a \emph{frozen-pipeline} read-out, and measures
 whether the learned decision function survives the move between cohorts. It
 is not a measure of whether CPTAC slides carry the signal: re-fitting the four
 aggregation conditions inside CPTAC, with only the representation carried
-over, returns \textit{TP53} to $0.698$ against the TCGA $0.717$
-(\cref{tab:cptac_refit}), so the collapse tabulated here is a property of the
-transported model rather than of the encoder or of the tissue.
+over, reaches \textit{TP53} $0.698$ against the TCGA $0.661$
+(\cref{tab:cptac_refit})---slightly \emph{above} the source cohort---so the
+collapse tabulated here is a property of the transported model rather than of
+the encoder or of the tissue.
 \end{flushleft}

@@ -1,0 +1,835 @@
+% ======================================================================
+% Supplementary Information — Scientific Reports build. Compiled as a
+% separate single PDF by supplementary_SR.tex (which supplies the
+% title-and-author first page the journal requires) and \input here.
+% Everything that is not one of the seven main display items is
+% Supplementary Information: figures, then tables, then notes.
+%
+% Numbering and cross-referencing: items are numbered S1, S2, ... as the
+% journal asks, and \crefalias makes every label defined from here on
+% resolve as "Supplementary Fig. SN" / "Supplementary Table SN" wherever it
+% is cited, including from the article (which reads this file's labels
+% through xr-hyper). Main-text labels are read the other way round.
+% ======================================================================
+\setcounter{figure}{0}
+\setcounter{table}{0}
+\renewcommand{\thefigure}{S\arabic{figure}}
+\renewcommand{\thetable}{S\arabic{table}}
+\renewcommand{\figurename}{Supplementary Fig.}
+\renewcommand{\tablename}{Supplementary Table}
+\crefalias{figure}{suppfigure}
+\crefalias{table}{supptable}
+
+\noindent\textbf{Contents.} Supplementary Figs.~S1--S10; Supplementary
+Tables~S1--S19; Supplementary Notes~1--5 (extended protocol for the two
+additional modalities, including the glioma pilot and the MGMT
+full-power null; position against the published mutation-prediction
+literature; relation to prior information-decomposition work; levels
+of analysis and the scope of a verdict; extended limitations). Equation, figure and table numbers
+without the S prefix refer to the main article.
+
+\clearpage
+% ======================================================================
+\section*{Supplementary Figures}
+% ======================================================================
+
+% --- Supplementary Fig. 1: the LUAD signal tree (demoted from the main
+% text: every LUAD regime read is directional and unadjudicated) ---
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\linewidth]{signal_tree}
+  \caption{\textbf{Where the mutation signal lives, gene by gene: the
+  three regimes of \cref{eq:pid} as a decision tree over the four
+  training conditions.} Each read is directional: it follows the sign of
+  the deciding contrast, and none is established, because no fusion
+  contrast excludes zero or falls inside the $\pm0.02$ equivalence
+  margin (Table~2). Regime~(i), encoder saturation (\textit{TP53},
+  \textit{EGFR}): the embedding already carries what the vocabulary
+  names. Regime~(ii), complementarity: its additive sub-form (ii-a) is
+  empty in LUAD, and its non-additive sub-form (ii-b), tested on
+  \textit{KRAS} by the conditional co-activation contrast, returns
+  empty (\cref{tab:kras_coactivation}). Regime~(iii), out-of-ontology
+  (\textit{STK11}, \textit{KEAP1}, \textit{RBM10}): the vocabulary
+  converts into no gain, for three different reasons that one
+  Inconclusive label conflates---label-space mismatch, modality ceiling
+  and collapse to prior. The cohort size each read would need for
+  confirmation is in \cref{tab:design_power}.}
+  \label{fig:signal_tree}
+\end{figure}
+
+% --- Supplementary Fig. 2: the KRAS morphological proxy (demoted from
+% the main text: the conditional synergy test it illustrates is a null) ---
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\linewidth]{kras_lepidic_solid_proxy}
+  \caption{\textbf{The pattern pair the Choquet head selects for KRAS,
+  and the textbook morphology it stands for.} Left, the three
+  components of a KRAS-driven invasive mucinous adenocarcinoma slide
+  (a tumour-cell layer growing along alveoli, dense sheet-like masses,
+  extracellular mucin). Right, what the $6$-d ANORAK vector retains of
+  it: lepidic and solid light up together, and the mucin has no
+  pattern. The positive interaction
+  $I(\text{lepidic}\!\times\!\text{solid})\!=\!{+}0.032$ the
+  $2$-additive measure learns on \textit{KRAS} is the aggregator paying
+  for that co-occurrence, the histological proxy for invasive mucinous
+  adenocarcinoma, the KRAS-enriched
+  subtype.\cite{rekhtman2013krassolid} The index is a
+  parameter of the fitted measure shared by every slide; whether it buys
+  accuracy where the pair co-activates is the conditional test of
+  \cref{tab:kras_coactivation}, which returns empty at this cohort size.
+  The full Choquet read-out is \cref{fig:choquet_kras}.}
+  \label{fig:kras_lepidic_solid_proxy}
+\end{figure}
+
+% --- Supplementary Fig. 3: the released per-slide tooling ---
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\linewidth,height=0.68\textheight,keepaspectratio]{lchai_ui_six_levels}
+  \caption{\textbf{The released per-slide tooling (\lchai{}~v2
+  interface)}, for KRAS on TCGA-55-7815, a case whose cohort verdict is
+  Inconclusive yet whose slide-level prediction is
+  $P(\mathrm{mut})=0.965$. The top strip carries the population verdict
+  and the slide-level prediction, with the molecular-testing flag raised
+  whenever $\auroc<0.70$. The six read-outs are materialised from a
+  single forward pass: \textbf{L1} ABMIL attention, \textbf{L2} pattern
+  overlay, \textbf{L3} SHAP embedding/pattern split, \textbf{L4}
+  Choquet--Shapley singleton values and pairwise interaction indices,
+  \textbf{L5} channel ablation, and \textbf{L6} the fuzzy-label language
+  output with its knowledge-graph-grounded references. The tooling is
+  released as software and is not evaluated in this study (Methods). All
+  imagery is from the public TCGA-LUAD cohort; the system is a research
+  tool and is not for clinical diagnosis. The cohort \auroc{} printed in
+  the strip ($0.609$) is the earlier single-split estimate served by the
+  deployment at the time of capture (Supplementary Note~2) and differs
+  from the nested cross-validation values of Table~1.}
+  \label{fig:ui_stack}
+\end{figure}
+
+% --- Supplementary Fig. 4: glioma pipeline ---
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{pipeline_glioma_domainB}
+\caption{\textbf{The glioma MRI\,$\rightarrow$\,genotype pipeline as a
+one-to-one transfer of the LUAD architecture.} An unconstrained learned
+encoder $\mathbf{E}$---a 2.5D CNN with \abmil{} over axial MRI slices,
+occupying the position \ctranspath{} with tile-level \abmil{} holds in
+LUAD---and the expert source vocabulary $\mathbf{P}$---the VASARI semantic
+MR features, expert-scored on the TCGA-LGG arm and propagated from the
+annotated seed for the BraTS MGMT arm, occupying the position ANORAK growth
+patterns hold in LUAD---feed
+the same four conditions: B2 encoder only, B3 ontology only, PI concat
+fusion and FC $2$-additive Choquet. Measured outcomes are in
+\cref{tab:crossdomain_merged} (MGMT, full power) and
+\cref{tab:glioma_domainb} (TCGA-LGG pilot).}
+\label{fig:pipeline_glioma}
+\end{figure}
+
+% --- Supplementary Fig. 5: ECG pipeline ---
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{pipeline_ecg_domainC}
+\caption{\textbf{The electrocardiogram\,$\rightarrow$\,physiological-state
+pipeline running the identical four-condition protocol in a different
+modality family.} The encoder $\mathbf{E}$---a 1D convolutional network
+over the raw twelve-lead signal---and the source vocabulary
+$\mathbf{P}$---the $71$ graded SCP-ECG statements---feed B2, B3, PI and FC
+exactly as \ctranspath{} embeddings and ANORAK patterns do in LUAD. Both
+targets are Conclusive and encoder-saturated: the fusion conditions match
+the encoder to within a fold's standard deviation while the statement
+channel alone trails.}
+\label{fig:pipeline_ecg}
+\end{figure}
+
+% --- Supplementary Fig. 6 ---
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{two_channel_architecture}
+\caption{\textbf{The two-channel architecture in full.} Tile embeddings
+from the frozen \ctranspath{} encoder and $6$-d fuzzy pattern
+probabilities from the ANORAK-trained classifier remain disjoint until the
+classifier head, which is what makes the decomposition of
+\cref{eq:pid} well posed as a statement about two sources.}
+\label{fig:two_channels}
+\end{figure}
+
+% --- Supplementary Fig. 7 ---
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{choquet_kras_55_7815}
+\caption{\textbf{Full Choquet read-out for KRAS, rendered on slide
+TCGA-55-7815.} The six singleton values $\phi_k$ and all
+$15$ pairwise interaction indices $I_{jk}$ learned by the $2$-additive
+fuzzy measure, from which the lepidic\,$\times$\,solid interaction of
+$+0.032$ reported in the main text is read. These are parameters of the
+fitted measure and are shared by every slide the model scores; the
+figure is titled by slide because that is the interface the read-out is
+served through, not because the values are estimated per slide. The
+conditional test of whether this interaction buys accuracy where the
+pair co-activates is \cref{tab:kras_coactivation}, and it is
+unresolved.}
+\label{fig:choquet_kras}
+\end{figure}
+
+% --- Supplementary Fig. 8 ---
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{glioma_example}
+\caption{\textbf{A real preoperative multiparametric MRI from a TCGA-LGG
+glioma} (IDH-mutant, 1p/19q-codeleted)---the four co-registered sequences
+(T1, T1-Gd, T2, FLAIR) the encoder $\mathbf{E}$ ingests, at the
+tumour-centroid axial slice with the expert segmentation contour (red).
+Below, the neuroradiologist VASARI scores for the same case, the source
+channel $\mathbf{P}$: the radiological counterpart of the ANORAK growth
+patterns in LUAD.}
+\label{fig:glioma_example}
+\end{figure}
+
+% --- Supplementary Fig. 9 ---
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{ecg_ptbxl_example}
+\caption{\textbf{A real twelve-lead electrocardiogram from PTB-XL}
+(a $37$-year-old woman, sinus rhythm, reported normal), in the standard
+clinical $3\times4$ format with a lead-II rhythm strip
+($25$\,mm/s, $10$\,mm/mV). This is the raw $100$\,Hz signal the encoder
+ingests. Age and sex are recorded for every case but absent from the $71$
+SCP-ECG statements forming the source channel, which is what makes the
+recovery reported in \cref{tab:crossdomain_merged}
+leakage-free.\cite{wagner2020ptbxl}}
+\label{fig:ecg_ptbxl}
+\end{figure}
+
+% --- Supplementary Fig. 10 ---
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{pid_estimator}
+\caption{\textbf{Why the atoms are read as directional signatures rather
+than estimated numerically.} The spread of the per-fold single-channel
+\auroc{}s from which any plug-in atom estimate would be built, against
+the size of the pattern-side effect such an estimate would have to
+resolve.}
+\label{fig:pid_estimator}
+\end{figure}
+
+\FloatBarrier
+% ======================================================================
+\section*{Supplementary Tables}
+% ======================================================================
+
+% --- Supplementary Table 1: levels of analysis ---
+\begin{table}[htbp]
+\centering
+\input{tables/tab_levels_of_analysis}
+\caption{\textbf{The four levels of analysis, the quantities estimated at
+each, and the scope of the claims each supports.} The
+Conclusive/Inconclusive verdict and the three-regime taxonomy are
+population-level objects; the per-slide read-outs (L1--L6, Methods) are
+slide-level and tile-level objects; neither transfers to the other. KRAS is the
+canonical illustration, and in both directions: a confident per-slide
+call does not lift the population verdict, and a population-level
+interaction weight does not descend into per-case evidence
+(\cref{tab:kras_coactivation}). Only the name of the unit and whether it is a bag
+or a single instance change when the framework moves to glioma MRI or to
+the electrocardiogram, which is the precise sense in which the framework,
+and not the model weights, transfers.}
+\label{tab:levels_of_analysis}
+\end{table}
+
+% --- Supplementary Table 2: literature comparison ---
+\begin{table}[htbp]
+\centering
+\input{tables/tab_literature_comparison}
+\caption{\textbf{Per-gene \auroc{} against the published
+mutation-prediction competition on LUAD.} This work reports six driver
+genes simultaneously on the public TCGA-LUAD cohort under a single MIL
+aggregator; prior work typically reports two to three genes on either the
+same public cohort or on proprietary cohorts an order of magnitude larger.
+Within \textbf{This work}, bold marks the better of the two aggregators
+per gene. No value is bolded \emph{across} studies: the protocols are not
+comparable, mixing held-out test sets with cross-validation and public
+with proprietary cohorts, so a column maximum would not identify a better
+method. A per-gene \auroc{} also does not answer the question this paper
+asks---whichever study reports the higher one, the number does not say
+whether the signal lies inside the source ontology or outside it, and
+that is what decides whether the next experiment is a larger cohort, a
+richer vocabulary or a different modality. No study below reports a regime
+or a per-target verdict. The comparison is developed in Supplementary
+Note~2.}
+\label{tab:literature_comparison}
+\end{table}
+
+% --- Supplementary Table 3: CPTAC frozen transfer ---
+\begin{table}[htbp]
+\centering
+\input{tables/tab_cptac_transfer}
+\caption{\textbf{Cohort transfer to CPTAC-LUAD: the frozen TCGA-trained
+pipeline applied off-the-shelf} ($498$ slides, $106$ genotyped patients).
+Read this way the TCGA verdicts do not transfer. What fails, however, is
+the transported decision function and not the tissue, so no assignment is
+licensed as near-intrinsic on this evidence, but neither is the coupling
+itself cohort-local. Per-gene values, the aggregator and
+stain-normalisation controls and the power caveat are set out below the
+table.}
+\label{tab:cptac_transfer}
+\end{table}
+
+% --- Supplementary Table 4: CPTAC refit ---
+\begin{table}[htbp]
+\centering
+\input{tables/tab_cptac_refit}
+\caption{\textbf{Re-fitting the four conditions inside CPTAC-LUAD, with
+only the representation carried over from TCGA.} This is the comparison
+the frozen-pipeline transfer of \cref{tab:cptac_transfer} cannot make, and it
+separates the two readings that transfer alone leaves open. The recovered
+values, the field-of-view control and the regime adjudication under the
+noise-aware rule are set out below the table.}
+\label{tab:cptac_refit}
+\end{table}
+
+% --- Supplementary Table 5 ---
+\begin{table}[htbp]
+\centering
+\input{tables/tab_atom_operationalization}
+\caption{\textbf{How each atom of \cref{eq:pid} is read from the model.}
+Every atom is mapped to the model-side signature that evidences it, the
+directional decision rule on the four training conditions, the
+interpretability level(s) that expose it, and the regime it drives. The
+signatures are read, not numerically estimated; atom names follow the
+Bertschinger convention.\cite{bertschinger2014unique}}
+\label{tab:atom_operationalization}
+\end{table}
+
+% --- Supplementary Table 6 ---
+\begin{table}[htbp]
+\centering
+\input{tables/tab_kras_coactivation}
+\caption{\textbf{The conditional test of regime~(ii-b) on KRAS.} The
+Choquet head is credited with recovering a lepidic$\,\times\,$solid
+synergy, which predicts that its advantage over additive fusion should
+concentrate where the two patterns co-occur. Cutting the cohort by a
+model-independent measure of that co-occurrence does not reproduce the
+prediction: the contrast is flat across strata and the high${-}$low
+difference disagrees in sign between the two protocols. The stratifying variable is
+itself associated with KRAS, so what fails is the aggregator step, not
+the morphological premise.}
+\label{tab:kras_coactivation}
+\end{table}
+
+% --- Supplementary Table 7 ---
+\begin{table}[htbp]
+\centering
+\input{tables/tab_design_power}
+\caption{\textbf{What cohort size a conditional regime claim requires.}
+Prospective design calculation for the contrast of
+\cref{tab:kras_coactivation}: target effects are stipulated a priori and
+the variance is taken from the hierarchical bootstrap at $n\!=\!444$, so
+this is design guidance rather than post-hoc power on the observed null.
+At TCGA-LUAD scale only implausibly large effects are resolvable, which
+is why we report the KRAS conditional result as a bounded null and why
+we recommend that interaction-level claims be pre-registered against a
+size target of this kind.}
+\label{tab:design_power}
+\end{table}
+
+% --- Supplementary Table 8 ---
+\begin{table}[htbp]
+\centering
+\input{tables/tab_literature_power_audit}
+\caption{\textbf{Reported aggregator gains against the resolution of the
+designs that report them.} The power argument of
+\cref{tab:design_power} is not specific to this cohort. Applying the same
+calculation to published mutation-prediction results, using each study's own
+AUROC and class counts, places every audited gain below the minimum effect
+its design could detect, and none of those studies reports an interval or a
+test. Two independent lines from within the field agree: where comparisons
+are formally tested most are not significant, and the same aggregator varies
+more between reimplementations than any claimed improvement.}
+\label{tab:literature_power_audit}
+\end{table}
+
+% --- Supplementary Table 9 ---
+\begin{table}[htbp]
+\centering
+\input{tables/tab_controls}
+\caption{\textbf{Control grid: tumour versus normal, permuted labels,
+patient sex and \textit{TP53}, on three seeds under both protocols.} The
+negative control lands on chance everywhere and the positive control
+clears it on both channels, so the low absolute values of
+\cref{tab:mutation_luad_resultssec} are a property of the cohort and
+encoder rather than of a defect in the pipeline. \textit{TP53}
+reproduces the five-seed main arm to within $0.011$, which we report as
+replication rather than as proof of the pipeline, a burden the
+tumour arm now carries instead. The sex control neither passes nor
+fails: the design cannot resolve the effect it was chosen to detect, so
+it is reported as underpowered---the verdict
+\cref{tab:literature_power_audit} issues on the published literature,
+applied here to ourselves.}
+\label{tab:controls}
+\end{table}
+
+% --- Supplementary Table 10 ---
+\begin{table}[htbp]
+\centering
+\input{tables/tab_mutation_prevalence}
+\caption{Mutation prevalence in the analysable TCGA-LUAD cohort
+($n\!=\!458$ tumour slides from $444$ patients, derived in Methods from
+the $687$-image inventory). The Conclusive-verdict column
+anticipates the cohort-level outcome of the cross-validation
+reported in Results.}
+\label{tab:mutation_prevalence}
+\end{table}
+
+% --- Supplementary Table 11 ---
+\begin{table}[htbp]
+\centering
+\input{tables/tab_viz_folds_methods}
+\caption{Conclusive/Inconclusive verdict bands and their assignment to the
+six target genes under the five-fold patient-stratified cross-validation
+protocol used throughout.}
+\label{tab:viz_folds_methods}
+\end{table}
+
+% --- Supplementary Table 12 ---
+\begin{table}[htbp]
+\centering
+\input{tables/tab_threshold_sensitivity}
+\caption{\textbf{Sensitivity of every categorical claim to the two free
+thresholds.} The Conclusive cut of \cref{eq:conclusive_verdict} and the
+equivalence margin that gates regimes~(i) and~(iii) are the only two
+parameters in the framework that are set rather than estimated. Both are swept
+here. No LUAD target is Conclusive at any cut at or above $0.65$ except
+\textit{TP53} on one protocol, and no regime read changes over
+$\delta\!\in\!\{.01,.02,.03\}$. At this cohort size the binding constraint is
+interval width rather than the margin: the median cell would need
+$\sim\!14{,}000$ patients before equivalence could be certified at $\pm.02$.}
+\label{tab:threshold_sensitivity}
+\end{table}
+
+% --- Supplementary Table 13 ---
+\begin{table}[htbp]
+\centering
+\input{tables/tab_cptac_power}
+\caption{Observed positive-set sizes for the six target genes in the
+CPTAC-LUAD cohort-transfer test, from the non-silent mutation frequencies
+in cBioPortal \texttt{luad\_cptac\_2020} ($n\!=\!110$). These fix, in
+advance of the imaging read-out, which targets the transfer can estimate:
+in the genotyped-with-imaging subset ($n\!=\!106$) \textit{TP53} and
+\textit{EGFR} clear the $n_+\!=\!32$ floor and \textit{KRAS} sits at it.}
+\label{tab:cptac_power}
+\end{table}
+
+% --- Supplementary Table 14 ---
+\begin{table}[htbp]
+\centering
+\input{tables/tab_pid_estimator}
+\caption{\textbf{The plug-in atom estimator the analysis specifies but
+declines to use.} For each term of \cref{eq:pid}, what it captures, how a
+plug-in estimator would compute it, and the role it plays in the regime
+assignment. No numerical atom value is reported anywhere in this work.}
+\label{tab:pid_estimator}
+\end{table}
+
+% --- Supplementary Table 15 ---
+\begin{table}[htbp]
+\centering
+\input{tables/tab_crossdomain_protocol}
+\caption{Cohorts, source ontologies, encoders and pre-registered expected
+regime assignments for the two additional modalities, fixed before the
+read-outs were computed.}
+\label{tab:crossdomain_protocol}
+\end{table}
+
+% --- Supplementary Table 16 ---
+\begin{table}[htbp]
+\centering
+\input{tables/tab_levels_crossdomain}
+\caption{The four levels of analysis instantiated in each of the three
+modalities, showing that only the name of the unit and whether it is a bag
+or a single instance change.}
+\label{tab:levels_crossdomain}
+\end{table}
+
+% --- Supplementary Table 17 ---
+\begin{table}[htbp]
+\centering
+\input{tables/tab_glioma_domainb}
+\caption{\textbf{Glioma MRI, full per-condition read-out.} The
+$n\!\sim\!63$ TCGA-LGG pilot with expert-scored VASARI (IDH, 1p/19q and
+a patient-sex control) together with the full-power MGMT test on
+BraTS~2021 ($n\!=\!577$). Only the MGMT row is a main-text result
+(panel~(a) of \cref{tab:crossdomain_merged}); the pilot rows are
+directional reads at a cohort size that cannot adjudicate a regime
+(Supplementary Note~1), and no regime is asserted from them.}
+\label{tab:glioma_domainb}
+\end{table}
+
+% --- Supplementary Table 19: regimes as PID atoms (demoted from the main
+% text: every LUAD assignment is a pre-registered expectation, unresolved) ---
+\begin{table}[htbp]
+\centering
+\input{tables/tab_pid_regimes_SR}
+\caption{\textbf{The three regimes as atoms of \cref{eq:pid}, with the
+model-side signature that evidences each atom in LUAD.} Every regime in
+the table is the pre-registered expectation against which the
+adjudication of Table~2 was run, not an established assignment: no
+fusion contrast excludes zero and none establishes equivalence at the
+$\pm0.02$ margin, so all six genes remain unresolved. The table is
+retained because the \emph{implied remedy} column is what the
+decomposition adds over a cohort-mean \auroc{}, and because it separates
+the three states one Inconclusive label conflates (empty, unestimable,
+unconverted).}
+\label{tab:pid_regimes}
+\end{table}
+
+% --- Supplementary Table 18 ---
+\begin{table}[htbp]
+\centering
+\input{tables/tab_ecg_domainc}
+\caption{Full per-condition electrocardiogram read-out with the
+directional-criterion discussion, condensed into panel~(b) of
+\cref{tab:crossdomain_merged}.}
+\label{tab:ecg_domainc}
+\end{table}
+
+\FloatBarrier
+% ======================================================================
+\section*{Supplementary Notes}
+% ======================================================================
+
+% ----------------------------------------------------------------------
+\subsection*{Supplementary Note 1: extended protocol for the two
+additional modalities}
+% ----------------------------------------------------------------------
+
+\paragraph{Glioma seed and propagation.}
+The VASARI-feature classifier is trained on the TCIA-annotated
+seed---$178$ LGG and $75$ GBM subjects carry expert scores, of which $63$
+LGG also carry the co-registered preoperative MRI and molecular call the
+protocol needs---and propagated to the ${\sim}1{,}251$ BraTS~2021
+subjects.\cite{baid2021brats} This occupies the position that the ANORAK
+pattern classifier, trained on the Zenodo seed and propagated to
+TCGA-LUAD, occupies in the LUAD two-channel architecture
+(\cref{fig:two_channels}). Because the VASARI channel on BraTS is
+therefore \emph{propagated} rather than expert-scored (held-out feature
+$\auroc\!\lesssim\!0.6$), the MGMT claim in the main text rests on the
+unconstrained encoder remaining at chance, not on the strict empty-atom
+versus data-floor separation that real VASARI licenses for \textit{KEAP1}
+and \textit{RBM10} in LUAD.
+
+\paragraph{Glioma pilot, per condition.}
+On the $63$-subject expert-scored cohort, five-fold patient-disjoint
+(\cref{tab:glioma_domainb}): IDH reaches $\auroc\!=\!0.86$ on the
+encoder alone with the fusion arms adding nothing beyond a fold's
+standard deviation, the radiogenomic expectation for regime~(i). For
+1p/19q neither channel alone is informative ($\mathrm{B2}\!=\!0.60$,
+$\mathrm{B3}\!=\!0.50$) while their concatenation recovers it
+($\mathrm{PI}\!=\!0.74$), the signature of complementary unique atoms
+rather than of a synergistic one, which points towards sub-form~(ii-a).
+At $n\!\sim\!63$ the learned Choquet pair interactions shrink to
+$\lvert I_{jk}\rvert\!\lesssim\!0.005$, so the non-additive read is not
+available, and the fold-to-fold spread (SD up to $0.14$) exceeds every
+contrast the regime rule would read. Both reads are therefore
+directional only; the pilot shows the protocol runs on expert-scored
+VASARI, and nothing more is claimed from it.
+
+\paragraph{MGMT at full power.}
+The MGMT literature is the cleanest existing instance of the reporting
+failure the main text addresses: cross-validated values around $0.81$
+within a development cohort fall to near chance under external
+validation,\cite{kim2022mgmtvalidation} and independent groups converge
+on the conclusion that the target may not be reachable from
+preoperative MRI.\cite{robinet2023mgmt,saeed2023mgmt} A decade of that
+work is readable only as a sequence of null results because the field
+has no reporting convention in which \emph{not reachable from this
+modality} is an outcome rather than a failure, and that is why MGMT is
+run here at full power. What the run licenses is bounded. On BraTS the
+VASARI channel is propagated from an annotated seed rather than scored
+by a radiologist on each case, so the two sources are not independent
+readings of the modality in the way expert VASARI on the glioma seed,
+or the pattern head on LUAD, makes them. The strict two-source atom
+separation therefore does not hold for MGMT, and the negative rests on
+the unconstrained encoder staying at chance across every condition at
+$n\!=\!577$. That is an \emph{encoder-ceiling} test: the target is not
+reachable from this modality by this encoder at this cohort size, which
+is the statement the field has lacked a convention for, and it is a
+full-power null. Full power attaches to the verdict, not to the
+contrasts: with $2{,}000$ hierarchical resamples over five seeds and
+patients of the pooled out-of-fold predictions the best condition
+($\mathrm{FC}$, $0.552$) has an upper bound of $0.59$, far below the
+$0.70$ threshold, while the four contrasts the rule reads have
+half-widths near $0.04$ and none excludes zero or falls inside the
+$\pm0.02$ margin ($\mathrm{PI}-\mathrm{B2}$ $-0.015$,
+$\mathrm{FC}-\mathrm{B2}$ $+0.012$, $\mathrm{FC}-\mathrm{PI}$ $+0.027$,
+$\mathrm{B3}-\mathrm{B2}$ $-0.021$; \cref{tab:crossdomain_contrasts}). The
+regime is therefore read from levels, every condition at chance, and
+not from an equivalence that would need roughly $2{,}500$ cases; the
+point read $\mathrm{FC}>\mathrm{PI}$, positive in all five seeds yet
+with an interval spanning zero, is exactly the kind of difference the
+rule exists to withhold. The level read is not a relaxation of the
+equivalence read but a stronger claim that happens to be available
+here: equivalence says fusion adds nothing to the encoder, whereas a
+ceiling says no condition in the design, the encoder included, reaches
+the threshold---which entails the former and is established by four
+upper bounds rather than by two contrasts. It is stated as a general
+clause of the rule in the Methods and MGMT is the one target in this
+work to which it applies. It is not a falsification of the two-source
+framework, because the propagated channel cannot deliver the separation
+such a falsification would test.
+
+\paragraph{Electrocardiogram, measured and remaining targets.}
+The $71$ SCP-ECG statements are organised into diagnostic, form and
+rhythm categories with a proposed hierarchy,\cite{wagner2020ptbxl} and
+PTB-XL$+$ adds upward propagation through the SNOMED-CT
+tree.\cite{strodthoff2023ptbxlplus} The measured pair reported in the
+main text is sex (pooled $\auroc\!=\!0.89$) and age$\,\geq\!65$ ($0.83$)
+under the best aggregator, against $0.61$ and $0.73$ for the statement
+channel alone, with $\mathrm{FC}-\mathrm{PI}\!=\!-0.003$ and $-0.000$
+respectively (\cref{tab:ecg_domainc}). This is the one arm in which the
+equivalence condition of the noise-aware rule is met: over five seeds
+and $18{,}869$
+patients the fusion-versus-encoder intervals have half-widths near
+$0.008$ and both fall inside $\pm0.02$ on both targets
+(\cref{tab:crossdomain_contrasts}), so regime~(i) is adjudicated rather
+than read from means. The $59$ borderline laboratory
+indicators that Xiao et~al.\cite{xiao2025anyecglab} describe as information that
+``may exist in the signal but is difficult to extract'' are the natural
+next targets. Beyond them, structural heart-disease labels and paired
+ECG, chest-radiograph and laboratory records extend the same protocol to
+a multimodal setting in which the missingness correction of
+Choi et~al.\cite{choi2025icym2i} becomes mandatory rather than optional.
+
+% ----------------------------------------------------------------------
+\subsection*{Supplementary Note 2: position against the published
+mutation-prediction literature}
+% ----------------------------------------------------------------------
+
+\Cref{tab:literature_comparison} places our per-gene values beside the published
+competition on LUAD. Our \textit{TP53} $0.661$ and \textit{EGFR} $0.582$
+sit below the strongest reported values on the same public cohort and
+well below those trained on proprietary cohorts one to two orders of
+magnitude larger. We report this plainly, because the comparison is the
+point rather than an embarrassment to be managed.
+
+Four things make the columns non-comparable, and we therefore bold no
+value across studies. Protocols differ, mixing a single held-out test set
+with $k$-fold cross-validation. Cohorts differ, mixing TCGA-LUAD with
+institutional collections that are not public. And target sets differ:
+this work reports six driver genes simultaneously under one aggregator,
+whereas most prior work reports the two or three genes on which its
+method performs best---a selection step that has no counterpart here and
+that systematically favours the published numbers.
+The fourth is the largest and is ours rather than theirs: our values are
+scored under nested cross-validation, early stopping on an inner split
+and the outer fold scored once, on a cohort cleared of squamous and
+solid-tissue-normal sections. Earlier single-split estimates from the
+same pipeline on the superseded inventory put \textit{TP53} at $0.718$
+and \textit{EGFR} at $0.701$; the gap between those and the values above
+is the price of removing the optimism, not a change of method.
+
+The deeper issue is that the metric does not answer the question. A
+higher per-gene \auroc{} does not say whether the residual signal lies
+inside the source ontology or outside it, and that is precisely what
+decides whether the next experiment should be a larger cohort, a richer
+vocabulary or a different modality altogether. Two of our genes make the
+point: \textit{KEAP1} at $0.488$ and \textit{RBM10} at $0.552$ would be
+ranked in that order on any leaderboard, yet the decomposition shows
+their atom structures are opposite and their remedies are opposite. No
+study in \cref{tab:literature_comparison} reports a regime, an estimation floor or a
+per-target verdict, so none of them can make that distinction, whatever
+their \auroc{}.
+
+% ----------------------------------------------------------------------
+\subsection*{Supplementary Note 3: relation to prior information-decomposition work}
+% ----------------------------------------------------------------------
+
+% Relocated from the Methods of the article (a pointer paragraph remains
+% there) to keep the Methods to the apparatus the Results use.
+
+\Cref{eq:pid} is not new, and it is worth being precise about what is.
+It has been used for a decade in neuroscience, in physiological signal
+analysis and in gene-regulatory inference. It was
+brought to multimodal learning with estimators that scale to
+high-dimensional sources and applied there to computational pathology:
+in TCGA lower-grade glioma every atom was near zero except the one
+unique to genomics, which the authors read as evidence that histology
+was not the modality carrying the answer.\cite{liang2023quantifying}
+
+That is the same shape of conclusion as our regime~(iii), and we take it
+as corroboration rather than as competition, because two things differ.
+The first is the \emph{axis}. Every application above decomposes across
+\emph{different} sources---pathology against genomics, pressure against
+respiration, gene against gene, contrast against contrast---whereas the
+two channels here are two readings of \emph{one} modality, which is what
+allows the question to be whether a clinically legible vocabulary adds
+anything to an opaque encoder. The second is the \emph{purpose}. Those
+studies use the decomposition to choose a fusion architecture; the
+analysis closest to ours uses a related bound to ask whether a translated
+representation adds information to the one it was derived
+from.\cite{saisan2026ceilings} We use it to adjudicate whether the target
+is reachable from the modality at all, under declared statistical power,
+and to attach a distinct remedy to each verdict. Adjudication with an
+explicit estimation floor, an Inconclusive verdict as a first-class
+output, and a full-power null on a target the field has failed to
+predict for a decade are not present in that line of work.
+
+This literature also supplies the strongest reason for the choice not to
+quote numerical atoms. When the four \pid{} statistics were estimated
+directly across seven modality pairs in four cancer cohorts, they agreed
+with downstream model performance in only one, and the authors concluded
+that the estimators are not yet accurate enough to guide a fusion
+decision.\cite{zhang2025evaluatingpid} Reading the atoms as directional
+signatures from trained contrasts is therefore not a concession to
+intractability but the more defensible instrument at these sample sizes.
+The bridge between $I_{jk}$ and the synergistic atom is used in one
+direction only and qualitatively---a supra-additive fuzzy measure on a
+pattern pair is the aggregator's way of paying for joint activation---and
+no claim here rests on the magnitude of either quantity.
+
+% ----------------------------------------------------------------------
+\subsection*{Supplementary Note 4: levels of analysis and the scope of a verdict}
+% ----------------------------------------------------------------------
+
+Every quantity in the article is estimated at one of four levels, and
+the claims each level supports are different
+(\cref{tab:levels_of_analysis}).
+We state the correspondence explicitly because the central verdict of
+the framework is defined at one level and is routinely read as though
+it held at another.
+
+\paragraph{The verdict is a population statement.}
+\Cref{eq:conclusive_verdict} thresholds a mean \auroc{}.
+The \auroc{} is the probability that a randomly drawn positive case
+is ranked above a randomly drawn negative one; it is a property of
+the \emph{joint distribution of case pairs} in the cohort and it
+contains no information about the posterior assigned to any named
+slide.
+Two inferences are therefore invalid, and we avoid both throughout.
+The \emph{upward} fallacy reads a Conclusive verdict as a licence to
+present every per-slide call as confident; the cohort mean is an
+average and says nothing about the tails.
+The \emph{downward} fallacy---the one that matters more here---reads
+an Inconclusive verdict as evidence that the source modality carries
+no information about the target.
+It does not follow, because the cohort mean is taken over a
+population that may be morphologically heterogeneous with respect to
+the target.
+
+\paragraph{An Inconclusive verdict is compatible with four distinct
+states.}
+A gene may fail \cref{eq:conclusive_verdict} because
+\emph{(a)}~the source-side atoms of \cref{eq:pid} are empty at every
+level, which is untranslatability in the strict sense;
+\emph{(b)}~those atoms are non-empty on a subpopulation defined by
+source-domain morphology, so the signal is diluted in a whole-cohort
+average;
+\emph{(c)}~the atoms are non-empty but unestimable at the available
+positive-set size; or
+\emph{(d)}~the gene-level label unions variants with different
+morphological correlates whose signals partly cancel.
+These share one cohort-mean signature and prescribe different
+remedies---a different source modality, a conditional readout, more
+slides of the same kind, a refined label---so the state is reported with
+its model-side evidence rather than the verdict alone. The conditional
+co-activation test of the Results is the readout state~\emph{(b)}
+prescribes, and on KRAS it returns empty
+(\cref{tab:kras_coactivation,tab:design_power}). State \emph{(d)} is not
+separable at the positive-set sizes available here---splitting
+\textit{EGFR} by variant leaves every subset below the estimation
+floor---and is flagged in \cref{tab:levels_of_analysis} as an untested
+confound on regime~(iii).
+
+% ----------------------------------------------------------------------
+\subsection*{Supplementary Note 5: extended limitations}
+% ----------------------------------------------------------------------
+
+\paragraph{Cohort and scale.}
+All primary results are cross-validation on a single
+retrospective cohort. At $458$ slides from $444$ patients TCGA-LUAD is
+one to two orders of
+magnitude smaller than the proprietary cohorts of the foundation-scale
+line, so our absolute values should be read as what is reachable from the
+most-used public cohort under a fully reproducible protocol, not as an
+upper bound on the task. Four of six genes sit at or below
+$n_+\!=\!100$ patients, and \textit{RBM10} at $n_+\!=\!30$ patients
+($32$ slides) is at the estimation floor by our own criterion.
+
+Scale binds harder still on the \emph{conditional} claims, and the KRAS
+analysis makes the bound explicit rather than rhetorical. A regime-(ii-b)
+assignment asks whether an aggregator gain concentrates inside a
+stratum, which spends the cohort twice: once on the stratification and
+once on the contrast. At the variance observed here, $444$ patients
+resolve a stratified FC${-}$PI difference of $0.135$ \auroc{} at $80\%$
+power, and $0.165$ once folds respect tissue-source site. Detecting the
+$0.03$ that the largest aggregator gains in this literature would imply
+requires on the order of $9{,}000$ patients patient-preserved and
+$13{,}400$ site-preserved, with roughly $2{,}500$ KRAS-positive patients
+at the observed $27.9\%$ patient-level prevalence
+(\cref{tab:design_power}). We therefore report the KRAS conditional
+result as a bounded null and recommend that interaction-level claims be
+pre-registered against a size target of this kind, which makes them
+multi-institutional studies by construction.
+
+\paragraph{What the external cohort does and does not establish.}
+The frozen pipeline does not reproduce the TCGA values on CPTAC-LUAD.
+Because re-fitting inside CPTAC recovers \textit{TP53} to $0.698$, the
+failure localises to the transported decision function rather than to the
+encoder or the tissue; but a regime assignment is a population
+expectation over a case mix, so no assignment is established as
+near-intrinsic on this evidence. Concordance across independent cohorts
+is the experiment that would settle it, and a single-cohort study cannot
+supply it. The magnification profiles of the two cohorts differ sharply
+and the field-of-view control does not restore transfer, so the
+mechanism remains open; we name scanner- and site-level batch
+signature\cite{howard2021site} as the leading untested candidate.
+
+\paragraph{The decomposition is a lens, not a measurement.}
+We do not report numerical atoms, for the reasons set out in Methods and
+corroborated by the seven-modality-pair evaluation that found direct
+estimates agreeing with downstream performance in one case of
+seven.\cite{zhang2025evaluatingpid} The consequence is that our regime
+assignments are directional claims and cannot be given confidence
+intervals in the atom units themselves, and that synergy magnitudes are
+not comparable between genes or between modalities. The learned Choquet
+interaction index is a parameter of our aggregator rather than an
+estimator of the synergistic atom, and we use the correspondence
+qualitatively and in one direction only; a quantitative bridge between
+the two would be a separate contribution, which nothing claimed here
+depends on. The KRAS result puts a number on how far apart the two
+objects can sit: the index selects the pathologically expected pair
+while the predictive gain it is supposed to signal does not appear
+where that pair co-activates
+(\cref{tab:kras_coactivation}). Reading $I_{jk}$ as evidence of
+$\Isyn$ without the conditional contrast is therefore not a
+conservative approximation but a distinct claim, and one that failed
+here.
+
+\paragraph{The per-slide tooling is not evaluated.}
+The released per-slide read-outs and the optional narrative layer
+(Methods) are software with architectural constraints on what the
+language agent \emph{can} emit---a fixed five-band fuzzy vocabulary for
+evidence strength and a closed entity/edge set drawn from NCIt and
+MONDO. They are not measurements of what a reader does with them: this
+study reports no reader study, no inter-rater agreement and no measured
+effect on diagnostic decisions, and makes no claim about them.
+
+\paragraph{Label definition.}
+A gene-level binary label unions variants with potentially different
+morphological correlates, whose signals may partly cancel. This is not
+separable at the positive-set sizes available here---splitting
+\textit{EGFR} by variant leaves every subset far below the estimation
+floor---so we flag it as an untested confound on regime~(iii) rather than
+adjudicating it.
+
+\paragraph{Subgroups and fairness.}
+No performance was estimated within sociodemographic subgroups (sex,
+age, ancestry), and no fairness assessment was undertaken; tissue-source
+site enters only as the clustering unit of the site-preserved protocol.
+Two reasons. First, four of six positive sets already sit at or below
+the estimation floor, so any subgroup split would place every stratum
+below it, and a subgroup \auroc{} at that size reports noise rather than
+disparity. Second, the output of this study is a cohort-level
+translatability verdict rather than an individual-level predictor
+proposed for use; a predictor that reached deployment would require the
+subgroup, calibration and fairness audit that TRIPOD+AI asks
+for,\cite{collins2024tripodai} on a cohort sized for it, and nothing
+reported here substitutes for that audit.

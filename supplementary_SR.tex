@@ -1,0 +1,48 @@
+% ======================================================================
+% Scientific Reports — Supplementary Information, compiled as the single
+% separate PDF the journal requires. First page carries the title and
+% author list. Items are numbered S1, S2, ...; the article's labels are
+% read through xr-hyper so that main-text equations, tables and figures
+% can be cited from here. Build with .\build_SR.ps1 (which compiles the
+% article and this file alternately until the cross-references settle).
+% ======================================================================
+\documentclass[12pt,a4paper]{article}
+
+\newif\ifanon
+\anonfalse
+
+\newcommand{\SRexternaldoc}{main_SR}
+\newcommand{\SRpdftitle}{Supplementary Information: A translatability verdict for cross-domain medical prediction that reports what a scarce cohort can adjudicate}
+\newcommand{\SRrunninghead}{Supplementary Information}
+\input{preamble_SR}
+\ifanon\hypersetup{pdfauthor={}}\else
+\hypersetup{pdfauthor={Servio F. Lima Reina, Servio R. Lima Idrobo, Doménica N. López García, Luis Terán}}\fi
+
+\begin{document}
+\thispagestyle{fancy}
+
+\begin{center}
+{\Large\bfseries Supplementary Information}\\[2ex]
+{\large A translatability verdict for cross-domain medical prediction that
+reports what a scarce cohort can adjudicate}\\[2ex]
+\ifanon
+Authors withheld for double-anonymised peer review\\[2ex]
+\else
+Servio F.~Lima Reina\textsuperscript{1,*}, Servio R.~Lima
+Idrobo\textsuperscript{1}, Dom\'enica N.~L\'opez Garc\'ia\textsuperscript{1}
+and Luis Ter\'an\textsuperscript{2}\\[1ex]
+{\small \textsuperscript{1}GPTfy Medical, Guayaquil, Ecuador;
+\textsuperscript{2}Lucerne University of Applied Sciences and Arts (HSLU),
+Lucerne, Switzerland.
+\textsuperscript{*}Correspondence: \href{mailto:slima@gptfy.biz}{slima@gptfy.biz}}\\[2ex]
+\fi
+\end{center}
+
+\input{sections/09_supplementary_SR}
+
+\clearpage
+\renewcommand{\refname}{Supplementary References}
+\bibliographystyle{naturemag}
+\bibliography{shared/references}
+
+\end{document}

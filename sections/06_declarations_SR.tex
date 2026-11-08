@@ -1,0 +1,84 @@
+% ======================================================================
+% Data and code availability — Scientific Reports build. The journal
+% requires the Data Availability Statement at the end of the main text,
+% before the References. Repository and deployment addresses are given in
+% full; under \anontrue (double-anonymised variant) they are withheld and
+% supplied in the cover letter instead.
+% ======================================================================
+
+\section*{Data availability}
+TCGA-LUAD whole-slide images and mutation calls are publicly
+available from the NIH Genomic Data Commons
+(\url{https://portal.gdc.cancer.gov/projects/TCGA-LUAD}); the
+CPTAC-LUAD cohort used for the external cohort-transfer test is
+available from the same portal
+(\url{https://portal.gdc.cancer.gov/projects/CPTAC-3}).
+The Zenodo-ANORAK expert-annotated pattern dataset is published
+under a DOI.\cite{ANORAKZenodo}
+Derived artefacts (per-slide pattern overlays, per-slide attention
+maps, region maps, SHAP decompositions, Choquet--Shapley values)
+are reproducible from the source code below.
+
+All cohorts of the two cross-domain instantiations
+(\cref{tab:crossdomain_protocol}) are public.
+\emph{Domain~B (glioma).}
+VASARI controlled-terminology feature scores and the feature key are
+distributed with the TCGA-GBM and TCGA-LGG collections of The Cancer
+Imaging Archive (\url{https://www.cancerimagingarchive.net});
+the corresponding DICOM series are retrievable programmatically
+through the NCI Imaging Data Commons \texttt{idc-index} client
+(collections \texttt{tcga\_gbm}, \texttt{tcga\_lgg},
+\texttt{upenn\_gbm}); the RSNA-ASNR-MICCAI BraTS 2021 training and
+validation data are at
+\url{https://www.cancerimagingarchive.net/analysis-result/rsna-asnr-miccai-brats-2021/}
+with the sequestered test set on Synapse
+(\texttt{syn25829067}).\cite{baid2021brats}
+The MGMT promoter-methylation labels used for the full-power
+encoder-ceiling test are from the RSNA-MICCAI Brain Tumor Radiogenomic
+Classification challenge
+(\url{https://www.kaggle.com/competitions/rsna-miccai-brain-tumor-radiogenomic-classification}).
+\emph{Domain~C (ECG).}
+PTB-XL v1.0.3 (\url{https://physionet.org/content/ptb-xl/1.0.3/}),
+PTB-XL$+$ v1.0.1
+(\url{https://physionet.org/content/ptb-xl-plus/1.0.1/}) and
+MIMIC-IV-ECG v1.0
+(\url{https://physionet.org/content/mimic-iv-ecg/1.0/}) are
+open-access on PhysioNet; EchoNext
+(\url{https://physionet.org/content/echonext/}) and Symile-MIMIC
+require a signed data use agreement.
+The download and preparation scripts for both domains are released
+with the manuscript source (see Code availability).
+The per-contrast bootstrap output behind \cref{tab:luad_contrasts} and
+the B3$-$B2 rows of \cref{tab:mutation_luad_resultssec}, and the
+seed-and-patient bootstrap output behind panels~(a) and~(b) of
+\cref{tab:crossdomain_merged} and behind \cref{tab:crossdomain_contrasts},
+are released as CSV files with the
+manuscript source.
+
+\section*{Code availability}
+The complete \lchai{} v2 source code (frontend webapp, FastAPI
+microservices, ML pipeline, inference workers, knowledge-graph
+service, LLM explanation agent, Helm charts for Kubernetes deployment)
+\ifanon
+is published in a public GitHub repository under an open-source
+licence, and a live, publicly accessible deployment is maintained.
+The manuscript source (LaTeX), all figures, the figure-generation and
+analysis scripts, and the acquisition and preparation scripts for the
+two cross-domain instantiations are in a second public repository.
+Because the repository and deployment addresses identify the authors,
+they are withheld from this file for double-anonymised peer review:
+they are given in the cover letter, and an anonymised archive of the
+code can be provided to reviewers through the editor on request.
+\else
+is published at \url{https://github.com/slima2/lchai} under an
+open-source licence. A live, publicly accessible deployment is at
+\url{https://lchai.gptfy.biz} (anonymous read-only credentials
+available on request).
+The manuscript source (LaTeX), all figures, the figure-generation and
+analysis scripts, and the acquisition and preparation scripts for the
+two cross-domain instantiations (retrieval of the VASARI feature scores
+and of the TCGA-GBM/TCGA-LGG/UPENN-GBM series through the NCI Imaging
+Data Commons for domain~B; construction of the graded $71$-d SCP-ECG
+source-vocabulary channel from PTB-XL and PTB-XL$+$ for domain~C) are
+at \url{https://github.com/slima2/paper1-medical}.
+\fi

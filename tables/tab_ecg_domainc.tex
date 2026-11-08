@@ -12,15 +12,21 @@
  & {\scriptsize encoder} & {\scriptsize SCP} & {\scriptsize concat} &
    {\scriptsize Choquet} & & \\
 \midrule
-Sex           & $0.898{\pm}0.009$ & $0.616{\pm}0.041$ & $0.899{\pm}0.008$ &
-  $\mathbf{0.901}{\pm}0.010$ & Conclusive & (i) saturation \\
-Age $\geq 65$ & $0.836{\pm}0.008$ & $0.732{\pm}0.017$ &
-  $\mathbf{0.841}{\pm}0.006$ & $0.839{\pm}0.006$ & Conclusive & (i) saturation \\
+Sex           & $0.887{\pm}0.005$ & $0.613{\pm}0.003$ & $\mathbf{0.890}{\pm}0.004$ &
+  $0.889{\pm}0.004$ & Conclusive & (i) saturation \\
+Age $\geq 65$ & $0.828{\pm}0.007$ & $0.732{\pm}0.001$ &
+  $\mathbf{0.829}{\pm}0.001$ & $\mathbf{0.829}{\pm}0.006$ & Conclusive & (i) saturation \\
 \bottomrule
 \end{tabular}
 \begin{flushleft}\footnotesize
-Mean test $\auroc\pm$SD over five patient-disjoint PTB-XL folds
-($21{,}799$ records, $18{,}869$ patients). Source channel $\mathbf{P}$:
+Pooled out-of-fold $\auroc$ per seed over five patient-disjoint PTB-XL
+folds ($21{,}799$ records, $18{,}869$ patients), mean$\,\pm\,$SD across
+the five seeds ($42$--$46$) whose predictions feed the hierarchical
+seed-and-patient bootstrap of \cref{tab:crossdomain_merged} (the
+seed-$42$ fold means were $0.896$, $0.616$, $0.901$, $0.900$ for sex and
+$0.838$, $0.732$, $0.843$, $0.839$ for age; pooled values sit
+${\approx}0.01$ below fold means because the folds are calibrated
+separately). Source channel $\mathbf{P}$:
 the $71$ graded SCP-ECG statements; encoder channel $\mathbf{E}$: a
 1D convolutional network over the raw $12$-lead signal ($100$\,Hz).
 Conditions match the LUAD protocol: $\mathrm{B2}$ encoder only,
@@ -33,21 +39,27 @@ regime is set by the \emph{direction} of the decomposition
 (\cref{eq:pid}), not by which cell is numerically largest or by the size
 of any margin, and regime~(ii) is excluded here in \emph{both} of its
 sub-forms (\cref{tab:atom_operationalization}). The additive sub-form
-(ii-a) would require concat fusion to exceed the better single channel,
-but $\mathrm{PI}$ improves on $\mathrm{B2}$ by only $+0.001$ on Sex and
-$+0.005$ on Age; the non-additive sub-form (ii-b) would require
-$\mathrm{FC}$ to improve on $\mathrm{PI}$, evidencing an exploited
-pattern interaction (a non-zero Choquet index $I_{jk}$), but
-$\mathrm{FC}$ exceeds $\mathrm{PI}$ by only $+0.002$ on Sex and loses to
-it on Age. Both pattern-side atoms are therefore empty, and at
+(ii-a) would require concat fusion to exceed the better single channel
+by more than the $\pm0.02$ margin, but the pooled
+$\mathrm{PI}-\mathrm{B2}$ is $+0.003$ on both Sex and Age, inside it
+with upper bounds of $+0.011$ (\cref{tab:crossdomain_contrasts}); the
+non-additive sub-form
+(ii-b) would require $\mathrm{FC}$ to improve on $\mathrm{PI}$ \emph{where
+a statement pair co-activates}, evidencing an exploited interaction (a
+non-zero Choquet index $I_{jk}$), but $\mathrm{FC}-\mathrm{PI}$ is
+$-0.003$ on Sex and $-0.000$ on Age, and no pair across all
+$\binom{71}{2}$ moves it further. Both
+pattern-side atoms are therefore empty, and at
 $n\!=\!21{,}799$ that is a measured negative rather than a deferral:
 unlike the $n\!\sim\!63$ glioma cohort, a near-zero interaction here sits
 well clear of the estimation floor. The criterion remains directional,
-not magnitude-based: KRAS in LUAD is
-regime~(ii-b) because $\mathrm{FC}$ recovers what additive $\mathrm{PI}$
-loses ($\mathrm{FC}\!-\!\mathrm{PI}\!=\!+0.019$) with an explicit
-interaction $I(\text{lepidic}\!\times\!\text{solid})\!=\!+0.032$, even
-though that cohort-level gain is itself within a fold's SD---which is
-precisely why KRAS is Inconclusive on the cohort mean yet argumentative
-per slide.
+not magnitude-based, but it is not unconditional either, and LUAD is
+where that distinction was forced: on KRAS both
+$\mathrm{FC}\!>\!\mathrm{PI}$ ($+0.019$) and
+$I(\text{lepidic}\!\times\!\text{solid})\!=\!+0.032$ hold, yet the gain
+does not concentrate where the pair co-activates, so the sub-form is not
+declared (\cref{tab:kras_coactivation}). An unconditional
+$\mathrm{FC}\!>\!\mathrm{PI}$ with a positive index is therefore
+necessary but not sufficient. Here the question does not arise, because
+neither condition is met on either target.
 \end{flushleft}

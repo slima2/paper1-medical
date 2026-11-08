@@ -1,0 +1,5 @@
+target,contrast,point,ci_lo,ci_hi,excludes_zero,equivalent,margin,n_seeds,seeds_positive,role
+mgmt,PI-B2,-0.014511050122778979,-0.05654424207549869,0.02800566920633017,False,False,0.02,5,2,(ii-a) decider; equivalence gate
+mgmt,FC-B2,0.012425971399682378,-0.02075653751731775,0.0478411483661253,False,False,0.02,5,4,equivalence gate
+mgmt,FC-PI,0.026937021522461357,-0.012819399340886611,0.0658076152619322,False,False,0.02,5,5,(ii-b) decider
+mgmt,B3-B2,-0.0206158216572776,-0.07228441849584377,0.032147696517188504,False,False,0.02,5,0,what the vocabulary omits

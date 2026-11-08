@@ -1,0 +1,99 @@
+% ======================================================================
+% Scientific Reports — Article. Build this file.
+% main_CM.tex (Communications Medicine) and main.tex (npj Digital
+% Medicine) remain buildable and unchanged.
+%
+% Journal format (https://www.nature.com/srep/author-instructions/
+% submission-guidelines):
+%   title            <= 20 words, one scientifically accurate sentence
+%   abstract         <= 200 words, unstructured, unreferenced
+%   keywords         <= 6
+%   section order    Introduction, Results (subheadings), Discussion
+%                    (no subheadings), Methods
+%   main text        <= 4,500 words (abstract, Methods, references and
+%                    legends not counted)
+%   display items    <= 8 figures and tables, each table <= one page
+%   references       ~60, numeric, square brackets, Nature style
+%   Data availability statement before the References
+%   Supplementary Information as a single separate PDF whose first page
+%   carries the title and author list; items numbered S1, S2, ...
+% Verify with: python wordcount_sr.py
+%
+% Peer review: Scientific Reports is single-anonymised by default. Set
+% \anontrue below to produce the double-anonymised variant (no authors,
+% affiliations, acknowledgements, contributions, funding or identifying
+% URLs) if that option is selected in the submission system.
+%
+% Build (article + supplement, cross-referenced):  .\build_SR.ps1
+% ======================================================================
+\documentclass[12pt,a4paper]{article}
+
+\newif\ifanon
+\anonfalse
+
+\newcommand{\SRexternaldoc}{supplementary_SR}
+\newcommand{\SRpdftitle}{A translatability verdict for cross-domain medical prediction that reports what a scarce cohort can adjudicate}
+\newcommand{\SRrunninghead}{A translatability verdict for cross-domain medical prediction}
+\input{preamble_SR}
+\ifanon\hypersetup{pdfauthor={}}\else
+\hypersetup{pdfauthor={Servio F. Lima Reina, Servio R. Lima Idrobo, Doménica N. López García, Luis Terán}}\fi
+
+\begin{document}
+\thispagestyle{fancy}
+
+% ----------------------------------------------------------------------
+% Title page: title, authors, affiliations, corresponding author (*).
+% ----------------------------------------------------------------------
+\begin{center}
+{\LARGE\bfseries A translatability verdict for cross-domain medical
+prediction that reports what a scarce cohort can adjudicate\par}
+\vspace{2ex}
+\ifanon
+{\large Authors and affiliations withheld for double-anonymised peer
+review\par}
+\else
+{\large Servio F.~Lima Reina\textsuperscript{1,*},
+Servio R.~Lima Idrobo\textsuperscript{1},
+Dom\'enica N.~L\'opez Garc\'ia\textsuperscript{1} and
+Luis Ter\'an\textsuperscript{2}\par}
+\vspace{1.5ex}
+{\small
+\textsuperscript{1}GPTfy Medical, Guayaquil, Ecuador\\
+\textsuperscript{2}Lucerne University of Applied Sciences and Arts (HSLU),
+Lucerne, Switzerland\\[1ex]
+\textsuperscript{*}Corresponding author: Servio F.~Lima Reina,
+\href{mailto:slima@gptfy.biz}{slima@gptfy.biz}\par}
+\fi
+\end{center}
+\vspace{2ex}
+
+% ----------------------------------------------------------------------
+% Abstract (<= 200 words) and keywords (<= 6)
+% ----------------------------------------------------------------------
+\input{sections/01_abstract_SR}
+
+% ----------------------------------------------------------------------
+% Body in the order Scientific Reports suggests.
+% ----------------------------------------------------------------------
+\input{sections/02_introduction_SR}
+\FloatBarrier
+\input{sections/03_results_SR}
+\FloatBarrier
+\input{sections/04_discussion_SR}
+\FloatBarrier
+\input{sections/05_methods_SR}
+\FloatBarrier
+\input{sections/06_declarations_SR}
+\FloatBarrier
+
+% ----------------------------------------------------------------------
+% References (Nature style, numeric, square brackets). The journal's
+% system cannot take a .bib file: main_SR.bbl is supplied with the
+% source and is what the submitted .tex is compiled against.
+% ----------------------------------------------------------------------
+\bibliographystyle{naturemag}
+\bibliography{shared/references}
+
+\input{sections/07_backmatter_SR}
+
+\end{document}

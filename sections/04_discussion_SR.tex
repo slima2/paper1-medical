@@ -1,0 +1,162 @@
+% Scientific Reports Article Discussion: continuous prose without
+% subheadings, no display items; the final paragraph states what is
+% established, what is a design argument and what is open. Derived from
+% 04_discussion_CM.tex. Relocated rather than deleted:
+%   - PID literature positioning and the differentiation from Liang et al.
+%     -> Methods, "Relation to prior information-decomposition work"
+%   - the noise-aware estimation argument -> Methods (already present)
+%   - the fidelity spectrum of cross-domain tasks -> Supplementary Fig.
+%     fig:fidelity_spectrum legend and Supplementary Note 3
+%   - glioma/ECG instantiation detail and the CPTAC controls -> Methods and
+%     Supplementary Note 1
+%   - the extended limitations block -> Supplementary Note 4
+
+\section*{Discussion}
+
+Computational pathology has converged on a single output for mutation
+prediction, a probability per gene, and on two assumptions: that it is
+comparable across genes, and that improvement on the
+cohort mean is the figure of merit. Our results challenge both. One
+cohort, encoder and backbone yield qualitatively different gene-level
+behaviour: an encoder-ceiling null, a label-space mismatch and an
+estimation floor are three failures a leaderboard reports as one
+mediocre number, calling for three different remedies. The
+Conclusive/Inconclusive flag is therefore not cosmetic: the cohort
+metric does not translate uniformly into per-slide actionability, so
+downstream clinical use must be gene-conditional.
+
+Reading the results this way also changes what counts as the
+contribution. The pattern-informed channel does not win the cohort-mean
+benchmark, and with the fusion signs disagreeing across seeds neither
+magnitude nor direction can be defended (\cref{tab:luad_contrasts}). The
+one contrast that survives says what the vocabulary omits, not what
+fusion adds. An instrument that reports this, rather than the largest
+cell of the table, is the result; the alternative reading, in which
+the $0.03$ gain of \fcmil{} over \piabmil{} on \textit{STK11} is a
+finding, is exactly the kind of claim the audited literature makes at
+the same effect size and that the bootstrap here shows to be
+unsupported.
+
+What pattern-informed aggregation wins is not accuracy but the argument
+with the pathologist. A model that names a positive
+lepidic\,$\times$\,solid interaction invites a textbook reply about the
+invasive-mucinous proxy, and the conditional test then settles whether
+the reply holds (\cref{tab:kras_coactivation}). A model that returns
+KEAP1 at chance on both channels is transparent about what the slide
+cannot answer, and points the next investigation toward NRF2
+immunostaining, not another loss function.\cite{rudin2019stop}
+
+What lifts this from an empirical grouping to a portable claim is where
+the categories come from: a taxonomy that sorts genes by \auroc{}
+describes one cohort and travels no further. These categories are
+instead the four ways two sources can distribute information about a
+target---an exhaustive partition, not an observed one---and so
+the taxonomy makes checkable commitments: the
+non-additive aggregator must win on exactly the genes with a recoverable
+synergistic atom, lose elsewhere, and---binding
+hardest---win \emph{where the named pattern pair co-activates}, not
+on average. That last commitment is the one the cohort could test, and
+on KRAS it returned empty; a taxonomy whose predictions cannot fail
+would not be worth porting. The objection this must answer is that the regimes restate
+what is already known: that KEAP1 acts through a biochemical axis, that
+STK11 acts through the immune microenvironment. Recovering those is
+\emph{calibration}, and an instrument earns trust
+by returning the known answer where the answer is known. The predictive
+content lies where prior knowledge does not reach: the additive sub-form
+(ii-a) is an empty cell of \cref{eq:pid} in LUAD, nameable because the
+lattice enumerates it and not because a case was observed; its
+completeness rests on the algebra, not on any cohort. What the framework
+predicts is not the mutation but which remedy will move it.
+
+That changes how the field decides what to build next. Under a cohort
+mean, ``what should we add?'' has one answer for every gene, usually
+more parameters or more slides. Under \cref{eq:pid} it is
+atom-conditional: a redundant atom binds on the encoder, a synergistic
+one on the aggregator's hypothesis space, an empty vocabulary-side atom
+on the \emph{source vocabulary}, and a non-empty but unestimable one on
+the \emph{cohort}.
+
+The sharper consequence is that untranslatability becomes a
+first-class, actionable result---provided it is asserted at the level
+where it was established, the qualification the framework most
+tempts one to skip. The
+verdict thresholds a mean \auroc{}, a property of the cohort and of no
+slide, so reading a low mean as ``this mutation cannot be seen in this
+tissue'' is a level error, and a consequential one, because it discards
+exactly the cases where the morphology does speak.
+Untranslatability proper is the narrower claim
+that the source-side atoms are empty at the level being discussed. When a
+gene meets it, the principled output is not a low probability presented
+as a confident call, but the statement that the mutation cannot be said
+in morphological words, and---from the single-channel conditions---why.
+The operational rule
+is restrictive: an Inconclusive gene licenses no
+diagnostic use, not a hedged call and not a ranked shortlist, until the
+deficit the decomposition names is repaired.
+
+Two facts about the evidence are structural rather than incidental, and
+we state them as such. The first is that regime~(ii) is occupied by no
+target in any cohort here. The taxonomy is a partition of
+\cref{eq:pid}, so the cell exists whether or not a cohort has filled
+it, and the rule states what would: \piabmil{}$-$B2 excluding zero with
+\fcmil{}$\approx$\piabmil{} for the additive sub-form, or an
+\fcmil{}$-$\piabmil{} contrast concentrating in the co-activation
+stratum for the non-additive one. Until a cohort supplies that
+observation, (ii) is the instrument's one untested prediction, and the
+accurate description of the taxonomy is two regimes observed and one
+specified. A $63$-subject glioma pilot with expert-scored VASARI points
+towards (ii-a) for 1p/19q---concat fusion $+0.14$ over the encoder
+(\cref{tab:glioma_domainb})---but its fold spread ($\pm0.21$) and a sex
+control returning a fusion gain of comparable size make it an
+illustration of where the cell would be filled, not an observation that
+fills it. The second is scarcity, and it is the condition the
+instrument is built for rather than a limitation it suffers. All
+primary numbers are cross-validation on a single retrospective cohort
+that the one external cohort we score does not reproduce off-the-shelf;
+at $458$ slides from $444$ patients TCGA-LUAD is one to two orders of
+magnitude smaller than the proprietary cohorts of the foundation-scale
+line, and every public histology-to-genotype cohort is of that order.
+At that size the design resolves $0.04$--$0.11$ \auroc{} per target, and
+detecting a $0.03$ aggregator gain, mid-range for this literature,
+would need roughly $9{,}000$ patients patient-preserved and $13{,}400$
+site-preserved (\cref{tab:design_power}). No single institution holds
+that, which makes interaction-level mechanistic claims
+multi-institutional by construction; what a single-institution cohort
+can honestly report is the number itself, and that is what the
+instrument returns where a cohort mean would return a false assignment.
+The encoder bounds the numbers too, and we measured that rather than
+assuming it: a permutation null returns chance and tumour-versus-normal
+$0.98$ while \textit{TP53} stops at $0.67$, so the pipeline is
+calibrated but its ceiling is low, and a stronger encoder could move
+genes between regimes. Structural portability and the stability of a
+given gene's assignment are therefore different claims: because the
+atoms and the verdict are population expectations, an assignment is a
+property of the triple (vocabulary, encoder, cohort) rather than of the
+gene, and calling one near-intrinsic would need cross-cohort concordance
+a single-cohort study cannot supply.
+
+Three things are established here, one is a design argument, and two
+are open. Established: that the four-condition protocol with its
+noise-aware rule returns a reading on every target it is given, across
+three vocabularies and three encoders with nothing in common---certifying
+equivalence where a cohort is large enough (the electrocardiogram) and,
+under the scarcity of every public cohort, returning a warranted
+null with the sample size that would resolve it, in place of an
+assignment; that the synergy signature is falsifiable and survived its
+one available test by returning empty; and that a predictor's collapse
+under cohort transfer can be localised to the transported decision
+function rather than to the tissue. The design argument is that the
+vocabulary the verdict is stated in is what would let a pathologist
+contest it; the per-slide tooling released with the code (Methods) is
+not evaluated here and no claim about reader behaviour is made. Open
+are whether any per-target regime assignment reproduces across cohorts,
+which no single-cohort study can settle, and whether any target occupies
+regime~(ii), which no cohort here does. The actionable conclusion is therefore not that this
+predictor outperforms the published competition---it does not, and is
+not expected to at this cohort size---but that cross-domain medical
+prediction should be reported with per-target Conclusive/Inconclusive
+flags, and that a taxonomy grounded in a partial information
+decomposition is a more rigorous scaffold for cross-paper comparison
+than the cohort average now in use. Being a decomposition rather than a
+naming convention, it applies unchanged to any task pairing an expert
+ontology with a learned encoder.

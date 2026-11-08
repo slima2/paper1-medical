@@ -2,7 +2,7 @@
 % Only the representation is frozen (CTransPath embeddings + ANORAK pattern
 % probabilities recomputed on CPTAC tiles); the four aggregation conditions are
 % re-fitted with 5-fold patient-disjoint CV inside CPTAC. TP53 only: it is the
-% one gene clearing the n_+=37 estimation floor in this subset (n_+=55).
+% one gene clearing the n_+=32 estimation floor in this subset (n_+=55).
 % "Native" tiles CPTAC at level 0 exactly as the TCGA pipeline does. "FOV-matched"
 % centre-crops and rescales every tile so its physical field of view matches a
 % 40x TCGA tile (target 0.25 micron/pixel), testing the scanner-magnification
@@ -24,7 +24,7 @@ Regime, point estimate               & (ii-a) & (ii-a) \\
 Regime, adjudicated                  & unresolved & unresolved \\
 $P(\text{regime reproduces TCGA})$   & $0.214$ & $0.129$ \\
 \midrule
-\multicolumn{3}{l}{\emph{Reference:} TCGA-LUAD $0.717$; frozen transfer $0.53$
+\multicolumn{3}{l}{\emph{Reference:} TCGA-LUAD $0.661$; frozen transfer $0.53$
 ($0.42$--$0.64$), \cref{tab:cptac_transfer}} \\
 \bottomrule
 \end{tabular}
@@ -33,10 +33,13 @@ Pooled out-of-fold AUROC over $5$ patient-disjoint folds on the $106$
 genotyped CPTAC patients ($498$ slides). Only the \emph{representation} is
 carried over from TCGA; the aggregation conditions are re-fitted inside CPTAC,
 which is the comparison the frozen-pipeline test of \cref{tab:cptac_transfer}
-cannot make. The native arm recovers $0.698$ against the TCGA value of $0.717$,
-so the morphology-to-genotype coupling for \textit{TP53} is present in CPTAC at
-comparable strength and the off-the-shelf collapse to $0.53$ is a property of
-the transported decision function, not of the encoder or of the tissue.
+cannot make. The native arm reaches $0.698$ against the TCGA value of $0.661$,
+and its encoder-only baseline ($0.665$) lands within $0.004$ of the TCGA
+encoder-only baseline ($0.661$). The morphology-to-genotype coupling for
+\textit{TP53} is therefore present in CPTAC at fully comparable strength---if
+anything marginally stronger---and the off-the-shelf collapse to $0.53$ is a
+property of the transported decision function, not of the encoder or of the
+tissue.
 The \textbf{FOV-matched} arm is a negative control for the
 scanner-magnification account (TCGA-LUAD is $76.4\%$ $40\times$, CPTAC-LUAD
 $98.6\%$ $20\times$): matching the physical field of view lowers every

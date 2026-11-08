@@ -1,0 +1,79 @@
+% Table tab:crossdomain_contrasts — main Table 4 (Scientific Reports build).
+% The four between-condition contrasts the noise-aware rule reads, for the
+% three full-power cross-domain targets of Table 3, from
+% data/glioma_mgmt_bootstrap_contrasts.csv and data/ecg_bootstrap_contrasts.csv
+% (hierarchical bootstrap, five seeds x patients, 2,000 draws).
+\footnotesize
+\setlength{\tabcolsep}{6pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{l l r l c c c}
+\toprule
+\textbf{Contrast} & \textbf{What it decides} & \textbf{Estimate} &
+  \textbf{95\% CI} & \textbf{Excludes 0} & \textbf{Within $\pm0.02$} &
+  \textbf{Seeds $>0$} \\
+\midrule
+\multicolumn{7}{l}{\emph{(a) MGMT, BraTS~2021, $n\!=\!577$}} \\
+\addlinespace[2pt]
+$\mathrm{PI}-\mathrm{B2}$ & (ii-a) additive gain; equivalence gate &
+  $-0.015$ & $[-0.057,\ +0.028]$ & no & no & 2/5 \\
+$\mathrm{FC}-\mathrm{B2}$ & equivalence gate &
+  $+0.012$ & $[-0.021,\ +0.048]$ & no & no & 4/5 \\
+$\mathrm{FC}-\mathrm{PI}$ & (ii-b) non-additive gain &
+  $+0.027$ & $[-0.013,\ +0.066]$ & no & no & 5/5 \\
+$\mathrm{B3}-\mathrm{B2}$ & what the vocabulary omits &
+  $-0.021$ & $[-0.072,\ +0.032]$ & no & no & 0/5 \\
+\addlinespace[2pt]
+\midrule
+\multicolumn{7}{l}{\emph{(b) Sex, PTB-XL, $18{,}869$ patients}} \\
+\addlinespace[2pt]
+$\mathrm{PI}-\mathrm{B2}$ & (ii-a) additive gain; equivalence gate &
+  $+0.003$ & $[-0.003,\ +0.011]$ & no & \textbf{yes} & 4/5 \\
+$\mathrm{FC}-\mathrm{B2}$ & equivalence gate &
+  $+0.000$ & $[-0.006,\ +0.007]$ & no & \textbf{yes} & 3/5 \\
+$\mathrm{FC}-\mathrm{PI}$ & (ii-b) non-additive gain &
+  $-0.003$ & $[-0.007,\ +0.002]$ & no & \textbf{yes} & 1/5 \\
+$\mathrm{B3}-\mathrm{B2}$ & what the vocabulary omits &
+  $\mathbf{-0.272}$ & $[-0.283,\ -0.262]$ & \textbf{yes} & no & 0/5 \\
+\addlinespace[2pt]
+\midrule
+\multicolumn{7}{l}{\emph{(c) Age $\geq 65$, PTB-XL, $18{,}869$ patients}} \\
+\addlinespace[2pt]
+$\mathrm{PI}-\mathrm{B2}$ & (ii-a) additive gain; equivalence gate &
+  $+0.003$ & $[-0.006,\ +0.011]$ & no & \textbf{yes} & 3/5 \\
+$\mathrm{FC}-\mathrm{B2}$ & equivalence gate &
+  $+0.003$ & $[-0.006,\ +0.011]$ & no & \textbf{yes} & 2/5 \\
+$\mathrm{FC}-\mathrm{PI}$ & (ii-b) non-additive gain &
+  $-0.000$ & $[-0.005,\ +0.005]$ & no & \textbf{yes} & 2/5 \\
+$\mathrm{B3}-\mathrm{B2}$ & what the vocabulary omits &
+  $\mathbf{-0.093}$ & $[-0.104,\ -0.084]$ & \textbf{yes} & no & 0/5 \\
+\bottomrule
+\end{tabular}
+\begin{flushleft}\footnotesize
+Each contrast is the difference of pooled out-of-fold $\auroc$ between two
+conditions of \cref{tab:crossdomain_merged}, with a $95\%$ interval from
+$2{,}000$ hierarchical draws (seeds with replacement, then patients within
+each drawn seed). \emph{Excludes 0}: the interval does not contain zero.
+\emph{Within $\pm0.02$}: the whole interval lies inside the equivalence
+margin, the condition under which the rule declares a difference absent.
+\emph{Seeds $>0$}: seeds, of five, in which the point estimate is
+positive. Rows are in the order the rule reads them (Methods).
+\textbf{(a)}~MGMT resolves nothing by contrast: half-widths near $0.04$
+exceed the margin, so equivalence is not certified and
+$\mathrm{FC}-\mathrm{PI}=+0.027$, positive in all five seeds yet spanning
+zero, is not promoted; certifying equivalence would need roughly
+$2{,}500$ cases. The regime in \cref{tab:crossdomain_merged} is therefore
+read from levels (all four upper bounds below $0.70$), the one target in
+this work to which that clause applies.
+\textbf{(b, c)}~Both ECG targets meet the equivalence condition,
+$\mathrm{PI}-\mathrm{B2}$ and $\mathrm{FC}-\mathrm{B2}$ inside $\pm0.02$,
+so regime~(i) is adjudicated here rather than read from means: the only
+cohort in this work large enough to do so. Once seed variance enters the
+interval no fusion contrast excludes zero on either target (upper bounds
+$+0.011$), so the margin is not even approached: equivalence, not
+complementarity. The $2$-additive Choquet head emits an interaction index
+over all $\binom{71}{2}$ statement pairs and none lets $\mathrm{FC}$
+improve on $\mathrm{PI}$, so the synergy channel is empty, a measured
+negative at this sample size rather than a deferral. The large negative
+$\mathrm{B3}-\mathrm{B2}$ on both targets is what separates (i) from
+(iii): the vocabulary omits most of what the encoder reads.
+\end{flushleft}

@@ -1,0 +1,50 @@
+% ======================================================================
+% Back matter after the References — Scientific Reports build:
+% Acknowledgements, Author contributions, Additional information
+% (Competing interests, Correspondence). Under \anontrue everything that
+% identifies the authors is withheld and supplied in the cover letter.
+% ======================================================================
+
+\ifanon
+\section*{Acknowledgements, author contributions and competing interests}
+Withheld from the manuscript for double-anonymised peer review and
+supplied in the cover letter. The authors declare the existence of a
+financial/non-financial competing interest; the complete declaration is
+provided to the editor and will be published with the article.
+\else
+\section*{Acknowledgements}
+We thank the patients whose data are made available in the TCGA-LUAD
+release, the ANORAK consortium for the expert pattern annotations,
+and SOLCA-Guayaquil (Ecuador) and CISOL for institutional support.
+This research was supported by the Lucerne University of Applied
+Sciences and Arts (HSLU) and GPTfy Medical (Guayaquil, Ecuador); no
+grant number applies.
+
+\section*{Author contributions}
+S.F.L.R.\ designed the system, implemented the ML pipeline
+and \lchai{} software, performed all experiments, analysed the
+results and wrote the manuscript.
+L.T.\ supervised the doctoral research and co-designed the
+fuzzy aggregation and the released per-slide tooling.
+S.R.L.I.\ and D.N.L.G.\ provided LUAD
+clinical-oncology expertise, validated the per-gene biological
+interpretation, specified the pathologist-facing requirements of the
+per-slide tooling and reviewed the Conclusive/Inconclusive verdict
+design from a clinical-deployment standpoint.
+All authors reviewed and approved the final manuscript.
+
+\section*{Additional information}
+\paragraph{Competing interests.}
+S.F.L.R., S.R.L.I.\ and D.N.L.G.\ are affiliated with GPTfy Medical
+(Guayaquil, Ecuador), the entity that developed the \lchai{} system
+described in this manuscript and that operates its public deployment;
+the source code is published openly and access to the deployment is
+provided at no cost. No patents, patent applications, licensing
+agreements, equity holdings or consultancies relate to the methods
+reported. L.T.\ declares no competing financial or non-financial
+interests.
+
+\paragraph{Correspondence.}
+Correspondence and requests for materials should be addressed to
+S.F.L.R.\ (\href{mailto:slima@gptfy.biz}{slima@gptfy.biz}).
+\fi

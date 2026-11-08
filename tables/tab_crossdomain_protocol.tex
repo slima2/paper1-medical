@@ -39,9 +39,9 @@ Vocabulary renderer
     and molecular call the protocol needs)
   & Direct: statements are supplied per record \\
 Propagated to
-  & 687 TCGA-LUAD slides
+  & 458 TCGA-LUAD slides (444 patients)
   & $\sim$1{,}251 BraTS 2021 subjects\cite{baid2021brats}
-  & 21{,}799 PTB-XL records; MIMIC-IV-ECG\cite{gow2023mimicivecg} \\
+  & 21{,}799 PTB-XL records \\
 Target lexicon (KG)
   & NCIt $+$ MONDO
   & NCIt $+$ MONDO $+$ RadLex
@@ -55,8 +55,11 @@ Regime (i) saturation
     measured (\cref{tab:ecg_domainc}); NT-proBNP
     ($\auroc\!\approx\!0.78$) as reported by\cite{xiao2025anyecglab},
     not run here \\
-Regime (ii) co-occurrence
-  & KRAS (lepidic$\times$solid; non-additive ii-b)
+Regime (ii) complementarity
+  & Not populated: the (ii-b) read on KRAS
+    (lepidic$\times$solid) is not supported once the FC${-}$PI
+    contrast is conditioned on co-activation
+    (\cref{tab:kras_coactivation})
   & 1p/19q (additive ii-a, $0.74$ by concat fusion; non-additive deferred)
   & Not populated by the two measured targets; candidate pairs for the
     predicted ones, e.g.\ LVH$\times$strain \\
@@ -70,7 +73,9 @@ Regime (iii) out-of-ontology
     by\cite{xiao2025anyecglab}, not run here \\
 \midrule
 Falsification test
-  & Non-additive aggregator wins on regime-(ii-b) targets only
+  & Non-additive aggregator gain must concentrate where the named
+    pattern pair co-activates; on KRAS it does not
+    (\cref{tab:kras_coactivation})
   & Additive fusion recovers 1p/19q but not IDH or MGMT (MGMT at chance
     in all conditions); the non-additive ii-b read on 1p/19q awaits a
     larger cohort
