@@ -34,14 +34,15 @@
 
 \vspace{1.1em}
 
-\begin{tabular}{l c c c c c c c}
-\multicolumn{8}{l}{\textbf{b}, Equivalence gate against the margin $\delta$,
-  and \textbf{c}, the cohort that would certify it}\\
+\begin{tabular}{l c c c c c c @{\hspace{16pt}} c}
+\multicolumn{7}{l}{\textbf{b}, Equivalence gate against the margin $\delta$}
+  & \textbf{c}, Cohort to certify \\
 \toprule
 \textbf{Gene} & \textbf{Prot.} & \textbf{binding} &
-  $\boldsymbol{.01}$ & $\boldsymbol{.02}$ & $\boldsymbol{.03}$ &
-  $\boldsymbol{.05}$ & \textbf{c}, $\boldsymbol{n}$ \\
- & & {\scriptsize $\max|\mathrm{CI}|$} & & {\scriptsize (def.)} & & & \\
+  $\boldsymbol{\delta=.01}$ & $\boldsymbol{.02}$ & $\boldsymbol{.03}$ &
+  $\boldsymbol{.05}$ & \textbf{patients, $\boldsymbol{n}$} \\
+ & & {\scriptsize $\max|\mathrm{CI}|$} & & {\scriptsize (default)} & & &
+  {\scriptsize for $\delta=.02$} \\
 \midrule
 \textit{TP53}  & pat.\ & $.042$ & . & . & . & \textbf{EQ} & $12{,}553$ \\
                & site  & $.051$ & . & . & . & .           & $6{,}190$ \\
@@ -57,7 +58,7 @@
                & site  & $.127$ & . & . & . & .           & $156{,}760$ \\
 \midrule
 \multicolumn{3}{l}{\emph{equivalences established}}
-  & $0$ & $\mathbf{0}$ & $0$ & $2$ & median $13{,}950$ \\
+  & $0$ & $\mathbf{0}$ & $0$ & $2$ & {\emph{median}} $13{,}950$ \\
 \bottomrule
 \end{tabular}
 
@@ -88,9 +89,14 @@ literature ($.046$, \cref{tab:literature_power_audit}), so it would certify as
 equivalent a difference larger than any this field has claimed. Within the
 range the literature makes defensible, the regime reads do not move.
 \par\medskip
-\textbf{c}, the cohort at which the default margin becomes certifiable, from
+\textbf{c}, the number of patients at which the default margin would become
+certifiable for that gene and protocol, with the present point estimates
+held fixed and the interval shrinking as $\sqrt{444/n}$:
 $|\text{point}| + \text{half-width}\sqrt{444/n} \leq .02$ on the binding
-contrast. \emph{never} marks the two cells whose point estimate already lies
+contrast. It is the cohort needed to \emph{decide} whether fusion adds
+anything to the encoder, not a cohort at which the \auroc{} would rise;
+the size at which a conditional (ii-b) gain of a stipulated magnitude would
+be detectable is \cref{tab:design_power}. \emph{never} marks the two cells whose point estimate already lies
 outside $\pm.02$ (\textit{KEAP1} patient-preserved, $\mathrm{PI}-\mathrm{B2}
 =-.042$; \textit{EGFR} site-preserved, $\mathrm{FC}-\mathrm{B2}=-.027$), where
 fusion is not a no-op but a measurable loss, so no cohort size certifies
