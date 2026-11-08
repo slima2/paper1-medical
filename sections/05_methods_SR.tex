@@ -461,6 +461,65 @@ of the fitted measure rather than differences between \auroc{}s, so their
 sign is read directly, against a floor set by the smallest $|I_{jk}|$
 the $L_1$ prior leaves non-zero.
 
+\emph{Sample-size calculation.} Every cohort size quoted in this paper
+comes from one of two closed forms, both anchored on the hierarchical
+bootstrap at $n_0\!=\!444$ patients and both rescaling its standard error
+as $n^{-1/2}$, which is the one assumption they make. The first is the
+prospective design calculation of \cref{tab:design_power}: the number of
+patients at which a stipulated difference $\delta$ in a contrast would be
+detected at two-sided $\alpha\!=\!0.05$ with power $1-\beta\!=\!0.80$,
+\begin{equation}
+n(\delta) \;=\; n_0\left(\frac{(z_{1-\alpha/2}+z_{1-\beta})\,
+  \mathrm{SE}_{n_0}}{\delta}\right)^{2}
+\;=\; 444\left(\frac{2.80\,\mathrm{SE}_{444}}{\delta}\right)^{2},
+\label{eq:design_n}
+\end{equation}
+with $\mathrm{SE}_{n_0}$ recovered from the bootstrap percentile interval
+as $(\mathrm{ci}_{\mathrm{hi}}-\mathrm{ci}_{\mathrm{lo}})/(2\times1.96)$.
+For the conditional contrast of \cref{tab:kras_coactivation}
+($\mathrm{FC}-\mathrm{PI}$, high minus low co-activation tercile) the
+intervals are $[-0.117,+0.072]$ patient-preserved and $[-0.090,+0.141]$
+site-preserved, so $\mathrm{SE}_{444}\!=\!0.048$ and $0.059$. At
+$\delta\!=\!0.03$, the mid-range of the aggregator gains this literature
+reports, \cref{eq:design_n} gives $444\,(2.80\times0.048/0.03)^2 \approx
+9{,}000$ patients patient-preserved and $444\,(2.80\times0.059/0.03)^2
+\approx 13{,}400$ site-preserved; at $\delta\!=\!0.05$, $3{,}200$ and
+$4{,}800$. The KRAS-positive column multiplies by the $27.9\%$
+patient-level prevalence. Inverting \cref{eq:design_n} gives the smallest
+effect the present cohort resolves, $2.80\times\mathrm{SE}_{444}
+\!=\!0.135$ and $0.165$. The second form is the equivalence version
+reported per gene in \cref{tab:threshold_sensitivity}c: a contrast with
+point estimate $\hat d$ and bootstrap half-width $h_{n_0}$ is certified
+inside $\pm\delta$ once $|\hat d| + h_{n_0}\sqrt{n_0/n} \le \delta$, so
+\begin{equation}
+n_{\mathrm{eq}} \;=\; n_0\left(\frac{h_{n_0}}{\delta-|\hat d|}\right)^{2},
+\qquad |\hat d|<\delta ,
+\label{eq:equivalence_n}
+\end{equation}
+evaluated on the binding of the two gating contrasts. For \textit{TP53}
+patient-preserved the binding contrast is $\mathrm{FC}-\mathrm{B2}$,
+$-0.015$ $[-0.042,+0.010]$, so $h_{444}\!=\!0.026$ and
+$n_{\mathrm{eq}}\!=\!444\,(0.026/0.005)^2\approx12{,}600$; where
+$|\hat d|\ge\delta$ no cohort certifies equivalence and the cell is marked
+\emph{never}.
+
+What these numbers are for needs stating, because it is the point of
+reading regimes rather than scores. Neither equation says anything about
+the level of a target: a larger cohort does not raise the \auroc{} of
+\textit{STK11} or \textit{KEAP1}, since the level is a property of what
+the modality carries about the target, not of how precisely it is
+measured. What grows with $n$ is the resolution of the \emph{contrast}
+between conditions, that is, the ability to say whether fusion adds to
+the encoder, adds nothing, or costs. The regime reads exist to separate
+the targets whose problem is data from those whose problem is not:
+regime~(iii) in its modality-ceiling form is adjudicated from levels and
+is already decided at $n\!=\!444$ (glioma MGMT), and no cohort size
+changes it; the LUAD regime reads are undecided because their deciding
+contrasts are wider than the margin, and \cref{eq:design_n,eq:equivalence_n}
+say exactly how much data would decide them. A cohort-size
+recommendation is therefore attached to a contrast, never to a target's
+\auroc{}.
+
 \emph{The assignment.} The additive sub-form (ii-a) is declared when
 $\mathrm{PI}\!>\!\max(\mathrm{B2},\mathrm{B3})$ while $\mathrm{FC}$ does
 not exceed $\mathrm{PI}$ and no pair interaction clears the floor.
