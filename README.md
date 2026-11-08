@@ -72,5 +72,6 @@ for the checks.
 
 ## Licence
 
-Manuscript text and figures (c) the authors; all rights reserved until
-publication. A licence for the scripts will be added at acceptance.
+Scripts and build tooling are released under the MIT licence (see `LICENSE`).
+Manuscript text, tables, figures and bibliography are (c) the authors, all
+rights reserved pending publication.
