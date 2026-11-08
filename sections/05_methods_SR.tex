@@ -464,7 +464,10 @@ the $L_1$ prior leaves non-zero.
 \emph{Sample-size calculation.} Every cohort size quoted in this paper
 comes from one of two closed forms, both anchored on the hierarchical
 bootstrap at $n_0\!=\!444$ patients and both rescaling its standard error
-as $n^{-1/2}$, which is the one assumption they make. The first is the
+as $n^{-1/2}$, which is the one assumption they make, and an optimistic
+one: the between-seed component of the hierarchical variance does not
+shrink with patient count, so every cohort size below is a lower bound
+on what would actually be required. The first is the
 prospective design calculation of \cref{tab:design_power}: the number of
 patients at which a stipulated difference $\delta$ in a contrast would be
 detected at two-sided $\alpha\!=\!0.05$ with power $1-\beta\!=\!0.80$,
